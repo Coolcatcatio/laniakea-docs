@@ -312,13 +312,13 @@ Prime's own junior risk capital; foundation of risk capacity.
 | Position | First-loss for Prime's exposures |
 | Purpose | "Skin in the game" for Prime |
 
-**Tip JRC (First Loss Capital):**
+**First Loss Capital (FLC):**
 
 | Property | Value |
 |----------|-------|
-| Size | Always 10% of IJRC |
+| Size | 10% of total JRC, sourced from Prime's own treasury (IJRC) |
 | Position | Absolute first-loss — absorbs before any other capital |
-| Purpose | Ensures Prime bears initial losses before external capital is touched |
+| Purpose | Ensures Prime has direct skin in the game before external capital is touched |
 
 ---
 
@@ -340,7 +340,7 @@ External parties provide JRC via smart contract.
 1. External party deposits capital to TEJRC queue
 2. Capital converts at settlement based on available capacity
 3. TEJRC tokens represent junior risk capital position
-4. Earns yield; absorbs losses after Tip JRC is depleted
+4. Earns yield; absorbs losses after First Loss Capital is depleted
 
 ---
 
@@ -366,7 +366,7 @@ When a Prime experiences losses, capital is consumed in strict order:
 
 | Order | Capital Layer | Mechanism |
 |-------|---------------|-----------|
-| **1** | Tip JRC (10% of IJRC) | First loss — absorbed entirely before moving to next layer |
+| **1** | First Loss Capital (10% from IJRC) | First loss — absorbed entirely before moving to next layer |
 | **2** | Remaining IJRC + EJRC | Split proportionally between Internal and External JRC |
 | **3** | Agent Token | Inflated (potentially to infinity) to cover remaining losses |
 | **4** | TISRC | Isolated senior risk capital for this Prime |
@@ -376,7 +376,7 @@ When a Prime experiences losses, capital is consumed in strict order:
 Loss Event
     ↓
 ┌─────────────────────────────────────┐
-│  1. Tip JRC (10% of IJRC)           │  ← Absolute first loss
+│  1. First Loss Capital (10%)        │  ← Absolute first loss
 ├─────────────────────────────────────┤
 │  2. IJRC + EJRC (pro-rata)          │  ← Remaining junior capital
 ├─────────────────────────────────────┤
@@ -622,7 +622,7 @@ When de-designated, the 3-year clock pauses. A future Pioneer Star continues fro
 
 ## Halo Agents
 
-Halo Agents are lighter investment products created by Primes. They wrap specific strategies and use LCTS for capacity-constrained operations.
+Halo Agents are investment products created by Primes. They wrap specific strategies and deploy capital into real-world assets, custodians, and regulated endpoints.
 
 ### Halo Types
 
@@ -644,19 +644,24 @@ Halo Agents are lighter investment products created by Primes. They wrap specifi
 |----------|-------|
 | Creator | Parent Prime only |
 | Method | Factory deployment from templates |
-| Result | Halo with Unit Structure, Artifact, LCTS integration |
+| Result | Halo with Unit Structure, Artifact, token standard integration |
 
 ---
 
 ### Halo Unit Structure
 
-Individual investment product within a Standard Halo.
+A **Halo Unit** is a governance-level construct — not a smart contract — representing a bankruptcy-remote capital deployment within a Halo. Similar to a serialized LLC, each Halo Unit is legally and operationally isolated from other units within the same Halo. If one unit suffers losses, other units are protected.
 
-| Property | Value |
-|----------|-------|
-| Components | LCTS Vault + PAU Infrastructure + Unit Sentinel |
-| Deployment | Factory-deployed from templates |
-| Sentinel | stl-unit operates per-Unit LCTS |
+A single Halo can contain multiple Halo Units, each independently managed and isolated.
+
+**Token Standards:** The choice of token standard determines how claims on a Halo Unit are represented — analogous to choosing between bonds, ETFs, or stocks to represent value:
+
+| Standard | Model | Use Case |
+|----------|-------|----------|
+| **LCTS** | Pooled, fungible shares | Many users, same terms, shared capacity (ETF-like) |
+| **NFATS** | Individual, non-fungible tokens | Bespoke deals, named counterparties (bond-like) |
+
+The underlying smart contract infrastructure (PAU + Sentinel) remains consistent; the token standard determines the user-facing mechanics for subscribing, redeeming, and transferring positions.
 
 ---
 

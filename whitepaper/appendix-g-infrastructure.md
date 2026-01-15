@@ -1,4 +1,4 @@
-# Appendix E: Deployed Infrastructure
+# Appendix G: Infrastructure
 
 Overview of currently deployed contracts, bridges, and legacy systems.
 

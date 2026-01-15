@@ -1,4 +1,4 @@
-# Appendix D: Glossary
+# Appendix F: Glossary
 
 Term definitions for the Sky Protocol.
 
@@ -99,7 +99,7 @@ Term definitions for the Sky Protocol.
 | **TISRC** | Tokenized Isolated SRC (per-Prime) |
 | **srUSDS** | Senior Risk USDS — global senior risk capital |
 | **Encumbrance Ratio** | Required Risk Capital / Total Risk Capital |
-| **Tip JRC** | Rule that makes an initial portion of junior losses fall on a Prime’s internal JRC before external JRC shares losses |
+| **First Loss Capital (FLC)** | The first 10% of JRC losses, absorbed solely by Prime's own capital (IJRC) before external JRC shares losses |
 
 ---
 

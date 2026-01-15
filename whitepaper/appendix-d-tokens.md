@@ -1,4 +1,4 @@
-# Appendix C: Token Reference
+# Appendix D: Tokens
 
 Complete reference of all tokens in the Sky ecosystem.
 

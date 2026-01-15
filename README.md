@@ -31,10 +31,12 @@ The public-facing narrative wrapper around the Laniakea system.
 |----------|-------------|
 | sky-whitepaper.md | Main 8-part document covering business model, history, tokens, agents, risk, and governance |
 | appendix-a-protocol-features.md | Exhaustive list of Sky Core mechanisms |
-| appendix-b-agent-primitives.md | Agent Framework capabilities (Primes, Halos, Executors) |
-| appendix-c-tokens.md | Complete token reference (USDS, sUSDS, SKY, stUSDS, and agent tokens) |
-| appendix-d-glossary.md | Term definitions |
-| appendix-e-infrastructure.md | Deployed contracts, bridges, and legacy systems |
+| appendix-b-sky-agent-framework-primitives.md | Sky Agent Framework capabilities (Primes, Halos, Executors) |
+| appendix-c-treasury-management-function.md | Complete TMF waterfall specification |
+| appendix-d-tokens.md | Complete token reference (USDS, sUSDS, SKY, stUSDS, and agent tokens) |
+| appendix-e-design-rationale.md | Q&A explaining critical design decisions |
+| appendix-f-glossary.md | Term definitions |
+| appendix-g-infrastructure.md | Deployed contracts, bridges, and legacy systems |
 
 ### risk-framework/
 Basel III-inspired capital requirements framework. Core principle: **Capital Requirement = Drawdown Magnitude × Forced Realization Probability**

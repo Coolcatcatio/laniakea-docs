@@ -175,6 +175,16 @@ This means:
         (Morpho, Aave, Curve - legacy DeFi approved by Sky Core)
 ```
 
+**Note: Risk Capital Tokens**
+
+The diagram above shows the capital deployment flow. Parallel to this, risk capital tokens (srUSDS, TEJRC, TISRC) provide the risk capital that backs deployments:
+
+- **srUSDS** (Senior Risk Capital) — held by end users, issued by Generators via LCTS
+- **TEJRC** (Tokenized External Junior Risk Capital) — held by end users, issued by Primes via LCTS
+- **TISRC** (Tokenized Isolated Senior Risk Capital) — held by end users, issued by Primes via LCTS
+
+Primes *ingress* (recognize) this external risk capital as part of their capital base. Risk capital holders don't participate in the deployment flow — they provide the buffer that absorbs losses. See `risk-framework/risk-capital-ingression.md` for details.
+
 ---
 
 ## Laniakea Factory
@@ -214,5 +224,4 @@ The governance layer defines what Sentinels can do; Sentinels execute within tho
 1. **Rate limits are the universal control mechanism** — every capital flow is rate-limited
 2. **Governance layer sits above deployed contracts** — no redeployment of audited ALM Controller infrastructure
 3. **Same contracts, different configuration** — layers differ only in approved targets and rate limit values
-4. **Unlimited rate limits are immutable once set** — withdrawals should always be possible
-5. **Instant decrease, constrained increase** — emergency response is never blocked by cooldowns
+4. **Instant decrease, constrained increase** — losses are reflected immediately via exchange rate haircuts; gains accrue gradually over time

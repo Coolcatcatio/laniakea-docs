@@ -19,11 +19,20 @@ The system consists of two independent queue contracts—SubscribeQueue and Rede
 
 LCTS solves the problem: **how do you fairly distribute limited conversion capacity among many users?**
 
-### Two Use Cases
+### Use Cases by Agent Type
 
-1. **External Risk Capital (mandatory)** — srUSDS, TEJRC, TISRC tokens MUST use LCTS. No alternative exists. These tokens represent risk capital that absorbs losses in exchange for yield.
+LCTS is a general-purpose token standard used across multiple layers of the Sky Agent framework:
 
-2. **Halo Units (default)** — Expected to use LCTS because Halos face capacity constraints on both subscribe (strategy limits) and redeem (liquidity). Alternatives exist (stablecoin-style vaults) but LCTS is the natural fit.
+| Agent | Token | Description |
+|-------|-------|-------------|
+| **Generator** | srUSDS | External pooled Senior Risk Capital — global risk absorption for the generated asset |
+| **Prime** | TEJRC | Tokenized External Junior Risk Capital — external parties providing junior risk capital to a Prime |
+| **Prime** | TISRC | Tokenized Isolated Senior Risk Capital — senior risk capital scoped to a specific Prime |
+| **Halo** | Halo Unit shares | Claims on Halo Units — the default token standard for capacity-constrained investment products |
+
+**Risk capital tokens (srUSDS, TEJRC, TISRC)** MUST use LCTS. No alternative exists. These tokens represent risk capital that absorbs losses in exchange for yield.
+
+**Halo Units** use LCTS as the default token standard. It's the natural fit when Halos face capacity constraints on both subscribe (strategy limits) and redeem (liquidity). Alternatives exist for Halos: NFATS for bespoke deals, stablecoin-style vaults for instant liquidity.
 
 ### The Core Problem
 

@@ -306,7 +306,7 @@ Defined sequence for absorbing losses.
 Loss Event
     ↓
 ┌─────────────────────────────┐
-│    Tip JRC (10% of JRC)     │  ← Prime's IJRC absorbs first
+│  First Loss Capital (10%)   │  ← Prime's IJRC absorbs first
 ├─────────────────────────────┤
 │   Remaining JRC (pro-rata)  │  ← IJRC + EJRC share proportionally
 ├─────────────────────────────┤
@@ -318,10 +318,10 @@ Loss Event
 └─────────────────────────────┘
 ```
 
-**Tip JRC Mechanism:**
-- First 10% of Total JRC absorbed solely by Prime's IJRC
-- Ensures Prime has skin-in-the-game for initial losses
-- Post-Tip losses allocated pro-rata across remaining JRC
+**First Loss Capital (FLC):**
+- First 10% of Total JRC absorbed solely by Prime's own capital (IJRC)
+- Ensures Prime has direct skin in the game for initial losses
+- Losses beyond FLC allocated pro-rata across remaining JRC (internal + external)
 
 ---
 

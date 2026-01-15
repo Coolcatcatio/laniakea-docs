@@ -22,6 +22,8 @@ As of December 2025 (approximate snapshot; subject to change):
 
 Sky Ecosystem's USDS supply grew significantly in 2025 (often cited at ~86%), outpacing overall stablecoin market growth in the same period (often cited at ~50%). This growth occurred while Sky Ecosystem remained among the highest-earning protocols in decentralized finance.
 
+The broader opportunity: over $300 billion in stablecoins currently sit idle without earning yield — capital that naturally seeks returns.
+
 ### How Sky Ecosystem Generates Revenue
 
 Sky Ecosystem generates revenue through the spread between what it earns on deployed capital (the "base rate") and what it pays to sUSDS holders (the "savings rate"). The difference constitutes net protocol revenue.
@@ -53,7 +55,7 @@ USDS is a decentralized yield-generating stablecoin focused on capital formation
 
 ## Part 2: History and Track Record
 
-Sky Ecosystem evolved from MakerDAO, which launched in 2017 and created DAI — the first decentralized stablecoin to achieve significant scale. Over eight years, the protocol has demonstrated continuous operation through multiple market cycles, including the 2018 bear market, the March 2020 crash, and the 2022 crypto winter.
+Sky Ecosystem evolved from MakerDAO, which launched in 2017 and created DAI — the first decentralized stablecoin to achieve significant scale. Over eight years, the protocol has demonstrated continuous operation through multiple market cycles, including the 2018 bear market, the March 2020 crash (ETH dropped over 50% in 24 hours), and the 2022 crypto winter.
 
 ### Key Milestones
 
@@ -111,7 +113,7 @@ The system is designed so that staked SKY provides three core functions:
 
 **1. Governance Participation**
 
-The ability to contribute to decentralized governance of all protocol parameters, risk controls, capital allocation, and the multi-billion-dollar treasury. SKY holders vote on executive proposals that modify protocol parameters, modify the risk frameworks, and change Alignment Conservers, who help facilitate alignment between Sky Ecosystem stakeholders and its governance process.
+The ability to contribute to decentralized governance of all protocol parameters, risk controls, capital allocation, and the multi-billion-dollar treasury. SKY holders vote on executive proposals that modify protocol parameters, modify the risk frameworks, and change Alignment Conservers — trusted entities that facilitate and protect the governance process, ensuring decisions serve the long-term health of the ecosystem.
 
 **2. Programmatic Profit Allocation**
 
@@ -194,7 +196,7 @@ USDS maintains its dollar peg through multiple layers:
 
 Today, LitePSM (Lite Peg Stability Module) provides a simple onchain conversion backstop that enables arbitrage to keep USDS tightly anchored.
 
-Over time, Sky’s Asset Liability Management framework shifts more of peg liquidity into the Prime layer through requirements like Actively Stabilizing Collateral (ASC) and the Demand Absorption Buffer (DAB). This turns peg defense into a system-wide obligation that can be dynamically managed (including renting obligations between Primes) rather than relying primarily on a single legacy module.
+Over time, Sky's Asset Liability Management framework shifts more of peg liquidity into the Prime layer through requirements like Actively Stabilizing Collateral (ASC) and the Demand Absorption Buffer (DAB). This approach is more efficient than a centralized module: Primes can hold yield-generating assets that convert to liquidity when needed, earning returns in normal times while still providing peg support. It also places liquidity where users actually are — including on L2s and other chains — and can earn spreads on conversions rather than leaving capital idle. This turns peg defense into a system-wide obligation that can be dynamically managed rather than relying primarily on a single legacy module.
 
 ---
 
@@ -213,6 +215,8 @@ Sky Protocol → Sky Agents (Primes) → Investment Products (Halos) → End Ass
 **Primes** are the primary capital deployers — governance-approved operators that receive capital from Sky Protocol and deploy it into various strategies. Each Prime operates with its own treasury, governance token, and specialized focus.
 
 **Halos** are investment product wrappers created by Primes. Each Halo wraps a specific strategy or asset class, providing standardized interfaces for capital deployment and risk management.
+
+This structure separates risk-taking from monetary policy: Sky Core sets parameters and constraints, while Primes compete to deploy capital efficiently within those bounds. Primes bear the business risk — providing their own capital as first-loss protection on the assets they deploy — freeing core governance from day-to-day investment decisions.
 
 ### Current Sky Agents
 
@@ -244,7 +248,7 @@ For the complete list of Agent Framework primitives and technical specifications
 
 ## Part 6: Risk Management
 
-Sky Ecosystem employs risk management methods adapted from traditional finance, using frameworks informed by banking regulation while designed for decentralized operation.
+Sky Ecosystem employs risk management methods adapted from traditional finance, using frameworks informed by banking regulation while designed for decentralized operation. The core principle: capital requirements reflect the maximum loss that could actually be forced to realize, not mark-to-market volatility. By measuring liability duration (how long USDS holders tend to stay), Sky can effectively and securely hold longer-duration assets while maintaining appropriate buffers.
 
 ### Two-Tier Capital Structure
 
@@ -257,19 +261,21 @@ Risk capital in Sky Ecosystem is organized into two tiers with distinct risk/rew
 
 Junior Risk Capital providers take first-loss position in exchange for higher returns. Senior Risk Capital providers are protected by the JRC buffer and accept lower returns for reduced risk.
 
+This structure operates at the Prime level: each Prime provides its own Junior Risk Capital from its treasury, taking first-loss position on the assets it deploys. Primes can also raise additional JRC from external parties and originate Senior Risk Capital from a global pool. This makes Primes directly accountable for their investment decisions — they lose their own capital first if things go wrong.
+
 ### Loss Absorption Waterfall
 
 If losses occur, they are absorbed in a defined sequence:
 
 ```
-1. Tip JRC (10% of JRC as first buffer)
-2. Remaining JRC (Junior Risk Capital)
+1. First Loss Capital (10% of JRC from Prime's own treasury)
+2. Remaining JRC (Junior Risk Capital, including external)
 3. SRC (Senior Risk Capital)
 4. Genesis Capital (protocol reserves)
 5. Peg adjustment (final backstop)
 ```
 
-This waterfall structure provides clear loss allocation and protects senior capital providers. Historically, realized losses have been contained within junior layers.
+The First Loss Capital requirement ensures Primes have direct skin in the game — they absorb the initial 10% of any losses from their own capital before external junior capital shares in subsequent losses. This waterfall structure provides clear loss allocation and protects senior capital providers.
 
 ### Encumbrance Monitoring
 
@@ -283,9 +289,11 @@ The target encumbrance ratio is ≤90%, providing a 10% buffer above minimum req
 
 ### Duration Matching
 
-Sky Agents can deploy capital into longer-duration assets with variable rates, enabling higher yields when liability duration permits. The risk framework matches asset characteristics to liability profiles, allowing efficient capital deployment without requiring traditional banks' liquidity buffers.
+Sky tracks USDS lot ages to estimate how long holders will actually stay, using a Lindy-based model: the longer someone has held, the longer they're likely to continue holding. This liability duration data determines capacity in duration buckets, measured by Stressed Pull-to-Par (SPTP) — the time until an asset converges to its fundamental value under stress conditions.
 
-This approach allows Sky Ecosystem to hold assets like CLO tranches or private credit that would require excessive capital under mark-to-market frameworks, provided liability duration supports the investment horizon.
+The risk framework matches asset characteristics to liability profiles: assets with longer time-to-liquidity require backing from longer-duration liabilities. When an asset's duration matches available liability capacity, it only needs capital for fundamental risk (credit default, smart contract failure). Unmatched assets must hold additional capital covering potential mark-to-market losses from credit spread widening — temporary price drops that recover as spreads normalize.
+
+Laniakea extends this framework with explicit rate hedging requirements: since duration matching protects against mean-reverting credit spread movements but not permanent interest rate shifts, all fixed-rate exposure must be hedged or carry additional capital.
 
 ### Independent Assessment
 
@@ -307,7 +315,7 @@ Laniakea introduces a weekly settlement cycle replacing the current monthly cade
 | Processing | Tuesday noon → Wednesday noon | Calculations, verification |
 | Settlement | Wednesday noon | All changes take effect |
 
-Weekly settlement enables faster capital reallocation, more responsive risk management, and tighter feedback loops between Agent performance and capital allocation.
+Weekly settlement enables faster capital reallocation, more responsive risk management, and tighter feedback loops between Agent performance and capital allocation. Each cycle includes sealed-bid auctions where Primes compete for senior risk capital capacity and duration-matching reservations.
 
 ### Automated Operations
 
@@ -404,10 +412,12 @@ Emergency powers are constrained by governance-set parameters and subject to pos
 ## Appendices
 
 - [Appendix A: Protocol Features](appendix-a-protocol-features.md) — Exhaustive list of Sky Protocol mechanisms
-- [Appendix B: Agent Framework Primitives](appendix-b-agent-primitives.md) — Complete Agent Framework capabilities
-- [Appendix C: Token Reference](appendix-c-tokens.md) — All tokens in Sky Ecosystem
-- [Appendix D: Glossary](appendix-d-glossary.md) — Term definitions
-- [Appendix E: Deployed Infrastructure](appendix-e-infrastructure.md) — Contract addresses
+- [Appendix B: Sky Agent Framework Primitives](appendix-b-sky-agent-framework-primitives.md) — Complete Agent Framework capabilities
+- [Appendix C: Treasury Management Function](appendix-c-treasury-management-function.md) — Complete TMF waterfall specification
+- [Appendix D: Tokens](appendix-d-tokens.md) — All tokens in Sky Ecosystem
+- [Appendix E: Design Rationale](appendix-e-design-rationale.md) — Q&A explaining critical design decisions
+- [Appendix F: Glossary](appendix-f-glossary.md) — Term definitions
+- [Appendix G: Infrastructure](appendix-g-infrastructure.md) — Deployed contracts, bridges, and legacy systems
 
 ---
 

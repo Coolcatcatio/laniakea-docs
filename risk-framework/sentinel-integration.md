@@ -19,7 +19,7 @@ The General Risk Framework provides the calculations that Sentinel performs:
 | **CRR** | Capital Ratio Requirement per position | Risk weight (if matched) or FRTB drawdown (if unmatched) |
 | **TRRC** | Total Required Risk Capital | Sum of CRR × position size across portfolio |
 | **TRC** | Total Risk Capital actually held | Actual safety capital |
-| **Encumbrance Ratio** | TRC / TRRC | Health score — must stay above 1.0 |
+| **Encumbrance Ratio** | TRRC / TRC | Capital utilization — target ≤90% |
 
 ---
 

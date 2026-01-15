@@ -110,7 +110,7 @@ Penalty Schedule (High Severity):
 
 Risk Capital Ratios:
   EPI (External Per Internal) = 1.00
-  Tip JRC = 10% of Total JRC (Prime's IJRC only)
+  First Loss Capital = 10% of Total JRC (Prime's IJRC only)
   ESRC Earnings Fee = 5%
 ```
 → All move to Synome as Config/Algorithm nodes.
