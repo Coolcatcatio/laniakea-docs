@@ -80,7 +80,7 @@ Subject to additional governance constraints:
 
 Governance should set:
 - Scenario set `S` and budgets `B(s)`
-- Cap update cadence (weekly at settlement vs monthly)
+- Cap update cadence (daily at settlement vs monthly)
 - Smoothing / rate limits on cap changes (e.g., ±X% per update)
 - Emergency freeze: ability to halt cap updates while keeping enforcement active
 
@@ -140,9 +140,9 @@ T = max(asset_SPTP, 3 months)
 
 Intuition: longer-duration assets take longer to normalize; very short durations still have a minimum normalization of 3 months.
 
-## Reallocation Rule (Weekly Settlement)
+## Reallocation Rule (Daily Settlement)
 
-At each weekly settlement:
+At each daily settlement:
 
 1. Compute each Prime’s category exposure `E[p][c]` (using matched/notional vs unmatched/MTM).
 2. Compute “penalized amount”:
@@ -156,7 +156,7 @@ This is the portion that is currently over that Prime’s in-cap allocation for 
 3. Update allocations by shifting capacity toward Primes that have been paying penalties, with rate:
 
 ```
-α = (1 week) / T
+α = (1 epoch) / T
 ```
 
 Mechanically, the intent is:
@@ -193,7 +193,7 @@ Portfolio-level:
 
 ## Open Questions
 
-1. What is the exact “allocation update” function (EMA vs explicit weekly reallocation), and where does it live (Sentinel vs on-chain vs governance process)?
+1. What is the exact “allocation update” function (EMA vs explicit per-epoch reallocation), and where does it live (Sentinel vs on-chain vs governance process)?
 2. How to compute category exposure for multi-category assets without double counting while still enforcing caps (binding category vs portfolio-wide max penalty)?
 3. Should caps be defined per-Prime, per-Prime-type, or only globally across all Primes?
 4. How are categories versioned and migrated when governance changes category definitions?

@@ -223,7 +223,7 @@ There are two primary Halo types:
 | **Passthrough Halo** | LCTS (pooled, fungible) | Standardized products with uniform terms — all participants share the same conditions |
 | **Structuring Halo** | NFAT (individual, non-fungible) | Bespoke deals with negotiated terms — each position can have different duration, size, and yield |
 
-**Passthrough Halos** use the Liquidity Constrained Token Standard (LCTS) for queue-based entry and exit. Participants deposit to a queue, and at weekly settlement, deposits convert to Halo Unit shares at the current exchange rate. This model works well for open-ended funds where all participants receive identical treatment.
+**Passthrough Halos** use the Liquidity Constrained Token Standard (LCTS) for queue-based entry and exit. Participants deposit to a queue, and at daily settlement (16:00 UTC), deposits convert to Halo Unit shares at the current exchange rate. The queue locks during the processing window (13:00 → 16:00 UTC) to ensure deterministic calculations and fair proportional allocation.
 
 **Structuring Halos** use Non-Fungible Allocation Tokens (NFATs) to represent individual deals. Each NFAT is a distinct position with its own terms negotiated within a defined "buybox" (acceptable parameter ranges). NFATs are transferable and can be used as collateral, enabling secondary markets for structured positions. For example, a Structuring Halo might issue 6-month, 12-month, and 18-month NFATs with different yields, all within the same legal framework.
 
@@ -350,9 +350,9 @@ Laniakea is deployed incrementally:
 | Phase | Focus | Settlement |
 |-------|-------|------------|
 | **Phase 1** | Core infrastructure — beacons, Synome-MVP, first Structuring Halos | Monthly |
-| **Phase 2+** | Full automation — weekly settlement, auction systems, Sentinel formations | Weekly |
+| **Phase 2+** | Full automation — daily settlement, auction systems, Sentinel formations | Daily |
 
-Phase 1 establishes the foundational infrastructure using low-power beacons (deterministic programs) while maintaining monthly settlement. Later phases introduce high-power Sentinels (AI-capable formations) and weekly settlement cycles.
+Phase 1 establishes the foundational infrastructure using low-power beacons (deterministic programs) while maintaining monthly settlement. Later phases introduce high-power Sentinels (AI-capable formations) and daily settlement cycles.
 
 ### Beacon Infrastructure
 
@@ -373,17 +373,17 @@ The current Legacy PAU architecture (Controller + ALMProxy + RateLimits) will be
 - Standardized factory deployment for new Halos
 - Unified interface across all agent types
 
-### Weekly Settlement Cycle
+### Daily Settlement Cycle
 
-Full Laniakea introduces a weekly settlement cycle replacing the monthly cadence:
+Full Laniakea introduces a daily settlement cycle replacing the monthly cadence:
 
 | Period | Timing | Function |
 |--------|--------|----------|
-| Measurement | Tuesday → Tuesday | Data collection, position tracking |
-| Processing | Tuesday noon → Wednesday noon | Calculations, verification |
-| Settlement | Wednesday noon | All changes take effect |
+| Active Window | 16:00 → 13:00 | Data collection, bid submission |
+| Processing (Lock) | 13:00 → 16:00 | Calculations, verification |
+| Settlement | 16:00 | All changes take effect |
 
-Weekly settlement enables faster capital reallocation, more responsive risk management, and tighter feedback loops between Agent performance and capital allocation. Each cycle includes sealed-bid auctions where Primes compete for senior risk capital capacity and duration-matching reservations.
+Daily settlement enables faster capital reallocation, more responsive risk management, and tighter feedback loops between Agent performance and capital allocation. Each cycle includes sealed-bid auctions where Primes compete for senior risk capital capacity and duration-matching reservations.
 
 ### Automated Operations
 

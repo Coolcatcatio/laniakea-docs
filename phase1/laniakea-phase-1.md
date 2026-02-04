@@ -28,7 +28,7 @@
 
 ## Executive Summary
 
-Phase 1 is pragmatically focused on delivering a minimal viable infrastructure for automated capital deployment. **Phase 1 operates on a monthly settlement cycle**; weekly settlement is a Phase 2+ target.
+Phase 1 is pragmatically focused on delivering a minimal viable infrastructure for automated capital deployment. **Phase 1 operates on a monthly settlement cycle**; daily settlement is the Phase 2 target.
 
 Seven deliverables in sequence order:
 
@@ -203,7 +203,7 @@ The Checker Beacon (lpla-checker) is the Phase 1 monitoring system for position 
 |----------------|-------------|
 | **Position Verification** | Verify on-chain positions match expected state |
 | **CRR Calculation** | Calculate Capital Ratio Requirements using risk params from Synome-MVP |
-| **Settlement Tracking** | Track weekly settlement cycle progress |
+| **Settlement Tracking** | Track daily settlement cycle progress |
 | **Alert Generation** | Flag positions approaching risk thresholds |
 
 **Inputs:** On-chain position data, price feeds, risk parameters from Synome-MVP

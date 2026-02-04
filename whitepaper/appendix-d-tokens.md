@@ -112,7 +112,7 @@ Complete reference of all tokens in the Sky ecosystem.
 
 ### LCTS
 - Queue-based entry and exit
-- Weekly settlement processing
+- Daily settlement processing (lock 13:00 UTC, settle by 16:00 UTC)
 - Pooled positions with uniform terms
 - Non-transferable queue positions; shares may be transferable depending on implementation
 

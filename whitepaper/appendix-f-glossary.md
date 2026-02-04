@@ -139,8 +139,8 @@ Term definitions for the Sky Protocol.
 |------|------------|
 | **LCTS** | Liquidity Constrained Token Standard — queue-based conversion |
 | **Generation** | LCTS grouping; users in same generation share capacity proportionally |
-| **Settlement Cycle** | Weekly: Tue lock → Wed settle (post-Laniakea) |
-| **Settlement Lock Period** | Period when queue entries cannot be withdrawn. Weekly mode: 24h (Tue 12:00 → Wed 12:00 UTC). Weekday mode: 3h (12:00 → 15:00 UTC) |
+| **Settlement Cycle** | Daily: lock 13:00 → settle 16:00 UTC (post-Laniakea) |
+| **Settlement Lock Period** | Period when the current LCTS generation is locked (no deposits, withdrawals, or claims). Daily: ≤3h (13:00 → 16:00 UTC) |
 | **OSRC Auction** | Sealed-bid auction for Senior Risk Capital capacity |
 | **SPTP** | Stressed Pull-to-Par — time until an asset converges to fundamental value under stress conditions; the asset-side duration metric. Assets are assigned to Duration Buckets based on their SPTP |
 | **Prime Intent Vault** | Restricted trading sub-account for delegated Prime trading. Holds bounded working capital, enforces trading policy (allowed pairs, slippage limits, notional caps). Limits blast radius — only vault balance is exposed to settlement, not full Prime PAU |

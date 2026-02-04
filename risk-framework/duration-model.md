@@ -18,7 +18,7 @@ For each lot of USDS:
 ### Duration Bucket Structure
 
 The Duration Bucket system uses a two-layer capacity calculation:
-1. **Weekly Lindy Measurement** — Dynamic calculation of liability duration distribution
+1. **Daily Lindy Measurement** — Dynamic calculation of liability duration distribution
 2. **Structural Maximum Caps** — Governance-set upper limits per bucket, derived from empirical bank run research
 
 #### Bucket Definitions
@@ -152,8 +152,8 @@ The parameters were fitted to match the aggressive end of empirical bank run res
 
 #### Two-Layer Capacity Calculation
 
-**Layer 1: Weekly Lindy Measurement**
-Every week, measure USDS lot ages and calculate expected remaining duration to produce a "raw" liability distribution.
+**Layer 1: Daily Lindy Measurement**
+Every day, measure USDS lot ages and calculate expected remaining duration to produce a "raw" liability distribution.
 
 **Layer 2: Apply Structural Caps**
 For each bucket from longest to shortest:
@@ -200,7 +200,7 @@ Cumulative Capacity at Bucket N = Σ (Effective Capacity for all buckets ≥ N)
 
 ### Duration Capacity Reservation System
 
-Duration Bucket capacity is allocated to Primes through a reservation system. Primes acquire reservations via weekly auctions, then can resell them on a secondary market.
+Duration Bucket capacity is allocated to Primes through a reservation system. Primes acquire reservations via daily auctions, then can resell them on a secondary market.
 
 #### Core Principles
 
@@ -208,19 +208,19 @@ Duration Bucket capacity is allocated to Primes through a reservation system. Pr
 2. **Excess capacity redistributes via tug-of-war** — When Lindy doesn't match reservations, excess flows to Primes with unmet need
 3. **Full secondary market flexibility** — Time-sliced ownership, partial amounts, arbitrary durations
 
-#### Weekly Cycle
+#### Daily Cycle
 
 | Event | Frequency | Description |
 |-------|-----------|-------------|
-| Lindy measurement | Weekly | Measure USDS lot ages, calculate liability duration distribution |
-| Duration auctions | Weekly | Auction unreserved capacity in each bucket |
-| Own-bucket allocation | Weekly | Reservations claim from their bucket first |
-| Tug-of-war | Weekly | Redistribute excess capacity to unmet need |
-| Settlement | Weekly | Process deposits, redemptions, yield distribution |
+| Lindy measurement | Daily | Measure USDS lot ages, calculate liability duration distribution |
+| Duration auctions | Daily | Auction unreserved capacity in each bucket |
+| Own-bucket allocation | Daily | Reservations claim from their bucket first |
+| Tug-of-war | Daily | Redistribute excess capacity to unmet need |
+| Settlement | Daily | Process deposits, redemptions, yield distribution |
 
 #### Primary Auction
 
-Auctions occur when unreserved capacity exists at a bucket. Primes bid price-per-week for capacity amounts. Highest bidders win. Winners receive reservations starting next period.
+Auctions occur when unreserved capacity exists at a bucket. Primes bid price-per-epoch for capacity amounts. Highest bidders win. Winners receive reservations starting next epoch.
 
 #### Secondary Market
 

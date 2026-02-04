@@ -456,7 +456,7 @@ Together, these guarantee that dust amounts get cleaned up in bounded iterations
 
 ## Connection to Risk Framework
 
-The Tug-of-War mechanism is part of the weekly duration capacity allocation process (ALDM):
+The Tug-of-War mechanism is part of the daily duration capacity allocation process (ALDM):
 
 1. **Lindy Measurement** — Calculate liability duration distribution
 2. **Structural Caps** — Apply governance caps per bucket

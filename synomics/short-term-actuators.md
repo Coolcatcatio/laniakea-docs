@@ -190,7 +190,7 @@ SYNOME-MVP ◄── Now includes learned patterns
 
 - Sentinels are High-Power (AI, adaptive)
 - Can learn from outcomes within constraints
-- Weekly settlement cycle
+- Daily settlement cycle
 - Still no teleonome layer — sentinels are "proto-teleonomes"
 
 ### Phase 3: Teleonome Emergence
@@ -332,7 +332,7 @@ This operational experience becomes the foundation for sentinel and teleonome de
 | Learning | None | Sentinels learn, teleonomes have full RSI |
 | Synome | MVP (operational database) | Full synart + telart + embart |
 | Governance | Human-in-loop (Core Council) | Increasing autonomy within bounds |
-| Settlement | Monthly | Weekly, then continuous |
+| Settlement | Monthly | Daily, then continuous |
 
 **The goal:** Build working infrastructure that accepts increasing autonomy without rearchitecting.
 

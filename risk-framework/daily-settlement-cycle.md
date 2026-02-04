@@ -1,57 +1,67 @@
-# Weekly Settlement Cycle
+# Daily Settlement Cycle
 
 **Status:** Draft
-**Last Updated:** 2026-01-27
+**Last Updated:** 2026-02-04
 
 ---
 
 ## Overview
 
-The weekly settlement cycle is the heartbeat of Laniakea's resource allocation system. It operates on a fixed weekly schedule with three distinct periods:
+The daily settlement cycle is the heartbeat of Laniakea's resource allocation system. It operates on a fixed daily schedule with a short lock window for processing and a single daily moment when all changes take effect.
 
-### Weekly Timeline
+### Daily Timeline
+
+All times are **UTC**.
 
 | Period | Timing | Duration | Purpose |
 |--------|--------|----------|---------|
-| **Measurement Period** | Tuesday 12:00 UTC → Tuesday 12:00 UTC | 7 days | Data collection, bid submission |
-| **Processing Period** | Tuesday 12:00 UTC → Wednesday 12:00 UTC | 24 hours | Calculation, verification, prepayment |
-| **Moment of Settlement** | Wednesday 12:00 UTC | Instant | New parameters take effect |
+| **Active Window** | 16:00 → 13:00 | 21 hours | Data collection, bid submission, deposits/withdrawals |
+| **Processing Window (Lock)** | 13:00 → 16:00 | ≤ 3 hours | Calculation, verification, prepayment |
+| **Moment of Settlement** | 16:00 | Instant | New parameters take effect |
 
 ```
-Week N                              Week N+1
-│                                   │
-├── Measurement Period ────────────►├── Measurement Period ──────────►
-│   (Tue noon → Tue noon)           │
-│                                   │
-│                    ├─ Processing ─┤
-│                    │  (24 hours)  │
-│                    │              │
-│                    Tue noon       Wed noon
-│                    Bids close     Settlement
-│                    Auctions       New params
-│                    revealed       take effect
+Day N                              Day N+1
+│                                  │
+├── Active Window ────────────────►├── Active Window ────────────────►
+│   (16:00 → 13:00)                │
+│                                  │
+│                    ├ Processing ─┤
+│                    │ (≤3h lock)  │
+│                    │             │
+│                    13:00         16:00
+│                    Lock +        Settlement
+│                    bids close    new params take effect
 ```
 
 ### Settlement Sequence
 
-1. **Measurement Period** (Tue → Tue)
+1. **Active Window** (16:00 → 13:00)
    - OSRC and Duration bids submitted (sealed)
-   - Interest and distributions calculated on this period's data
+   - Normal deposits/withdrawals permitted (including LCTS queues)
 
-2. **Processing Period** (Tue noon → Wed noon)
+2. **Processing Window** (13:00 → 16:00)
+   - Bids close and state is locked for settlement-critical systems
    - Auctions revealed and matched
-   - Lindy measurement snapshot
-   - Tug-of-war allocation
-   - Duration excess auction
+   - Lindy measurement snapshot and tug-of-war allocation
    - Prepayments made (interest, distributions)
    - Verification and compliance checks
 
-3. **Moment of Settlement** (Wed noon)
+3. **Moment of Settlement** (16:00)
    - New OSRC allocations take effect
    - New Duration capacity published
    - srUSDS exchange rate updated
    - LCTS queues settle
    - Penalties begin accruing for non-compliant actors
+
+### Optional Skips (e.g., Weekends)
+
+Some deployments may choose to skip specific cycles (commonly weekends) as an operational choice. This is handled in userspace by simply not calling the lock/settle actions for those cycles. When a cycle is skipped:
+
+- Systems remain in their **ACTIVE** state (no lock window is entered).
+- Bid windows extend until the next executed lock.
+- The next executed settlement processes the accumulated state for the longer interval.
+
+Protocol-level risk capital tokens are intended to run on the full daily cadence; skip behavior is primarily relevant for specific Halo operators.
 
 ---
 
@@ -59,15 +69,15 @@ Week N                              Week N+1
 
 ### Timing Model
 
-Interest payments and distribution rewards are calculated based on the **Measurement Period** (Tuesday noon → Tuesday noon), and must be **prepaid before Moment of Settlement** (Wednesday noon).
+Interest payments and distribution rewards are calculated on the most recent epoch’s state and must be **prepaid before Moment of Settlement** (16:00).
 
 ```
-Measurement Period          Processing Period      Settlement
-(Tue noon → Tue noon)       (Tue noon → Wed noon)  (Wed noon)
-│                           │                      │
-│   Data collected here     │   Calculate owed     │   Must be paid by now
-│   for interest/distrib    │   Prepay amounts     │   Penalties start if late
-│                           │                      │
+Active Window              Processing Window        Settlement
+(16:00 → 13:00)            (13:00 → 16:00)          (16:00)
+│                          │                        │
+│   Data collected here    │   Calculate + verify   │   Must be paid by now
+│   for interest/distrib   │   Prepay amounts       │   Penalties start if late
+│                          │                        │
 ```
 
 ### Interest Payments (Prime → Generator)
@@ -77,19 +87,19 @@ Each Prime that has borrowed from a Generator must pay interest on outstanding d
 **Calculation (stl-base):**
 
 ```
-Interest Payment = Average Outstanding Debt × Weekly Rate
+Interest Payment = Average Outstanding Debt × Daily Rate
 
 Where:
-- Average Outstanding Debt = time-weighted average of debt over the Measurement Period
-- Weekly Rate = Annual Base Rate / 52
+- Average Outstanding Debt = time-weighted average of debt over the epoch
+- Daily Rate = Annual Base Rate / 365
 ```
 
 **Process:**
 
-1. **Tuesday noon:** Measurement Period ends, calculation begins
-2. **During Processing Period:** stl-base calculates interest owed
-3. **Before Wednesday noon:** stl-base submits interest payment transaction
-4. **Wednesday noon:** Payment must be complete; penalties accrue if late
+1. **13:00:** Processing Window begins; calculation finalization begins
+2. **During Processing Window:** stl-base calculates interest owed
+3. **Before 16:00:** stl-base submits interest payment transaction
+4. **16:00:** Payment must be complete; penalties accrue if late
 
 ### Distribution Rewards (Generator → Prime)
 
@@ -97,16 +107,16 @@ Generators distribute rewards to Primes that have "tagged" addresses — address
 
 **Calculation:**
 
-1. Generator accumulates yield from various sources (SSR spread, fees, etc.) during Measurement Period
+1. Generator accumulates yield from various sources (SSR spread, fees, etc.) during the epoch
 2. Distribution amounts calculated based on tagged balances
 3. Distribution flows to tagged Prime addresses proportional to their tagged balances
 
 **Process:**
 
-1. **Tuesday noon:** Measurement Period ends
-2. **During Processing Period:** Distribution calculations performed
-3. **Before Wednesday noon:** Distribution transactions submitted
-4. **Wednesday noon:** Distributions must be complete
+1. **13:00:** Processing Window begins
+2. **During Processing Window:** Distribution calculations performed
+3. **Before 16:00:** Distribution transactions submitted
+4. **16:00:** Distributions must be complete
 
 **Tagged Addresses:**
 
@@ -116,13 +126,13 @@ Generators distribute rewards to Primes that have "tagged" addresses — address
 
 ### Late Payment Penalties
 
-Any actor that fails to complete their obligations before Moment of Settlement (Wednesday noon) incurs penalties:
+Any actor that fails to complete their obligations before Moment of Settlement (16:00) incurs penalties:
 
 ```
 Penalty = Owed Amount × Penalty Rate × Time Late
 
 Where:
-- Time Late = hours past Wednesday noon UTC
+- Time Late = hours past 16:00 UTC
 - Penalty Rate = governance-set rate (e.g., 0.1% per hour)
 ```
 
@@ -137,11 +147,11 @@ Where:
 
 ## Part 2: lpha-auction (Auction Sentinel)
 
-A new Sentinel type that runs sealed-bid auctions for OSRC and Duration capacity.
+A Sentinel type that runs sealed-bid auctions for OSRC and Duration capacity on the daily cadence.
 
 ### Architecture
 
-**Level:** Generator (one lpha-auction per Generator)
+**Level:** Generator (one lpha-auction per Generator)  
 **Operator:** Accordant GovOps
 
 **Components:**
@@ -156,7 +166,7 @@ A new Sentinel type that runs sealed-bid auctions for OSRC and Duration capacity
 │  └──────────────┘  └──────────────┘  └──────────────────┘  │
 │                                                              │
 │  Receives signed bids from stl-base instances               │
-│  Runs matching algorithm at settlement time                  │
+│  Runs matching algorithm during processing window            │
 │  Coordinates with lpha-lcts for LCTS settlement               │
 └─────────────────────────────────────────────────────────────┘
 ```
@@ -166,7 +176,7 @@ A new Sentinel type that runs sealed-bid auctions for OSRC and Duration capacity
 1. Each Prime's stl-base connects to lpha-auction
 2. stl-base submits bid messages signed with its private key
 3. Bids are stored in lpha-auction's private database (sealed)
-4. Bids are not revealed until settlement
+4. Bids are not revealed until processing/settlement
 
 **Bid Message Format:**
 
@@ -184,7 +194,7 @@ A new Sentinel type that runs sealed-bid auctions for OSRC and Duration capacity
 
 ### Security Properties
 
-- **Sealed bids:** No participant can see others' bids before settlement
+- **Sealed bids:** No participant can see others' bids before processing window
 - **Authenticity:** Signatures verify bids came from legitimate stl-base instances
 - **Non-repudiation:** Signed bids cannot be denied after submission
 - **Timing:** Bids accepted until cutoff; late bids rejected
@@ -199,11 +209,11 @@ Allocate srUSDS capacity to Primes. Primes that win OSRC auction capacity can us
 
 ### Auction Mechanics
 
-**Type:** Sealed-bid, uniform-price auction (weekly)
+**Type:** Sealed-bid, uniform-price auction (daily)
 
 **Process:**
 
-1. **Bid Collection** (before settlement)
+1. **Bid Collection** (during Active Window)
    - Each Prime's stl-base submits sealed bids to lpha-auction
    - Bid specifies: amount of OSRC wanted, maximum rate willing to pay
 
@@ -271,34 +281,34 @@ Result:
 - Prime D: unmatched
 ```
 
-### Weekly-Only Design
+### Daily-Only Design
 
-**No multi-week reservations.** Every Prime must re-bid every week.
+**No multi-day reservations.** Every Prime must re-bid each day.
 
 **Rationale:**
 
-Multi-week reservations create problems:
+Multi-epoch reservations create problems:
 1. **Rate lock-in distortion:** Low locked-in rates reduce effective yields
 2. **Capacity mismatch:** Reserved capacity may not match actual srUSDS supply
 3. **Exit incentives:** srUSDS holders leave if yields are suppressed by old reservations
 4. **Complexity:** Overpayment/underpayment scenarios require complex handling
 
-Weekly auctions provide:
-- Clean price discovery every week
+Daily auctions provide:
+- Clean price discovery each day
 - Rates reflect current market conditions
 - srUSDS holders see real yields, make informed decisions
 - Simple, predictable system
 
-**Trade-off:** Primes have no duration certainty on SRC access. If rates spike, they pay up or lose access. This is acceptable because:
+**Trade-off:** Primes have no long-duration certainty on SRC access. If rates spike, they pay up or lose access. This is acceptable because:
 - Primes can manage rate risk through their own capital structure
-- Weekly auctions are predictable — no surprise rate changes mid-week
+- Daily auctions are predictable — no surprise rate changes mid-day
 - Market-clearing rates reflect true cost of risk capital
 
 ### OSRC Usage
 
 Primes that win OSRC capacity:
 - Can count the SRC toward their capital requirements (per Risk Framework)
-- Must pay the clearing rate weekly until they stop using SRC
+- Must pay the clearing rate each epoch until they stop using SRC
 - Can reduce usage at any time (no lock-in on the Prime side)
 
 ---
@@ -318,7 +328,7 @@ Duration and OSRC are **separate auctions** serving different purposes:
 | **What's allocated** | Senior Risk Capital capacity | Duration-matching capacity |
 | **Purpose** | Capital structure (loss absorption) | Capital treatment (risk weight vs FRTB) |
 | **Pricing** | Rate paid to srUSDS holders | Price paid for reservation rights |
-| **Duration** | Weekly (no reservations) | Can reserve for multiple weeks |
+| **Duration** | Daily (no reservations) | Can reserve for multiple epochs |
 
 A Prime might:
 - Win OSRC capacity (to use SRC in its capital structure)
@@ -332,8 +342,8 @@ The Duration auction follows a specific sequence where tug-of-war happens FIRST,
 ```
 1. Bid submission window opens
 2. Bids submitted (sealed)
-3. Bid window closes
-4. Lindy measurement (snapshot at bid close)
+3. Bid window closes (13:00)
+4. Lindy measurement (snapshot)
 5. Tug-of-war processes existing reservations against Lindy capacity
 6. Excess capacity identified (Lindy capacity - consumed by reservations)
 7. Auction matches bids against excess capacity
@@ -352,9 +362,9 @@ The Duration auction follows a specific sequence where tug-of-war happens FIRST,
 
 **Process:**
 
-1. **Bid Collection** (before close)
+1. **Bid Collection** (during Active Window)
    - Each Prime's stl-base submits sealed bids to lpha-auction
-   - Bid specifies: bucket number, amount, maximum price, duration (weeks)
+   - Bid specifies: bucket number, amount, maximum price, duration (epochs)
 
 2. **Tug-of-War First**
    - Lindy measured at bid close
@@ -378,9 +388,9 @@ The Duration auction follows a specific sequence where tug-of-war happens FIRST,
    - Reservations tracked in lpha-auction database
    - Published to Synome
 
-### Multi-Week Reservations
+### Multi-Epoch Reservations
 
-Unlike OSRC, Duration allows multi-week reservations:
+Unlike OSRC, Duration allows multi-epoch reservations:
 
 **Rationale:**
 - Duration capacity is about duration matching, which is inherently longer-term
@@ -388,17 +398,17 @@ Unlike OSRC, Duration allows multi-week reservations:
 - Reservations don't directly affect other participants' yields (unlike OSRC rates)
 
 **Mechanics:**
-- Bid includes duration (1-52 weeks, or longer)
-- Price is per-week
+- Bid includes duration (in settlement epochs)
+- Price is per-epoch
 - Commitment: must pay for full duration even if Lindy capacity falls short
-- If Lindy < reservation in future weeks, shortfall handled by tug-of-war pro-rata
+- If Lindy < reservation in future epochs, shortfall handled by tug-of-war pro-rata
 
 ### Secondary Market
 
 Reservation holders can trade their reservations:
 
 - Sell full or partial amounts
-- Time-slice (sell weeks 5-10 of a 20-week reservation)
+- Time-slice (sell epochs 5-10 of a 20-epoch reservation)
 - Buyers get same rights as original auction winners
 - Enables price discovery between auctions
 
@@ -406,44 +416,41 @@ Reservation holders can trade their reservations:
 
 ## Part 5: LCTS Settlement
 
-LCTS (Liquidity Constrained Token Standard) uses a multi-generation model synchronized with the weekly settlement cycle. See `smart-contracts/lcts.md` for the specification.
+LCTS (Liquidity Constrained Token Standard) settlement is synchronized with the daily settlement cycle. See `smart-contracts/lcts.md` for the queue specification.
 
-### LCTS Weekly Cycle
+### LCTS Daily Cycle
 
 | Event | Timing | Action |
 |-------|--------|--------|
-| **Generation Lock** | Tuesday 12:00 UTC | Active generation locks; new generation opens for deposits |
-| **Settlement** | Wednesday 12:00 UTC | All locked generations processed proportionally |
-| **Unlock** | Wednesday 12:00 UTC | Processed generations return to ACTIVE (or FINALIZED if fully converted) |
+| **Lock** | 13:00 UTC | LCTS enters LOCKED; deposits/withdrawals/claims blocked for the current generation |
+| **Settlement** | 16:00 UTC | Locked generation processed; exchange rates updated |
+| **Unlock / Dormant** | 16:00 UTC | Generation returns to ACTIVE (if not fully converted) or FINALIZED + queue becomes DORMANT (if fully converted) |
 
-### Why Multi-Generation?
+### Simplified Single-Generation Model
 
-During the 24-hour Processing Period, LCTS needs to:
-1. Lock deposits so auction matching is based on known quantities
-2. Allow new users to deposit (into a new generation)
-3. Process all pending generations at Moment of Settlement
+The daily cycle removes the need for concurrent generations:
 
-This creates concurrent generations:
-- **Locked generations** — Awaiting settlement; no deposits or withdrawals
-- **Active generation** — Accepting new deposits; withdrawals allowed
+- At most **one** current generation per queue is ever ACTIVE or LOCKED.
+- During the lock window, users simply wait (≤ 3 hours); new deposits do not spill into a “next” generation.
+- If a generation fully converts, the queue becomes **DORMANT** until the next user action creates a new generation.
+- Users may always claim from **FINALIZED** generations (immutable), including during the lock window.
 
 ### srUSDS Settlement Flow
 
-1. **Tuesday 12:00:** lpha-lcts locks active generations
-   - SubscribeQueue generation → LOCKED
-   - RedeemQueue generation → LOCKED
-   - New active generations created for both queues
+1. **13:00:** lpha-lcts locks the current generations (if any)
+   - SubscribeQueue current generation → LOCKED
+   - RedeemQueue current generation → LOCKED
 
-2. **During Processing Period:**
-   - lpha-auction completes OSRC auction
-   - Determines clearing rate and matched amounts
-   - Publishes results
+2. **During Processing Window:**
+   - lpha-auction completes OSRC and Duration auctions
+   - Determines clearing rates and matched amounts
+   - Publishes results for settlement application
 
-3. **Wednesday 12:00:** lpha-lcts settles all locked generations
+3. **16:00:** lpha-lcts settles the locked generations
    - Updates exchange rate based on clearing rate yield
    - Calculates settlement capacity (see below)
    - Calls settle() on SubscribeQueue and RedeemQueue
-   - All locked generations receive proportional capacity
+   - Unlocks (ACTIVE) or finalizes (FINALIZED → DORMANT)
 
 ### Capacity Calculation
 
@@ -451,7 +458,7 @@ Settlement capacity for srUSDS comes from three sources:
 
 ```
 Subscribe Capacity = Net Flow Netting + OSRC Capacity (throttled by target spread)
-Redeem Capacity = Net Flow Netting + Weekly Redemption Limit
+Redeem Capacity = Net Flow Netting + Daily Redemption Limit
 ```
 
 **Step 1: Net Flow Netting**
@@ -459,8 +466,8 @@ Redeem Capacity = Net Flow Netting + Weekly Redemption Limit
 Subscribe and redeem queues cancel each other out first:
 
 ```
-SubscribeQueue total (all locked generations): $100M
-RedeemQueue total (all locked generations): $30M
+SubscribeQueue total: $100M
+RedeemQueue total:    $30M
 
 Net flow netting: $30M matched both ways
 - $30M subscribe converts to srUSDS
@@ -478,24 +485,7 @@ For subscribes after netting:
 - Subject to target spread throttling (see below)
 
 For redeems after netting:
-- Weekly redemption limit (governance-set) determines how much more can convert
-- Ensures "a decent chunk" always processes each week
-
-**Step 3: Distribute to Generations Proportionally**
-
-When multiple locked generations exist:
-
-```
-Gen 1: $40M underlying (from 2 weeks ago)
-Gen 2: $60M underlying (locked this week)
-
-Total locked: $100M
-Settlement capacity: $60M
-
-Distribution:
-- Gen 1 receives: $60M × (40/100) = $24M → $16M remains
-- Gen 2 receives: $60M × (60/100) = $36M → $24M remains
-```
+- Daily redemption limit (governance-set) determines how much more can convert
 
 ### Target Spread Mechanism
 
@@ -509,15 +499,7 @@ If OSRC auction demand provides yield ≥ target spread:
 
 If OSRC auction demand would result in yield < target spread:
   → Reduce subscribe capacity to maintain target spread
-  → Excess demand waits in queue for next week
-```
-
-**Example:**
-```
-Target spread: 2% above SSR
-SubscribeQueue demand after netting: $100M
-OSRC auction demand at 2.5%: Full $100M converts
-OSRC auction demand at 1.5%: Only $X converts (where X maintains 2% spread)
+  → Excess demand waits in queue for the next epoch
 ```
 
 **Rationale:**
@@ -525,21 +507,14 @@ OSRC auction demand at 1.5%: Only $X converts (where X maintains 2% spread)
 - Protects existing srUSDS holders from yield dilution
 - Creates natural equilibrium between supply and demand
 
-**Redemption capacity:**
+### One Queue Spans Multiple Days
 
-- Fixed limit per week (governance-set)
-- A "decent chunk" always processes each week
-- When redemptions exceed limit, remaining users wait in queue
-- Large redemptions cause rates to spike (attracting new subscribers)
+Due to net flow netting, at most one queue has leftover demand after netting:
 
-### One Queue Clears Each Week
+- If subscribe > redeem: RedeemQueue clears, SubscribeQueue retains backlog
+- If redeem > subscribe: SubscribeQueue clears, RedeemQueue retains backlog
 
-Due to net flow netting, at most one queue has leftover demand:
-
-- If subscribe > redeem: RedeemQueue fully clears, SubscribeQueue has remainder
-- If redeem > subscribe: SubscribeQueue fully clears, RedeemQueue has remainder
-
-This means only one side ever accumulates multi-week generations.
+The queue with backlog can span multiple days as partial conversions occur at each daily settlement.
 
 ---
 
@@ -547,7 +522,7 @@ This means only one side ever accumulates multi-week generations.
 
 ### Timing
 
-Tug-of-war runs as part of the Duration auction sequence, BEFORE the auction matches bids. This ensures existing reservations get their capacity first, and only genuine excess goes to auction.
+Tug-of-war runs as part of the Duration auction sequence during the Processing Window. This ensures existing reservations get their capacity first, and only genuine excess goes to auction.
 
 ### Process
 
@@ -570,7 +545,7 @@ Tug-of-war runs as part of the Duration auction sequence, BEFORE the auction mat
 
 4. **Excess Identification**
    - After tug-of-war completes, calculate remaining capacity per bucket
-   - This excess goes to the Duration auction (Part 4)
+   - This excess goes to the Duration auction
 
 5. **Capital Calculation** (after auction completes)
    - Apply Risk Framework formulas based on final allocation
@@ -596,57 +571,42 @@ When Lindy-measured capacity ≠ total reservations:
 
 ---
 
-## Part 7: Weekly Timeline
+## Part 7: Daily Timeline
 
 ### Fixed Schedule
 
 All times are **UTC**.
 
-| Day/Time | Event | Actor |
-|----------|-------|-------|
-| **Tuesday 12:00** | Measurement Period ends | — |
-| | Bid window closes (OSRC + Duration) | lpha-auction |
-| | **LCTS generations LOCKED** | lpha-lcts |
-| | New active generation opens | lpha-lcts |
-| | Processing Period begins | — |
-| **Tuesday 12:00-14:00** | Auctions revealed and matched | lpha-auction |
-| **Tuesday 14:00-16:00** | Lindy measurement snapshot | lpla-checker |
-| **Tuesday 16:00-18:00** | Tug-of-war allocation | lpha-auction |
-| **Tuesday 18:00-20:00** | Duration excess auction matching | lpha-auction |
-| **Tuesday 20:00-22:00** | Interest calculations finalized | stl-base (each Prime) |
-| **Tuesday 22:00-24:00** | Distribution calculations finalized | lpla-checker |
-| **Wednesday 00:00-08:00** | Prepayments submitted | stl-base |
-| **Wednesday 08:00-12:00** | Verification and compliance checks | lpla-checker |
-| **Wednesday 12:00** | **Moment of Settlement** | — |
+| Time | Event | Actor |
+|------|-------|-------|
+| **13:00** | Active Window ends; bid window closes (OSRC + Duration) | lpha-auction |
+| | LCTS queues lock (if active) | lpha-lcts |
+| | Processing Window begins | — |
+| **13:00 → 16:00** | Auctions, measurement, tug-of-war, prepayments, verification | lpha-auction / lpla-checker / stl-base |
+| **16:00** | **Moment of Settlement** | — |
 | | New OSRC allocations take effect | lpha-auction |
 | | New Duration capacity published to Synome | lpha-auction |
 | | srUSDS exchange rate updated | lpha-lcts |
-| | **LCTS locked generations settle** | lpha-lcts |
-| | Locked generations unlock (ACTIVE or FINALIZED) | lpha-lcts |
+| | LCTS queues settle + unlock/finalize | lpha-lcts |
 | | Capital calculations apply | lpla-checker |
 | | Penalties begin for non-compliant actors | — |
-| **Wednesday 12:00+** | Next Measurement Period begins | — |
+| **16:00 → 13:00** | Next Active Window (bids open, deposits/withdrawals allowed) | — |
 
 ### Key Timing Principles
 
-1. **Bids close at Tuesday noon** — All sealed bids must be submitted before this time
-2. **24-hour processing window** — Ample time to calculate, verify, and prepay
-3. **Prepayment required** — Interest and distributions must arrive before Wednesday noon
+1. **Bids close at 13:00** — All sealed bids must be submitted before this time
+2. **Short processing window** — Systems must calculate, verify, and prepay within ≤3 hours
+3. **Prepayment required** — Interest and distributions must arrive before 16:00
 4. **Atomic settlement** — All new parameters take effect simultaneously at Moment of Settlement
-5. **Penalties for lateness** — Any actor not in compliance by Wednesday noon accrues penalties
+5. **Penalties for lateness** — Any actor not in compliance by 16:00 accrues penalties
 
 ### Sequencing Dependencies
 
 ```
-Tue 12:00: Bids close + LCTS generations lock
+13:00: Bids close + LCTS locks
     │
-    ├─────────────────────────────────────────┐
-    │                                         │
-    ▼                                         ▼
-Auctions revealed                    LCTS generations locked
-    │                                (users can deposit into new gen,
-    ▼                                 but cannot withdraw from locked)
-OSRC matching
+    ▼
+Auctions revealed + matched
     │
     ▼
 Lindy measurement
@@ -658,58 +618,50 @@ Tug-of-war (existing reservations)
 Duration excess auction (depends on tug-of-war output)
     │
     ▼
-All results known → Prepayments can be calculated and submitted
+All results known → Prepayments calculated + submitted
     │
     ▼
-Wed 12:00: Everything takes effect simultaneously
-    │
-    ├── LCTS locked generations settle proportionally
+16:00: Everything takes effect simultaneously
     ├── Exchange rates updated
-    └── Generations unlock (ACTIVE or FINALIZED)
+    ├── LCTS queues settle
+    └── Penalties begin (if non-compliant)
 ```
 
 ### Failure Handling
 
-**Before Tuesday noon (bid submission):**
+**Before 13:00 (bid submission):**
 - **Bid submission failure:** Prime's bid not included; can resubmit until deadline
-- **Late bid:** Rejected; must wait for next week
+- **Late bid:** Rejected; must wait for next cycle
 
-**During Processing Period (Tue noon → Wed noon):**
+**During Processing Window (13:00 → 16:00):**
 - **Auction processing failure:** Retry with exponential backoff; escalate to GovOps if persistent
-- **Tug-of-war failure:** Use previous week's allocation temporarily; flag for investigation
-- **Prepayment transaction failure:** Actor must retry; penalties will accrue if not resolved by Wednesday noon
-- **LCTS lock failure:** Users in active generation remain able to withdraw; flag for investigation
-- **User tries to withdraw from locked generation:** Transaction reverts; must wait for settlement
+- **Tug-of-war failure:** Use previous allocation temporarily; flag for investigation
+- **Prepayment transaction failure:** Actor must retry; penalties accrue if not resolved by 16:00
+- **LCTS lock failure:** Queue remains ACTIVE; flag for investigation; do not settle until locked
+- **User tries to interact with locked generation:** Transaction reverts; must wait for unlock
 
-**At/After Moment of Settlement (Wed noon):**
-- **Late prepayment:** Penalties accrue from Wednesday noon until payment completes
-- **LCTS settlement failure:** Locked generations remain locked; retry immediately; users cannot withdraw until settled
-- **LCTS unlock failure:** Generations remain in limbo; escalate to GovOps
+**At/After Moment of Settlement (16:00):**
+- **Late prepayment:** Penalties accrue from 16:00 until payment completes
+- **LCTS settlement failure:** Generation remains locked; retry immediately; users cannot interact until settled
 - **Persistent non-compliance:** Escalation path (alerts → restrictions → governance review)
 
-**LCTS-specific guarantees:**
-- Users can ALWAYS deposit into the active generation (even during processing period)
-- Users in locked generations can claim rewards but not withdraw underlying
-- All locked generations receive proportional settlement capacity
+**LCTS-specific guarantees (daily model):**
+- Deposits/withdrawals/claims are **blocked during lock** for the current generation
+- At most one generation per queue is ACTIVE/LOCKED at a time
+- Users can always claim from FINALIZED generations
 - No user loses funds due to settlement failure — positions remain intact
 
 ---
 
 ## Open Questions
 
-1. **Bid modification** — Can Primes modify/cancel bids before Tuesday noon cutoff, or is first bid final?
-
+1. **Bid modification** — Can Primes modify/cancel bids before 13:00 cutoff, or is first bid final?
 2. **Minimum bid increments** — Should there be minimum bid sizes or rate increments to prevent spam?
-
-3. **Penalty rate calibration** — What's the right penalty rate? (e.g., 0.1% per hour = 2.4% per day)
-
+3. **Penalty rate calibration** — What's the right penalty rate for a daily cadence?
 4. **Escalation thresholds** — At what point does lateness trigger restrictions vs just penalties?
-
-5. **Duration reservation duration limits** — Max 52 weeks? Longer? Should there be a cap?
-
-6. **Secondary market mechanics** — How exactly do Duration reservation trades settle? Same weekly cycle or continuous?
-
-7. **Emergency procedures** — What happens if systemic issue prevents settlement? (e.g., network outage, oracle failure)
+5. **Reservation duration limits** — Max duration in epochs? (e.g., 365 days) Longer?
+6. **Secondary market mechanics** — How exactly do Duration reservation trades settle? Same daily cycle or continuous?
+7. **Emergency procedures** — What happens if systemic issue prevents settlement? (network outage, oracle failure)
 
 ---
 
@@ -718,10 +670,10 @@ Wed 12:00: Everything takes effect simultaneously
 | Document | Relationship |
 |----------|--------------|
 | `README.md` | Risk framework index and entry point |
-| `tugofwar.md` | Tug-of-war algorithm is part of this weekly cycle |
+| `tugofwar.md` | Tug-of-war algorithm is part of this daily cycle |
 | `smart-contracts/lcts.md` | LCTS settlement is triggered by this cycle |
-| `sentinel-network.md` | Defines lpha-auction, lpha-lcts, stl-base roles |
+| `legal-and-trading/sentinel-network.md` | Defines lpha-auction, lpha-lcts, stl-base roles |
 
 ---
 
-*This document describes the weekly settlement cycle. For capital requirement calculations, see `README.md`. For tug-of-war algorithm, see `tugofwar.md`.*
+*This document describes the daily settlement cycle. For capital requirement calculations, see `README.md`. For tug-of-war algorithm, see `tugofwar.md`.*

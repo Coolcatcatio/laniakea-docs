@@ -205,7 +205,7 @@ Update: totalShares -= shares, totalUnderlying -= underlyingOut, user shares = 0
 Transfer: sUSDS from queue to depositor
 ```
 
-- Available anytime (no lock period — unlike LCTS, there's no batch settlement requiring a lock)
+- Available anytime (no lock period — unlike LCTS, there's no batch settlement lock window)
 - Complete withdrawal only (like LCTS "claim and exit")
 
 **Claim (Sentinel only):**
@@ -227,8 +227,8 @@ Mint: NFAT to target
 |--------|------|-------------|
 | Share calculation | amount × totalShares ÷ totalUnderlying | same |
 | Shares transferable | No (internal accounting) | No (internal accounting) |
-| Generations | Yes (batch settlement needs lock) | No (selective claiming) |
-| Lock period | Yes (Tue noon → Wed noon) | No |
+| Generations | Yes (generation-based batch settlement) | No (selective claiming) |
+| Lock period | Yes (13:00 → 16:00 UTC daily) | No |
 | Settlement | Batch, proportional to all | Selective: Halo picks (address, amount) |
 | Output | Rewards accrue over time | NFAT minted at claim |
 
@@ -585,7 +585,7 @@ The patterns above describe the core mechanisms, but payment delivery should be 
 | **Terms** | Same for all in generation | Bespoke per deal |
 | **Queue** | Shared across generation | Individual per depositor |
 | **Capacity allocation** | Proportional distribution | Per-deal (Halo decides) |
-| **Settlement** | Batch (weekly cycle) | Per-deal (anytime) |
+| **Settlement** | Batch (daily cycle) | Per-deal (anytime) |
 | **Transferability** | Non-transferable shares | Transferable NFAT (optionally restricted) |
 | **Exit before settlement** | Withdraw from active generation | Withdraw from queue before claim |
 | **Redemption initiation** | Holder-initiated only | Either party (request/fulfill or direct) |

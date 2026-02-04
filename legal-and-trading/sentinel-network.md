@@ -384,7 +384,7 @@ Operations:
 - Calculate PnL
 - Calculate interest payable
 - Determine carry amounts
-- Process weekly settlement cycle
+- Process daily settlement cycle
 
 Used by: Baseline (for self-monitoring), Wardens (for independent verification), Baseline (at settlement periods)
 
@@ -502,7 +502,7 @@ Shared infrastructure across all Primes and Halos:
 
 | Beacon | Role |
 |--------|------|
-| **lpla-checker** | Position verification, compliance checks, risk framework calculations, weekly settlement cycle, LCTS generation processing |
+| **lpla-checker** | Position verification, compliance checks, risk framework calculations, daily settlement cycle, LCTS queue processing |
 
 ---
 

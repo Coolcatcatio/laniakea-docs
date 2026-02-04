@@ -105,13 +105,13 @@ Senior risk capital token providing global backing for all USDS.
 | Purpose | Global senior risk capital for USDS; backs all protocol exposure |
 | Standard | LCTS-based (queue settlement) |
 | Risk Profile | Lower risk than JRC; absorbs losses only after JRC depleted |
-| Settlement | Weekly queue processing (deposit/redemption) |
+| Settlement | Daily queue processing (deposit/redemption) |
 | Status | **Planned** |
 
 **Mechanics:**
 - Users deposit USDS to deposit queue → converts to srUSDS at settlement
 - Users add srUSDS to redemption queue → converts back to USDS at settlement
-- Queue entries can be withdrawn before settlement lock
+- Queue entries can be withdrawn before the daily settlement lock window
 - Conversion rate updated at each settlement based on pool performance
 
 ---
@@ -293,7 +293,7 @@ Global senior risk capital for all USDS; LCTS-based with queue settlement.
 |----------|-------|
 | Position | Senior (absorbs after JRC depleted) |
 | Scope | All USDS exposure globally |
-| Settlement | Weekly LCTS queue processing |
+| Settlement | Daily LCTS queue processing |
 | Status | **Planned** |
 
 ---
@@ -712,15 +712,15 @@ Current settlement cadence for risk capital and distributions.
 
 ---
 
-### Weekly Settlement Cycle (Planned)
+### Daily Settlement Cycle (Planned)
 
-Post-Laniakea: Tue lock → Wed settle; faster capital reallocation.
+Post-Laniakea: daily processing window (lock 13:00 → settle 16:00 UTC); faster capital reallocation.
 
 | Period | Timing | Purpose |
 |--------|--------|---------|
-| Measurement | Tuesday noon → Tuesday noon | Data collection, bid submission |
-| Processing | Tuesday noon → Wednesday noon | Calculation, verification |
-| Settlement | Wednesday noon | All changes take effect |
+| Active Window | 16:00 → 13:00 | Data collection, bid submission |
+| Processing (Lock) | 13:00 → 16:00 | Calculation, verification |
+| Settlement | 16:00 | All changes take effect |
 
 **Status:** Draft
 
@@ -732,9 +732,9 @@ Sealed-bid auction for Senior Risk Capital capacity allocation.
 
 | Property | Value |
 |----------|-------|
-| Timing | Weekly at settlement |
+| Timing | Daily at settlement |
 | Mechanism | Sealed-bid, uniform-price |
-| Duration | OSRC valid for one week; no rollover |
+| Duration | OSRC valid for one epoch (1 day); no rollover |
 | Status | **Planned** |
 
 ---

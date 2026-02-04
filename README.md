@@ -9,7 +9,7 @@ Laniakea is Sky's infrastructure for **automated capital deployment at scale**. 
 - **Unified capital flow architecture** — Capital flows from Sky Core → Primes → Halos → end investments, with every flow rate-limited
 - **Scientific risk management** — Basel III-inspired framework determining capital requirements based on asset duration and forced realization probability
 - **Autonomous operation** — Sentinel network operates infrastructure within governance-defined bounds, enabling 99% automation
-- **Weekly settlement cycles** — Standardized Tue-Wed cycles for auctions, distributions, and LCTS token settlement
+- **Daily settlement cycles** — Standardized daily cycles for auctions, distributions, and LCTS token settlement (lock 13:00 UTC, settle by 16:00 UTC)
 
 This repository provides a complete view of all future Laniakea upgrades alongside current Sky Ecosystem parameters and features.
 
@@ -55,7 +55,7 @@ Basel III-inspired capital requirements framework. Core principle: **Capital Req
 | correlation-framework.md | Category caps and capacity rights |
 | risk-capital-ingression.md | How external capital is recognized on Prime balance sheets |
 | tugofwar.md | Capacity allocation when reservations exceed availability |
-| weekly-settlement-cycle.md | Settlement timing and processes |
+| daily-settlement-cycle.md | Settlement timing and processes |
 | sentinel-integration.md | Output metrics and Sentinel integration |
 | examples.md | Current vs proposed examples |
 

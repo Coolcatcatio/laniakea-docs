@@ -607,7 +607,7 @@ Acquire duration-matching capacity via auctions.
 | Property | Value |
 |----------|-------|
 | Purpose | Reserve Duration Bucket capacity for long-duration assets |
-| Mechanism | Weekly sealed-bid auctions |
+| Mechanism | Daily sealed-bid auctions |
 | Benefit | Lower capital requirements when assets match liability duration |
 
 **101 Duration Buckets:**

@@ -425,7 +425,7 @@ Machines verify that the Synome:
 
 This happens through:
 - Sentinel constraint checking before actions
-- Monthly/Weekly Settlement Cycle validation (A.2, A.3)
+- Monthly/Daily Settlement Cycle validation (A.2, A.3)
 - Independent Calculation vs Initial Calculation comparison
   - ≤1% deviation = **Agreed Amount** (auto-approved)
   - >1% deviation = **Disputed Amount** (requires Core GovOps resolution)
