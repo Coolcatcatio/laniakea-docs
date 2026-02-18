@@ -311,46 +311,48 @@ Loss Event
 │  2. Remaining JRC (pro-rata)   │  ← IJRC + EJRC proportionally  │
 ├────────────────────────────────┤                                │
 │  3. Agent Token Inflation      │  ← Dilute Prime token holders  │
-├────────────────────────────────┤                                │
-│  4. TISRC                      │  ← Prime-isolated SRC          │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─── SYSTEM-LEVEL (shared across all Primes) ─────────────────────┐
-│  5. Global SRC (srUSDS)        │  ← System-wide senior capital  │
+│  4. SRC Pool (pari passu)      │  ← TISRC + Global SRC combined │
 ├────────────────────────────────┤                                │
-│  6. SKY Token Inflation        │  ← Dilute protocol token       │
+│  5. SKY Token Inflation        │  ← Dilute protocol token       │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─── NUCLEAR OPTIONS (protocol reserves / peg) ───────────────────┐
-│  7. Genesis Capital Haircut    │  ← Protocol reserves           │
+│  6. Genesis Capital Haircut    │  ← Protocol reserves           │
 ├────────────────────────────────┤                                │
-│  8. USDS Peg Adjustment        │  ← Final backstop              │
+│  7. USDS Peg Adjustment        │  ← Final backstop              │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
 | Step | Capital Layer | Tier | Mechanism |
 |------|---------------|------|-----------|
-| **1** | First Loss Capital | Prime | First 10% of IJRC absorbed before any other capital |
+| **1** | First Loss Capital | Prime | First 10% of total JRC absorbed from IJRC before any other capital |
 | **2** | Remaining JRC | Prime | IJRC + EJRC share losses proportionally |
 | **3** | Agent Token Inflation | Prime | Dilute Prime token holders (potentially to infinity) |
-| **4** | TISRC | Prime | Prime-isolated senior risk capital |
-| **5** | Global SRC (srUSDS) | System | Shared senior risk capital pool |
-| **6** | SKY Token Inflation | System | Dilute SKY holders at protocol level |
-| **7** | Genesis Capital | Nuclear | Protocol reserves haircut |
-| **8** | USDS Peg Adjustment | Nuclear | Final backstop — affects all USDS holders |
+| **4** | SRC Pool | System | TISRC merges into Global SRC (srUSDS); losses shared pari passu |
+| **5** | SKY Token Inflation | System | Dilute SKY holders at protocol level |
+| **6** | Genesis Capital Haircut | Nuclear | Protocol reserves |
+| **7** | USDS Peg Adjustment | Nuclear | Final backstop — affects all USDS holders |
 
 **First Loss Capital (FLC):**
-- First 10% of Total JRC absorbed solely by Prime's own capital (IJRC)
+- First 10% of total JRC absorbed solely by Prime's own capital (IJRC)
 - Ensures Prime has direct skin in the game for initial losses
 - Losses beyond FLC allocated pro-rata across remaining JRC (internal + external)
 
+**SRC Pool (pari passu):**
+- When a Prime's losses exhaust steps 1-3, its TISRC merges into the Global SRC pool
+- Losses are shared proportionally across all SRC holders in the combined pool
+- Sky charges a fee on TISRC yield for this pari passu protection
+
 **Token Inflation Layers:**
 - Agent Token Inflation (step 3) dilutes the specific Prime's token holders
-- SKY Token Inflation (step 6) dilutes protocol-level token holders
+- SKY Token Inflation (step 5) dilutes protocol-level token holders
 - Both can theoretically cover unlimited losses through dilution
 
 **Nuclear Options:**
-- Steps 7-8 should never be reached under normal conditions
+- Steps 6-7 should never be reached under normal conditions
 - Genesis Capital is the protocol's reserve fund
 - Peg Adjustment is the absolute last resort, affecting all USDS holders
 
@@ -383,14 +385,40 @@ Human-readable governance constitution defining principles, structure, and agent
 
 ### Sky Synome (Planned)
 
-Machine-readable operational database containing all parameters, artifacts, and transaction logs.
+The Synome begins as a machine-readable operational database containing all parameters, artifacts, and transaction logs. Over time, it evolves into the cognitive architecture that encompasses the entire Sky ecosystem — much as "Ethereum" refers not just to the blockchain but to the community, tooling, and coordinated intelligence around it. In its mature form, the Synome is the living, self-improving structure through which autonomous agents (teleonomes) accumulate knowledge, coordinate action through beacons, and operate Sky's institutional shells (Synomic Agents). See `synomics/synome-overview.md` for the full architectural vision.
 
 | Property | Value |
 |----------|-------|
-| Purpose | Contain ALL operational data; machine-readable state |
-| Contents | Agent Artifacts, rate limits, penalty schedules, transaction logs |
-| Relationship | Atlas is single root node within Synome |
-| Status | **Planned** |
+| Phase 1 (Synome-MVP) | Operational database — parameters, Agent Artifacts, rate limits, penalty schedules, transaction logs |
+| Long-term | Cognitive architecture — five-layer system encompassing governance, autonomous agents, embodiments, and recursive self-improvement |
+| Contents | Agent Artifacts, rate limits, penalty schedules, transaction logs (Phase 1); knowledge artifacts, probabilistic mesh, teleonome directives (long-term) |
+| Relationship | Atlas is the single authoritative root node within the Synome; its content propagates as axioms throughout the deontic skeleton |
+| Status | **Synome-MVP in Phase 1; full architecture incremental** |
+
+#### Five-Layer Architecture
+
+The mature Synome is organized as a five-layer containment hierarchy:
+
+| Layer | Name | Role |
+|-------|------|------|
+| 1 | **Synome** | Atlas, Language Intent, Synomic Axioms, Synomic Library — constitutional governance and canonical knowledge |
+| 2 | **Synomic Agents** | Primes, Halos, Generators, Guardians — durable, ledger-native institutional entities operated through Agent Directives |
+| 3 | **Teleonomes** | Private, goal-directed AI systems — operate Synomic Agents through beacons but remain dark by default |
+| 4 | **Embodiment** | Physical infrastructure — compute, storage, network, cryptographic keys |
+| 5 | **Embodied Agent** | Running agents — beacons, hardware control, real-time execution |
+
+Each layer contains the layers below it. Intelligence lives privately at Layers 3–5; power enters the world only through regulated apertures (beacons) registered at Layer 2.
+
+#### Dual Architecture
+
+The Synome's knowledge model combines two complementary structures:
+
+- **Deontic skeleton** — Hard, sparse rules derived from Atlas and Agent Directives. Binary truth values (1,1): either binding or not. Forms the constitutional backbone.
+- **Probabilistic mesh** — Soft, dense knowledge connections with (strength, confidence) truth values. Evidence accumulates; high-confidence patterns may crystallize into deontic rules through governance.
+
+This dual architecture separates what the system *must do* (deontic) from what it *knows* (probabilistic). The crystallization interface — the governance process that converts accumulated evidence into binding rules — bridges the two. See `synomics/synodoxics/probabilistic-mesh.md` for the full epistemological framework.
+
+Long-term, the Synome supports neuro-symbolic cognition: attention allocation, live graph context, and cognitive manipulation loops that enable autonomous agents to reason over the knowledge graph in real time. See `synomics/neurosymbolic/` for the cognition model and `synomics/synoteleonomics/` for the design theory of teleonomes — autonomous goal-directed entities that operate Synomic Agents through beacons.
 
 ---
 
@@ -444,6 +472,9 @@ Spells perform all types of protocol actions — parameter changes, contract dep
 - Direct protocol modifications become rare as Laniakea factory standardizes operations
 - See Appendix B for Agent Spells (Prime Spells, Halo Spells)
 
+**Governance Evolution:**
+The Executive Vote model described above is the current mechanism. Post-transition, spell triggering moves to a Core Council Guardian vote model (SpellCore) where 16 of 24 Core Council Guardians must vote a spell into the hat position. SKY holders retain ultimate sovereignty through a graduated freeze/override mechanism — a tiny minority can freeze for hours, a larger minority for days, and a full quorum triggers override (dismissing the entire Core Council and reverting to direct SKY holder control). See `governance-transition/spellguard-system.md` for full SpellGuard architecture.
+
 ---
 
 ### Aligned Delegate System
@@ -463,15 +494,15 @@ Ranked delegates (L1-L3) with compensation tied to governance activity.
 
 ---
 
-### Facilitator Framework
+### Guardian Interpretation Framework
 
-Interpret Atlas on behalf of Executor Agents.
+Core Guardians interpret Atlas and Artifacts directly — absorbing the former Facilitator role with collateral-backed accountability.
 
 | Property | Value |
 |----------|-------|
-| Role | Interpret Atlas and Artifacts for Executors |
-| Discretion | Broad discretionary authority when explicit guidance absent |
-| Precedents | All interpretations documented as Facilitator Action Precedents |
+| Role | Interpret Atlas and Artifacts |
+| Discretion | Broad discretionary authority when explicit guidance absent, backed by posted collateral |
+| Precedents | All interpretations documented as Guardian Action Precedents |
 
 ---
 
@@ -519,7 +550,7 @@ Solvency buffer for bad debt protection.
 | Skip Condition | 0% allocation when buffer is full |
 
 **Phases:**
-- **Phase 1 (Safety Floor):** Buffer < 125M → MIN(25%, calculated rate) floor
+- **Phase 1 (Safety Floor):** Buffer < 125M → MAX(25%, calculated rate) floor
 - **Phase 2 (Filling):** 125M ≤ Buffer < Target → Calculated rate
 - **Phase 3 (Full):** Buffer ≥ Target → 0% allocation
 
@@ -718,7 +749,7 @@ Post-Laniakea: daily processing window (lock 13:00 → settle 16:00 UTC); faster
 
 | Period | Timing | Purpose |
 |--------|--------|---------|
-| Active Window | 16:00 → 13:00 | Data collection, bid submission |
+| Active Window | 16:00 → 13:00 | Data collection, allocation submission (bids once `stl-base` is live) |
 | Processing (Lock) | 13:00 → 16:00 | Calculation, verification |
 | Settlement | 16:00 | All changes take effect |
 
@@ -729,6 +760,8 @@ Post-Laniakea: daily processing window (lock 13:00 → settle 16:00 UTC); faster
 ### OSRC Auction (Planned)
 
 Sealed-bid auction for Senior Risk Capital capacity allocation.
+
+> **Activation:** Begins once Prime-side `stl-base` is deployed. Prior to that, OSRC allocations are governance-set and published top-down (pre-auction).
 
 | Property | Value |
 |----------|-------|
@@ -742,6 +775,8 @@ Sealed-bid auction for Senior Risk Capital capacity allocation.
 ### Duration Bucket Auction (Planned)
 
 Capacity reservations for duration-matched asset deployment.
+
+> **Activation:** Begins once Prime-side `stl-base` is deployed. Prior to that, duration capacity is allocated manually by governance (top-down).
 
 | Property | Value |
 |----------|-------|
@@ -809,7 +844,7 @@ Original collateralized debt positions.
 | Property | Value |
 |----------|-------|
 | Function | Deposit collateral → mint DAI |
-| Successor | Allocation System via Sky Agents |
+| Successor | Allocation System via Synomic Agents |
 | Status | Legacy (still active) |
 
 ---

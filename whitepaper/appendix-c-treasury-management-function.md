@@ -408,7 +408,7 @@ Each step operates on what remains after previous steps, ensuring all priorities
 The Net Revenue Ratio causes Fortification and Burn allocations to grow with protocol scale, reflecting increased need for legal infrastructure and value capture at larger sizes.
 
 ### Buffer Dynamics
-The Backstop buffer fills aggressively when empty (up to 50% allocation) and stops entirely when full, creating a self-regulating solvency mechanism.
+The Backstop buffer fills aggressively when empty (up to 50% allocation at maximum Net Revenue Ratio; the effective rate scales with the Net Revenue Ratio) and stops entirely when full, creating a self-regulating solvency mechanism.
 
 ### Genesis vs Post-Genesis
 Higher Security allocation during Genesis (21% vs 4-10%) reflects the intensive development and infrastructure buildout required in early phases.

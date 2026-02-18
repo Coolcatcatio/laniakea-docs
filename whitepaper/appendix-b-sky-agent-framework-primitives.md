@@ -1,12 +1,12 @@
-# Appendix B: Sky Agent Framework Primitives
+# Appendix B: Synomic Agent Framework Primitives
 
-Features and capabilities available to Sky Agents. Together with Appendix A (Protocol Features), this provides complete coverage of every mechanism in Sky.
+Features and capabilities available to Synomic Agents. Together with Appendix A (Protocol Features), this provides complete coverage of every mechanism in Sky.
 
 ---
 
 ## Agent Types Overview
 
-Sky Agents are created directly as their permanent type. Each agent type has specific capabilities, primitives, and governance structures. Agent types cannot be changed after creation.
+Synomic Agents are created directly as their permanent type. Each agent type has specific capabilities, primitives, and governance structures. Agent types cannot be changed after creation.
 
 ### Agent Type Hierarchy
 
@@ -15,7 +15,7 @@ Sky Agents are created directly as their permanent type. Each agent type has spe
 | **Prime** | Capital-deploying agents operating at scale | 5 Stars (Spark, Grove, Keel, Star4, Star5) + 1 Institutional (Obex) |
 | **Halo** | Lighter investment products under Prime umbrella | CLO tranches, yield vaults |
 | **Generator** | Issue Sky Generated Assets (new currencies) | USDS Generator (current), future SGA Generators |
-| **Executor** | Operate systems with collateral backing | Core Executors, Operational Executors |
+| **Guardian** | Operate systems with collateral backing | Core Guardians, Operational Guardians |
 
 ### Agent Subtypes
 
@@ -35,9 +35,9 @@ On-chain treasury controlled by the Agent.
 
 | Property | Value |
 |----------|-------|
-| Control | Agent governance via Executor Accord |
+| Control | Agent governance via Guardian Accord |
 | Purpose | Hold treasury assets, execute approved transactions |
-| Access | Executors with appropriate BEAM authorization |
+| Access | Guardians with appropriate BEAM authorization |
 
 ---
 
@@ -57,7 +57,7 @@ Agent Artifact
 ├── Introduction (strategic overview)
 ├── Sky Primitives
 │   ├── Genesis Primitives (Agent Creation, Token, etc.)
-│   ├── Operational Primitives (Executor Accord, Root Edit, etc.)
+│   ├── Operational Primitives (Guardian Accord, Root Edit, etc.)
 │   └── Rewards Primitives (Distribution, Integration Boost, etc.)
 └── Omni Documents
     ├── Governance Information
@@ -206,31 +206,31 @@ This separation ensures Primes operate within standardized, factory-defined cons
 
 ---
 
-### Executor Accord Primitive
+### Guardian Accord Primitive
 
-Framework for executor relationships.
+Framework for guardian relationships.
 
 | Property | Value |
 |----------|-------|
-| Purpose | Define executor roles, responsibilities, accountability |
-| Parties | Agent ↔ Executor (Operational or Core) |
+| Purpose | Define guardian roles, responsibilities, accountability |
+| Parties | Agent ↔ Guardian (Operational or Core) |
 | Enforcement | Collateralized insurance, derecognition |
 
 ---
 
-### Facilitator Framework
+### Guardian Interpretation Framework
 
-Interpret Atlas/Artifacts on behalf of Executors.
+Core Guardians interpret Atlas and Artifacts directly — absorbing the former Facilitator role with collateral-backed accountability.
 
 | Property | Value |
 |----------|-------|
 | Role | Authoritative interpretation of governance documents |
-| Discretion | Broad authority when explicit guidance absent |
-| Documentation | All interpretations recorded as Facilitator Action Precedents |
+| Discretion | Broad authority when explicit guidance absent, backed by posted collateral |
+| Documentation | All interpretations recorded as Guardian Action Precedents |
 
 **Key Principle: Spirit of the Atlas**
 - All rules have underlying intent to serve human values
-- Facilitators interpret Spirit when explicit guidance is absent
+- Core Guardians interpret Spirit when explicit guidance is absent
 - Balance between "letter of the rule" and true purpose
 
 ---
@@ -339,7 +339,7 @@ Constraint on rate limit increase speed.
 
 | Property | Value |
 |----------|-------|
-| Max Increase | 20% per cooldown period |
+| Max Increase | 25% per cooldown period |
 | Cooldown | 18 hours between increases |
 | Decrease | Always instant (no constraint) |
 
@@ -347,6 +347,49 @@ Constraint on rate limit increase speed.
 - Prevent sudden capacity expansion attacks
 - Enable emergency decreases without delay
 - Give monitoring time to detect anomalies
+
+---
+
+#### Configurator Unit
+
+Governance layer that controls rate limits and static parameters for PAUs without modifying deployed contracts.
+
+| Component | Purpose |
+|-----------|---------|
+| **BEAMTimeLock** | Enforces 14-day delay on all additions (new PAU registrations, new inits, new role grants) |
+| **BEAMState** | Stores approved init configurations and accordant mappings |
+| **Configurator** | Operational interface where cBEAMs set rate limits and execute approved actions |
+
+**BEAM Authority Cascade:**
+
+| Level | Role | Holder | Capabilities |
+|-------|------|--------|-------------|
+| **1** | **Council Beacon** (HPHA) | Core Council (set by SpellCore) | Root of all operational authority — sets aBEAMs, overrides all BEAM ownership, sets Synome write rights |
+| **2** | **aBEAM** (Admin BEAM) | Core Council | Register PAUs, approve inits, grant cBEAMs — all via timelock. Instant removals for emergency response |
+| **3** | **cBEAM** (Configurator BEAM) | GovOps teams | Set rate limits (within SORL), execute approved controller actions, manage relayer/freezer addresses |
+| **4** | **pBEAM** (Process BEAM) | Relayers / operational agents | Direct execution on PAUs — calls Controller functions, moves capital within rate limits |
+
+Post-transition, the Council Beacon is set by SpellCore spells (16/24 Core Council Guardian hat) and is the single point from which all downstream BEAM authority flows. See `governance-transition/council-beam-authority.md` for the full authority model.
+
+A GovOps team becomes **accordant** to a PAU when Core Council grants them the cBEAM for that PAU. The accordant GovOps has unified operational control: rate limit configuration, SORL increases, relayer management, and onboarding approved allocation targets.
+
+**Safety Asymmetry:**
+- **Additions** (new PAUs, new inits, new permissions) — always timelocked (14-day delay), giving wardens time to review
+- **Removals** (revoke permissions, delete inits, unregister PAUs) — always instant, enabling rapid emergency response
+
+**Deployment Scope:**
+
+Each Configurator Unit manages PAUs within its governance scope:
+
+| Configurator | Manages |
+|-------------|---------|
+| **Generator Configurator** | All Generator PAUs (single, central instance) |
+| **Mainnet Configurator** | All mainnet Prime + Halo PAUs |
+| **Altchain Configurator** (per chain) | All Foreign Prime + Foreign Halo PAUs on that chain |
+
+The Generator Configurator is separate from the Prime/Halo Configurators because Generators have a distinct governance scope (see `architecture-overview.md`). Prime and Halo PAUs on each blockchain share a single Configurator for that chain.
+
+For detailed contract interfaces, invariants, and user stories, see `smart-contracts/configurator-unit.md`. For the post-transition Council Beacon authority model, see `governance-transition/council-beam-authority.md`.
 
 ---
 
@@ -419,11 +462,10 @@ When losses occur, capital is consumed in strict order across three tiers:
 | **1** | First Loss Capital (10% from IJRC) | Prime | First loss — absorbed entirely before moving to next layer |
 | **2** | Remaining IJRC + EJRC | Prime | Split proportionally between Internal and External JRC |
 | **3** | Agent Token Inflation | Prime | Dilute Prime token holders (potentially to infinity) |
-| **4** | TISRC | Prime | Isolated senior risk capital for this Prime |
-| **5** | Global SRC (srUSDS) | System | Shared senior risk capital pool across all Primes |
-| **6** | SKY Token Inflation | System | Dilute protocol token holders |
-| **7** | Genesis Capital Haircut | Nuclear | Protocol reserves |
-| **8** | USDS Peg Adjustment | Nuclear | Final backstop — affects all USDS holders |
+| **4** | SRC Pool | System | TISRC merges into Global SRC (srUSDS); losses shared pari passu |
+| **5** | SKY Token Inflation | System | Dilute protocol token holders |
+| **6** | Genesis Capital Haircut | Nuclear | Protocol reserves |
+| **7** | USDS Peg Adjustment | Nuclear | Final backstop — affects all USDS holders |
 
 ```
 Loss Event
@@ -434,28 +476,26 @@ Loss Event
 │  2. IJRC + EJRC (pro-rata)          │  ← Remaining junior       │
 ├─────────────────────────────────────┤                           │
 │  3. Agent Token Inflation           │  ← Dilute Prime token     │
-├─────────────────────────────────────┤                           │
-│  4. TISRC                           │  ← Prime-isolated SRC     │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─── SYSTEM-LEVEL (shared across all Primes) ─────────────────────┐
-│  5. Global SRC (srUSDS)             │  ← System-wide SRC        │
+│  4. SRC Pool (pari passu)           │  ← TISRC + Global SRC     │
 ├─────────────────────────────────────┤                           │
-│  6. SKY Token Inflation             │  ← Dilute SKY holders     │
+│  5. SKY Token Inflation             │  ← Dilute SKY holders     │
 └─────────────────────────────────────────────────────────────────┘
                               ↓
 ┌─── NUCLEAR OPTIONS (protocol reserves / peg) ───────────────────┐
-│  7. Genesis Capital Haircut         │  ← Protocol reserves      │
+│  6. Genesis Capital Haircut         │  ← Protocol reserves      │
 ├─────────────────────────────────────┤                           │
-│  8. USDS Peg Adjustment             │  ← Final backstop         │
+│  7. USDS Peg Adjustment             │  ← Final backstop         │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-**Prime-Level (Steps 1-4):** Losses are first absorbed by the specific Prime's capital stack. Agent Token inflation at step 3 can theoretically cover unlimited losses through dilution of Prime token holders.
+**Prime-Level (Steps 1-3):** Losses are first absorbed by the specific Prime's capital stack. Agent Token inflation at step 3 can theoretically cover unlimited losses through dilution of Prime token holders.
 
-**System-Level (Steps 5-6):** If Prime-level capital is exhausted, losses flow to system-wide pools. Global SRC is shared across all Primes; SKY inflation dilutes protocol token holders.
+**System-Level (Steps 4-5):** If Prime-level capital is exhausted, the insolvent Prime's TISRC merges into the Global SRC pool and losses are shared pari passu across all SRC holders. Sky charges a fee on TISRC yield for this protection. SKY inflation dilutes protocol token holders.
 
-**Nuclear Options (Steps 7-8):** Genesis Capital and peg adjustment are last-resort mechanisms that should never be reached under normal conditions. These affect the entire protocol and all USDS holders.
+**Nuclear Options (Steps 6-7):** Genesis Capital and peg adjustment are last-resort mechanisms that should never be reached under normal conditions. These affect the entire protocol and all USDS holders.
 
 ---
 
@@ -508,7 +548,7 @@ Tagging associates a USDS/sUSDS balance with a Prime for Distribution Reward pur
 | Method | How It Works |
 |--------|--------------|
 | **On-chain** | Codes embedded into transactions by frontends or smart contracts |
-| **Off-chain** | Verified by Executor and GovOps |
+| **Off-chain** | Verified by Guardian and GovOps |
 
 **Tag Ownership Rules:**
 
@@ -602,19 +642,19 @@ Rewards for Primes providing compliant governance frontends.
 
 ### Prime: Duration Capacity Reservation (Planned)
 
-Acquire duration-matching capacity via auctions.
+Acquire duration-matching capacity via governance allocations initially, then via auctions once Prime-side `stl-base` is live.
 
 | Property | Value |
 |----------|-------|
 | Purpose | Reserve Duration Bucket capacity for long-duration assets |
-| Mechanism | Daily sealed-bid auctions |
+| Mechanism | Governance allocations (pre-auction), then daily sealed-bid auctions (once `stl-base` is live) |
 | Benefit | Lower capital requirements when assets match liability duration |
 
 **101 Duration Buckets:**
-- Each bucket = 0.5 months (15 days)
+- Each bucket = 15 days
 - Bucket 0 = immediate liquidity
-- Bucket 84 = 42 months (JAAA CLO AAA)
-- Bucket 100 = 50+ months (structural/permanent)
+- Bucket 84 = 1,260 days (JAAA CLO AAA)
+- Bucket 100 = 1,500+ days (structural/permanent)
 
 ---
 
@@ -693,17 +733,34 @@ When de-designated, the 3-year clock pauses. A future Pioneer Star continues fro
 
 Halo Agents are investment products created by Primes. They wrap specific strategies and deploy capital into real-world assets, custodians, and regulated endpoints.
 
-### Halo Types
+### Halo Classification
 
-| Type | Purpose | Flexibility |
-|------|---------|-------------|
-| **Standard Halo** | General investment products; supports Halo Units | Can do anything |
-| **Identity Network Halo** | Operates identity verification infrastructure | Specially regulated |
-| **Exchange Halo** | Operates intent-based exchange infrastructure | Specially regulated |
+Halos are classified on two dimensions: **regulatory treatment** and **Halo Class type** (which determines the capital deployment mechanism).
 
-**Standard Halos** are the most common type and can be configured for any investment strategy or operational purpose. They support multiple Halo Units within a single Halo structure.
+**By regulatory treatment:**
 
-**Identity Network Halos** and **Exchange Halos** are specialized types with additional regulatory requirements, tied to the Identity Network and Sky Intents systems respectively. See `identity-network.md` and `sky-intents.md` for details.
+| Treatment | Types | Rules |
+|-----------|-------|-------|
+| **Standard** | Portfolio, Term, Trading | Normal Halo rules — standard governance, rate limits, and risk framework |
+| **Special** | Identity Network, Exchange, Staking | Additional regulatory or operational requirements beyond standard Halo rules |
+
+**Standard Halo Class types** (by capital deployment mechanism):
+
+| Class Type | Token Standard | Use Case |
+|------------|----------------|----------|
+| **Portfolio Halo** | LCTS (pooled, fungible) | Standardized products with uniform terms — all participants share the same conditions |
+| **Term Halo** | NFAT (individual, non-fungible) | Bespoke deals with negotiated terms — each position has different duration, size, and yield |
+| **Trading Halo** | AMM (programmatic counterparty) | Instant liquidity for RWA tokens and ecosystem assets via automated market making |
+
+A Halo Agent with a single Halo Class is commonly referred to by its class name (e.g., "a Portfolio Halo" or "a Trading Halo").
+
+**Special Halos:**
+
+| Type | Purpose |
+|------|---------|
+| **Identity Network Halo** | Operates identity verification infrastructure (KYC registries). See `sky-agents/halo-agents/identity-network.md` |
+| **Exchange Halo** | Operates intent-based exchange infrastructure (orderbooks, matching engines). See `trading/sky-intents.md` |
+| **Staking Halo** | Personal Growth Staking vehicle for SKY holders. See `growth-staking/growth-staking.md` |
 
 ---
 
@@ -717,51 +774,45 @@ Halo Agents are investment products created by Primes. They wrap specific strate
 
 ---
 
-### Halo Class Structure
+### Halo Class, Sleeve, and Unit Structure
 
-A **Halo Class** is a grouping of Halo Units that share the same smart contract infrastructure (PAU, sentinel formation) and legal framework (buybox, agreements). The Halo Class defines the operational bounds; individual Halo Units vary within those bounds.
+Halos organize capital into three layers: **Class**, **Sleeve**, and **Unit**. Each layer serves a distinct purpose — infrastructure sharing, risk isolation, and individual claims.
 
 **Hierarchy:**
 ```
 Halo (Synomic Agent)
 └── Halo Class (shared SC + legal infra)
-    └── Halo Unit (specific instance)
+    ├── ASSET SIDE: Halo Sleeves (bankruptcy-remote containers)
+    └── LIABILITY SIDE: Halo Units (claims on sleeves)
 ```
 
-**Examples:**
+**Halo Class** — shared smart contract infrastructure (PAU, LPHA beacon) and legal framework (buybox, agreements). The Class defines operational bounds.
 
-| Halo Type | Halo Class Example | Halo Units Within |
-|-----------|-------------------|-------------------|
-| **Passthrough** | Tranched CLO structure | Senior tranche, Junior tranche (same PAU, same lpha-lcts) |
-| **Structuring** | NFAT Facility with buybox | Multiple NFAT deals (varying duration, size within buybox) |
+| What a Class shares | What varies per Unit |
+|---------------------|---------------------|
+| PAU (Controller + ALMProxy + RateLimits) | Tranche seniority (for Portfolio) |
+| LPHA beacon (lpha-lcts, lpha-nfat, or lpha-amm) | Duration, size, specific terms (for Term) |
+| Legal framework (buybox constraints) | Asset pair, spread, pool depth (for Trading) |
+| Factory template (audited, reusable) | Risk/return profile within class constraints |
 
-**What a Halo Class shares:**
-- PAU (Controller + ALMProxy + RateLimits)
-- Sentinel formation (lpha-lcts or lpha-nfat)
-- Legal framework (buybox constraints, counterparty agreements)
-- Factory template (audited, reusable deployment)
+**Halo Sleeve** — an asset-side, bankruptcy-remote container holding the actual assets backing one or more Units. Sleeves provide risk isolation: units sharing a sleeve are pari passu on losses; units on different sleeves are fully isolated. Multiple assets can be blended in a sleeve for borrower privacy. Sleeves progress through a lifecycle (Filling → Deploying → At Rest → Unwinding) with capital requirements varying by phase — see `sky-agents/halo-agents/halo-class-sleeve-unit.md`.
 
-**What Halo Units can vary:**
-- Tranche seniority (for Passthrough)
-- Duration, size, specific terms (for NFAT)
-- Risk/return profile within class constraints
-
----
-
-### Halo Unit Structure
-
-A **Halo Unit** is a governance-level construct — not a smart contract — representing a bankruptcy-remote capital deployment within a Halo Class. Similar to a serialized LLC, each Halo Unit is legally and operationally isolated from other units within the same Halo. If one unit suffers losses, other units are protected.
-
-A single Halo Class can contain multiple Halo Units, each with specific parameters within the class's bounds.
-
-**Token Standards:** The choice of token standard determines how claims on a Halo Unit are represented — analogous to choosing between bonds, ETFs, or stocks to represent value:
+**Halo Unit** — a liability-side claim on a specific Sleeve. Each Unit is legally and operationally isolated from other units (similar to a serialized LLC). The token standard determines how claims are represented:
 
 | Standard | Model | Use Case |
 |----------|-------|----------|
 | **LCTS** | Pooled, fungible shares | Many users, same terms, shared capacity (ETF-like) |
 | **NFATS** | Individual, non-fungible tokens | Bespoke deals, named counterparties (bond-like) |
 
-The underlying smart contract infrastructure (PAU + Sentinel) remains consistent across a Halo Class; the token standard determines the user-facing mechanics for subscribing, redeeming, and transferring positions.
+**Examples:**
+
+| Class Type | Halo Class Example | Halo Units Within |
+|-----------|-------------------|-------------------|
+| **Portfolio** | Tranched CLO structure | Senior tranche, Junior tranche (same PAU, same lpha-lcts) |
+| **Term** | NFAT Facility with buybox | Multiple NFAT deals (varying duration, size within buybox) |
+| **Trading** | RWA instant-settlement pool | USDS/T-Bill pair, USDS/JAAA pair (same AMM, same lpha-amm) |
+
+The underlying smart contract infrastructure (PAU + LPHA beacon) remains consistent across a Halo Class; the token standard determines the user-facing mechanics for subscribing, redeeming, and transferring positions.
 
 ---
 
@@ -816,43 +867,43 @@ Generators have a limited set of specific primitives available to them:
 
 | Property | Value |
 |----------|-------|
-| Purpose | Distribute duration auction income to Primes |
+| Purpose | Distribute duration auction income to Primes (once auctions are live) |
 | Recipients | Primes that have sourced sticky demand (long-duration liabilities) |
-| Source | Revenue from Duration Bucket capacity auctions |
+| Source | Revenue from Duration Bucket capacity auctions (once auctions are live) |
 
 ---
 
-## Executor Agents
+## Guardian Agents
 
-Executor Agents operate systems with collateral backing. They execute day-to-day operations and provide oversight within the Sky governance framework.
+Guardian Agents operate systems with collateral backing. They interpret governance documents, participate in governance, execute day-to-day operations, and provide oversight within the Sky governance framework. Guardians consolidate the former Facilitator (interpretation), Aligned Delegate (governance participation), and Executor (operations) roles into a single collateral-backed role.
 
-### Executor Types
+### Guardian Types
 
 | Type | Role | Accountability |
 |------|------|----------------|
-| **Operational Executor** | Day-to-day execution | Posts collateral; subject to derecognition |
-| **Core Executor** | Oversight of Operational Executors | Atlas alignment; governs Operational Executors |
+| **Operational Guardian** | Day-to-day execution | Posts collateral; subject to derecognition |
+| **Core Guardian** | Interprets Atlas, oversees Operational Guardians, participates in governance | Atlas alignment; collateral-backed interpretation |
 
 ---
 
-### Operational Executor
+### Operational Guardian
 
 | Property | Value |
 |----------|-------|
 | Function | Execute routine operations within defined bounds |
 | Collateral | Posts insurance backing their operations |
-| Supervision | Subject to Core Executor oversight |
+| Supervision | Subject to Core Guardian oversight |
 | Risk | Derecognition and collateral loss for violations |
 
 ---
 
-### Core Executor
+### Core Guardian
 
 | Property | Value |
 |----------|-------|
-| Function | Oversee Operational Executors; ensure Atlas alignment |
-| Relationship | Governs multiple Operational Executors |
-| Accountability | To Sky Governance and Facilitators |
+| Function | Interpret Atlas, oversee Operational Guardians, participate in governance votes |
+| Relationship | Governs multiple Operational Guardians; receives delegated SKY voting power |
+| Accountability | To Sky Governance; collateral-backed interpretation and execution |
 
 ---
 

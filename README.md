@@ -24,69 +24,30 @@ This documentation is designed for navigation with **code LLMs** (Claude Code, C
 
 ## Contents
 
-### whitepaper/
-The public-facing narrative wrapper around the Laniakea system.
+| Directory | Description |
+|---|---|
+| [`whitepaper/`](whitepaper/) | Public-facing narrative — main 8-part whitepaper plus appendices (glossary, tokens, design rationale, infrastructure) |
+| [`risk-framework/`](risk-framework/) | Basel III-inspired capital requirements — duration model, asset classification, capital formulas, sentinel integration |
+| [`accounting/`](accounting/) | Settlement operations — daily settlement cycle, auctions, tug-of-war allocation, capital recognition |
+| [`smart-contracts/`](smart-contracts/) | On-chain architecture — PAU pattern (Controller + ALMProxy + RateLimits), Diamond proxy, LCTS, NFATS, rate limits |
+| [`roadmap/`](roadmap/) | Implementation phases 0–10 — from MVP beacons through factory stack to full sentinel automation |
+| [`sky-agents/`](sky-agents/) | Synomic Agent specifications — Generators, Primes, Halos, Guardians, plus creation and restructuring mechanics |
+| [`trading/`](trading/) | Sentinel network and Sky Intents — real-time execution infrastructure and intent-based trading protocol |
+| [`synomics/`](synomics/) | The Synome and the entities that inhabit it — macrosynomics, synodoxics, neurosymbolic, synoteleonomics, the Hearth, core concepts |
+| [`governance-transition/`](governance-transition/) | Alignment conserver consolidation — three legacy roles merged into single Guardian role with collateral backing |
+| [`growth-staking/`](growth-staking/) | Growth Staking — SKY staker incentives tied to ecosystem growth asset holdings (Agent tokens, risk capital, sSGA) |
+| [`skychain/`](skychain/) | Skychain research — proposed AI-native EVM blockchain optimized for agent operation |
+| [`input-documents/`](input-documents/) | Community contributions — submit PRs with corrections, suggestions, questions, or new information |
+
+## Key Documents
 
 | Document | Description |
-|----------|-------------|
-| sky-whitepaper.md | Main 8-part document covering business model, history, tokens, agents, risk, and governance |
-| appendix-a-protocol-features.md | Exhaustive list of Sky Core mechanisms |
-| appendix-b-sky-agent-framework-primitives.md | Sky Agent Framework capabilities (Primes, Halos, Executors) |
-| appendix-c-treasury-management-function.md | Complete TMF waterfall specification |
-| appendix-d-tokens.md | Complete token reference (USDS, sUSDS, SKY, stUSDS, and agent tokens) |
-| appendix-e-design-rationale.md | Q&A explaining critical design decisions |
-| appendix-f-glossary.md | Term definitions |
-| appendix-g-infrastructure.md | Deployed contracts, bridges, and legacy systems |
-
-### risk-framework/
-Basel III-inspired capital requirements framework. Core principle: **Capital Requirement = Drawdown Magnitude × Forced Realization Probability**
-
-| Document | Description |
-|----------|-------------|
-| README.md | Framework overview and module map |
-| duration-model.md | Liability duration analysis (Lindy Duration Model), Duration Buckets, structural caps |
-| asset-classification.md | Asset characteristics, fundamental risk, drawdown risk, SPTP |
-| matching.md | Rate risk vs credit spread risk, duration matching eligibility |
-| asset-type-treatment.md | Worked treatments for TradFi, crypto, hybrid assets |
-| collateralized-lending-risk.md | Jump-to-default and liquidation loss (gap risk) |
-| market-risk-frtb.md | FRTB-style drawdown treatment for unmatched liquid assets |
-| asc.md | Actively Stabilizing Collateral requirements |
-| capital-formula.md | Capital formulas and computation flow |
-| correlation-framework.md | Category caps and capacity rights |
-| risk-capital-ingression.md | How external capital is recognized on Prime balance sheets |
-| tugofwar.md | Capacity allocation when reservations exceed availability |
-| daily-settlement-cycle.md | Settlement timing and processes |
-| sentinel-integration.md | Output metrics and Sentinel integration |
-| examples.md | Current vs proposed examples |
-
-### smart-contracts/
-Laniakea smart contract architecture built on the **PAU pattern** (Parallelized Allocation Unit).
-
-| Document | Description |
-|----------|-------------|
-| architecture-overview.md | Four-layer capital flow (Generator → Prime → Halo → RWA), PAU pattern, modular design |
-| configurator-unit.md | Governance layer: BEAM hierarchy (aBEAM/cBEAM/pBEAM), rate limits, SORL |
-| lcts.md | Liquidity Constrained Token Standard — queue-based tokens for fair capacity distribution |
-
-### governance-operations/
-Governance structure and autonomous operational infrastructure.
-
-| Document | Description |
-|----------|-------------|
-| sentinel-network.md | Autonomous agents (Sentinels) operating infrastructure: taxonomy, interfaces, toolkit |
-| atlas-synome-separation.md | Two-layer split: Atlas (human-readable constitution) + Synome (machine-readable database) |
-
-### legal-and-trading/
-Trading infrastructure, compliance frameworks, and institutional integration.
-
-| Document | Description |
-|----------|-------------|
-| passthrough-halo.md | Standardized wrapper enabling rapid RWA product launch with immediate capital |
-| identity-network.md | KYC/identity verification as a Halo type — on-chain registry of verified addresses |
-| sky-intents.md | Intent-based trading protocol: fair matching, no MEV, permissioned trading |
-
-### input-documents/
-Community contribution directory. Submit PRs with corrections, suggestions, questions, or new information.
+|---|---|
+| [`whitepaper/sky-whitepaper.md`](whitepaper/sky-whitepaper.md) | Main whitepaper — business model, tokens, agents, risk, governance |
+| [`whitepaper/appendix-f-glossary.md`](whitepaper/appendix-f-glossary.md) | Term definitions |
+| [`smart-contracts/architecture-overview.md`](smart-contracts/architecture-overview.md) | Four-layer capital flow architecture and PAU pattern |
+| [`synomics/macrosynomics/beacon-framework.md`](synomics/macrosynomics/beacon-framework.md) | Beacon taxonomy — power x authority matrix (LPLA/LPHA/HPLA/HPHA) |
+| [`roadmap/roadmap-overview.md`](roadmap/roadmap-overview.md) | Master roadmap with phase summaries, dependencies, and milestones |
 
 ## Contributing
 

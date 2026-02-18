@@ -22,7 +22,7 @@ The Configurator Unit is a governance layer that controls rate limits and static
 | **Restricted init** | An init that can only be used by a specific PAU (when `pau != address(0)`) |
 | **Relayer** | The address that executes operations on the Controller; set by accordant GovOps via `setRelayer` |
 | **Freezer** | The address that can remove compromised relayers from a Controller; set by accordant GovOps via `setFreezer` |
-| **Second-order rate limit (SORL)** | The constraint on how fast rate limits can be increased (default: 20% per 18 hours) |
+| **Second-order rate limit (SORL)** | The constraint on how fast rate limits can be increased (default: 25% per 18 hours) |
 
 ---
 
@@ -105,7 +105,7 @@ The Configurator Unit is a governance layer that controls rate limits and static
 | Action | Constraint | Description |
 |--------|------------|-------------|
 | Set rate limit | Must have init | Convert an init rate limit into an active rate limit for an accordant PAU |
-| Increase rate limit | SORL | Max 20% increase per 18h cooldown period |
+| Increase rate limit | SORL | Max 25% increase per 18h cooldown period |
 | Decrease rate limit | None | Always instant |
 | Call controller action | Must have init | Execute an approved controller call for an accordant PAU |
 | Set relayer | None | Set the relayer address for an accordant PAU |
@@ -298,7 +298,7 @@ function delInitControllerActions(bytes32 key, address pau) external onlySigner;
 |-----------|---------|-------------|
 | Timelock delay | 14 days | Minimum wait before additions take effect |
 | `hop` | 18 hours | SORL cooldown between rate limit increases |
-| `maxChange` | 20% (2000 bps) | SORL maximum increase per cooldown period |
+| `maxChange` | 25% (2500 bps) | SORL maximum increase per cooldown period |
 
 ---
 
@@ -427,10 +427,10 @@ PAU registration should be an aBEAM function routed through BEAMTimeLock (adding
    configurator.callControllerAction(primeA, setMaxSlippage(vault, 0.999e18))
    ```
 
-4. **GovOps can now increase limits** (subject to SORL: 20%/18h):
-   - Day 1: 10M → 12M ✓
-   - Day 2: 12M → 14.4M ✓
-   - Day 7: up to ~35.8M
+4. **GovOps can now increase limits** (subject to SORL: 25%/18h):
+   - Day 1: 10M → 12.5M ✓
+   - Day 2: 12.5M → 15.6M ✓
+   - Day 7: up to ~47.7M
 
 ---
 

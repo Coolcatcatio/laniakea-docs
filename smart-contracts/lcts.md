@@ -18,7 +18,7 @@ The system consists of two independent queue contracts—**SubscribeQueue** and 
 - The queue can be **DORMANT** (no active generation) when unused; a generation is created **lazily** when a user first enters.
 - A generation may span multiple days if capacity is constrained; the same generation locks/settles/unlocks each day until drained.
 
-LCTS integrates with the protocol-wide daily settlement cycle (see `risk-framework/daily-settlement-cycle.md`).
+LCTS integrates with the protocol-wide daily settlement cycle (see `accounting/daily-settlement-cycle.md`).
 
 ---
 
@@ -59,7 +59,7 @@ LCTS eliminates this by pooling users in a generation and distributing capacity 
 
 1. **Rate-Limited Conversions**
    - Conversions (subscribe or redeem) occur only when external capacity is available
-   - An LCTS-pBEAM (operated by a Sentinel) controls how much capacity is allocated each epoch
+   - An LCTS-pBEAM (operated by an authorized LPHA beacon, e.g. `lpha-lcts`) controls how much capacity is allocated each epoch
    - Users cannot bypass the queue to convert instantly
 
 2. **Fair Proportional Distribution**
@@ -115,8 +115,8 @@ The lock window is bounded (≤3 hours). Operationally, some deployments may cho
 
 The daily lock window serves critical functions:
 
-1. **Auction accuracy** — Capacity auctions rely on known queue quantities; if users could mutate the queue during processing, matching would be invalidated
-2. **Settlement certainty** — The Sentinel needs fixed quantities to calculate proportional distributions
+1. **Allocation accuracy** — Capacity allocation relies on known queue quantities; if users could mutate the queue during processing, allocations would be invalidated
+2. **Settlement certainty** — The LPHA beacon needs fixed quantities to calculate proportional distributions
 3. **Accounting integrity** — Blocking deposits/withdrawals/claims eliminates race conditions around share ratios and reward accounting
 
 ---
@@ -126,14 +126,14 @@ The daily lock window serves critical functions:
 For paired subscribe/redeem systems like srUSDS, settlement capacity typically comes from:
 
 1. **Net flow netting** — Subscribe and redeem queues cancel each other out first
-2. **OSRC capacity** — New srUSDS capacity from auction (for subscribes)
+2. **OSRC capacity** — New srUSDS capacity (governance-originated pre-auction; auction-originated once auctions are live)
 3. **Redemption capacity** — Governance-set limit per epoch (for redeems)
 
 ```
 Example:
 - SubscribeQueue total: $100M waiting
 - RedeemQueue total:    $30M waiting
-- OSRC auction capacity: $30M new minting
+- OSRC capacity: $30M new minting
 
 Settlement:
 1. Net flow netting: $30M subscribe ↔ $30M redeem (matched)
@@ -151,7 +151,7 @@ Settlement:
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
-│                    LCTS-pBEAM (Sentinel)                         │
+│                   LCTS-pBEAM (LPHA beacon)                       │
 │         Determines capacity each epoch, calls lock/settle        │
 └─────────────────────────────┬───────────────────────────────────┘
                               │
@@ -190,7 +190,7 @@ Settlement:
 | **Net Flow Netting** | Subscribe and redeem queues canceling each other out, reducing net conversion needs |
 | **rewardPerToken** | Cumulative rewards distributed per share (accumulator pattern) |
 | **rewardDebt** | Snapshot of rewardPerToken at time of user's entry (prevents claiming pre-entry rewards) |
-| **LCTS-pBEAM** | pBEAM held by Sentinel that can call lock/settle |
+| **LCTS-pBEAM** | pBEAM held by an authorized operator (LPHA beacon) that can call lock/settle |
 | **Holding System** | Contract holding sUSDS backing srUSDS; receives funding, sources redemptions |
 
 ---
@@ -286,7 +286,7 @@ Each user has one position per queue:
 
 **Preconditions:**
 
-- Caller is the LCTS-pBEAM (held by Sentinel)
+- Caller is the LCTS-pBEAM (held by an authorized LPHA beacon operator)
 - Called at the configured lock time (daily target: 13:00 UTC)
 
 **Behavior:**
@@ -441,7 +441,7 @@ On settlement, srUSDS is burned and sUSDS is transferred from the Holding System
 
 1. User subscribes 1,000 sUSDS
    - First in generation: 1,000 shares
-2. Sentinel settles with capacity = 1,000 (full conversion)
+2. lpha-lcts settles with capacity = 1,000 (full conversion)
    - 1,000 sUSDS converts to (e.g.) 980 srUSDS
    - rewardPerToken = 0.98e18
    - totalUnderlying = 0 → FINALIZED → queue becomes DORMANT
@@ -520,7 +520,7 @@ Throughout: the generation is LOCKED during the daily lock window, and ACTIVE ou
 
 ### Zero Capacity Epoch
 
-**Scenario:** Sentinel sets capacity to 0 for an epoch.
+**Scenario:** lpha-lcts sets capacity to 0 for an epoch.
 
 - No conversion occurs; rewardPerToken unchanged.
 - At settlement, the generation unlocks back to ACTIVE.
@@ -557,11 +557,11 @@ Throughout: the generation is LOCKED during the daily lock window, and ACTIVE ou
 
 ---
 
-## LCTS-pBEAM (Sentinel) Integration
+## LCTS-pBEAM (LPHA Beacon) Integration
 
 ### Interface
 
-The LCTS-pBEAM (held by the lpha-lcts Sentinel) calls:
+The LCTS-pBEAM (held by the `lpha-lcts` beacon) calls:
 
 - `SubscribeQueue.lock()`
 - `RedeemQueue.lock()`
@@ -577,19 +577,19 @@ The LCTS-pBEAM (held by the lpha-lcts Sentinel) calls:
 
 ### Capacity Determination (srUSDS)
 
-The Sentinel determines capacity based on:
+The `lpha-lcts` beacon determines capacity based on:
 
 1. Net flow netting
-2. OSRC auction results (subscribe side)
+2. OSRC allocation (governance-originated pre-auction; auction results once auctions are live)
 3. Per-epoch redemption limit (redeem side)
 4. Target spread protection (subscribe side)
 5. Guardrails (cBEAM-defined bounds)
 
 ### Target Spread Mechanism (srUSDS)
 
-srUSDS has a governance-set **target spread** above SSR. The Sentinel enforces this:
+srUSDS has a governance-set **target spread** above SSR. The `lpha-lcts` beacon enforces this:
 
-- If OSRC auction demand provides yield ≥ target spread: allow full subscribe capacity
+- If OSRC clearing yield (governance-set pre-auction; auction-cleared later) provides yield ≥ target spread: allow full subscribe capacity
 - If demand would result in yield < target spread: reduce subscribe capacity to maintain spread
 
 Redemption capacity is bounded by a governance-set per-epoch limit.
@@ -598,8 +598,20 @@ Redemption capacity is bounded by a governance-set per-epoch limit.
 
 The srUSDS exchange rate is updated each epoch:
 
-- **Increases** from yield (OSRC auction clearing rate × time)
+- **Increases** from yield (OSRC clearing rate × time)
 - **Decreases** from haircuts when losses occur
+
+### Exchange Rate Query Interface (Fixed Rates Compatibility)
+
+All LCTS tokens MUST expose a public on-chain function that returns the current exchange rate between the LCTS token and its underlying asset:
+
+```
+function exchangeRate() external view returns (uint256)
+```
+
+This returns the amount of underlying (in underlying precision) that 1e18 shares of the LCTS token are currently worth. The exchange rate changes at each settlement epoch as yield accrues or haircuts are applied.
+
+This interface is required for integration with the **Fixed Rates Yield Splitter** (see `smart-contracts/fixed-rates.md`). The Yield Splitter uses the exchange rate to track yield accrual on deposited LCTS tokens and to correctly attribute yield between Principal Tokens (PT) and Yield Tokens (YT) across splitting buckets. Without a queryable exchange rate, LCTS tokens cannot participate in fixed-rate yield splitting.
 
 ---
 
@@ -656,3 +668,16 @@ The following decisions should be made during implementation:
 2. Holding system architecture (separate contract vs integrated)
 
 These are implementation choices that do not change the business requirements.
+
+---
+
+## Related Documents
+
+| Document | Relationship |
+|----------|--------------|
+| [`accounting/daily-settlement-cycle.md`](../accounting/daily-settlement-cycle.md) | Daily settlement timeline — LCTS lock/settle synchronized with this cycle |
+| [`risk-framework/capital-formula.md`](../risk-framework/capital-formula.md) | srUSDS, TEJRC, TISRC as risk capital instruments in the capital formula |
+| [`risk-framework/operational-risk-capital.md`](../risk-framework/operational-risk-capital.md) | ORC sizing linked to LCTS settlement cadence |
+| [`smart-contracts/fixed-rates.md`](fixed-rates.md) | Fixed-rate yield splitting — requires LCTS exchange rate interface |
+| [`sky-agents/halo-agents/portfolio-halo.md`](../sky-agents/halo-agents/portfolio-halo.md) | Portfolio Halos use LCTS as their token standard |
+| [`roadmap/roadmap-overview.md`](../roadmap/roadmap-overview.md) | LCTS launches in Phase 4 |

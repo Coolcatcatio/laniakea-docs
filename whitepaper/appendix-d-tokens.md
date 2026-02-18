@@ -50,8 +50,8 @@ Complete reference of all tokens in the Sky ecosystem.
 
 | Token | Type | Description |
 |-------|------|-------------|
-| **LCTS Shares** | Position | Non-transferable internal accounting for queue positions (Passthrough Halos) |
-| **NFAT** | Position | Non-Fungible Allocation Token — transferable claim on individual Structuring Halo deals |
+| **LCTS Shares** | Position | Non-transferable internal accounting for queue positions (Portfolio Halos) |
+| **NFAT** | Position | Non-Fungible Allocation Token — transferable claim on individual Term Halo deals |
 | **Halo Unit Shares** | Ownership | Pro-rata claim on Halo Unit assets |
 
 ### Token Standards
@@ -105,7 +105,7 @@ Complete reference of all tokens in the Sky ecosystem.
 - Global senior risk capital for USDS
 
 ### NFAT
-- ERC-721 representing claim on Structuring Halo deal
+- ERC-721 representing claim on Term Halo deal
 - Each NFAT has individual terms (duration, size, yield) within buybox
 - Transferable — can be sold or used as collateral
 - Burned on redemption when funds are claimed

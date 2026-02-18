@@ -8,7 +8,7 @@
 |------|---------|
 | `sky-whitepaper.md` | Main whitepaper document (Parts 1-8) |
 | `appendix-a-protocol-features.md` | Exhaustive list of Sky Core mechanisms |
-| `appendix-b-sky-agent-framework-primitives.md` | Sky Agent Framework primitives and capabilities |
+| `appendix-b-sky-agent-framework-primitives.md` | Synomic Agent Framework primitives and capabilities |
 | `appendix-c-treasury-management-function.md` | Treasury Management Function waterfall |
 | `appendix-d-tokens.md` | Complete token reference (core + agent framework) |
 | `appendix-e-design-rationale.md` | Protocol design rationale |

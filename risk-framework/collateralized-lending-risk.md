@@ -48,8 +48,17 @@ Gap risk is the bad debt that occurs when collateral prices crash faster than li
 - `gap_risk_CRR` (capital ratio requirement for collateralized lending exposures)
 - Optional: breakouts for `jump_risk`, `liquidation_LGD`, and `mechanism_risk` if we want a more granular reporting model
 
+## Combination Rule
+
+`gap_risk_CRR` is the **forced-liquidation / shortfall** capital term for collateralized lending exposures. In the capital formula it is combined with fundamental risk (risk weight) via a loss envelope:
+
+```
+Position Capital = Position Size × max(Risk Weight, Gap Risk CRR)
+```
+
+See `capital-formula.md` for how this connects to other asset types.
+
 ## Connections
 
 - Capital composition: `capital-formula.md`
 - Asset examples: `asset-type-treatment.md`
-

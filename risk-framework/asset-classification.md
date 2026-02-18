@@ -16,6 +16,8 @@ What can go wrong even if you hold to maturity?
 
 This is the irreducible risk that doesn't go away with time. Expressed as a **risk weight** percentage.
 
+**Note:** In the capital formula, risk weight is the fundamental-loss floor. For unmatched exposures it is combined with forced-sale / forced-liquidation terms via `max(...)` (see `capital-formula.md`).
+
 ### B. Mark-to-Market Risk (Drawdown)
 
 How far could this asset fall from current price before recovering?
@@ -47,7 +49,7 @@ The stress modifier is derived from historical worst-case prepayment slowdowns f
 
 | Asset Class | Normal Pull-to-Par | Stress Modifier | Stressed Pull-to-Par | Historical Basis |
 |-------------|-------------------|-----------------|---------------------|------------------|
-| CLO AAA (JAAA) | ~2.5 years | 1.3-1.4x | ~3.25-3.5 years | 2008-2009: prepayments dropped from 28% to 9-15% |
+| CLO AAA (JAAA) | ~2.5 years | 1.4x | ~3.5 years | 2008-2009: prepayments dropped from 28% to 9-15% (historical range 1.3-1.4x; 1.4x used for capital purposes) |
 | Agency MBS | Varies | 1.2-1.5x | Varies | Rate-dependent; extension risk in rising rate environments |
 | Corporate bonds | To maturity | 1.0x | To maturity | Fixed maturity, no prepayment optionality |
 | T-bills | To maturity | 1.0x | To maturity | Fixed maturity, no extension risk |

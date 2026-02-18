@@ -125,36 +125,37 @@ Assets can be matched against liability tiers based on their stressed pull-to-pa
 - Capital requirement = **Risk Weight only**
 - You only need capital for fundamental risk (credit, smart contract, etc.)
 
-### Unmatched Assets (FRTB Treatment)
+### Unmatched Assets (Forced-Loss Treatment)
 
 **Condition:** Asset stressed pull-to-par > liability tier duration, OR no pull-to-par
 
 **Treatment:**
 - Forced realization probability is high
-- Capital requirement = **Full stressed drawdown**
-- Must cover mark-to-market loss at relevant confidence level
+- Capital requirement = **max(Risk Weight, forced-loss capital term)**
+- For liquid, tradable assets the forced-loss term is the stressed drawdown (FRTB-style)
+- For collateralized lending positions the forced-loss term is gap risk (liquidation shortfall)
 
 ### Matching Example
 
 | Asset | Stressed Pull-to-Par | Required Bucket | If Matched | If Unmatched |
 |-------|---------------------|-----------------|------------|--------------|
-| JAAA | ~42 months (30mo × 1.4x) | 42mo | ~4-5% risk weight | ~10% FRTB |
-| 90-day T-bill | ~13 weeks (no stress modifier) | 3mo | ~0.5% risk weight | ~2% FRTB |
-| 4-week T-bill | 4 weeks (no stress modifier) | 4wk | ~0.2% risk weight | ~1% FRTB |
-| Sparklend | None | Cannot match | N/A | Gap risk capital |
+| JAAA | ~1,260 days (900d × 1.4x) | bucket 84 | ~4-5% risk weight | ~10% FRTB (≥ RW) |
+| 90-day T-bill | ~90 days (no stress modifier) | bucket 6 | ~0.5% risk weight | ~2% FRTB (≥ RW) |
+| 4-week T-bill | ~30 days (no stress modifier) | bucket 2 | ~0.2% risk weight | ~1% FRTB (≥ RW) |
+| Sparklend | None | Cannot match | N/A | max(RW, gap risk) |
 
 ### Partial Matching (Split Treatment)
 
 When an asset position exceeds available duration capacity, the position is split into matched and unmatched portions. Each portion receives its appropriate capital treatment.
 
 **Example:**
-- Hold $500M JAAA (SPTP = 42 months, requires 42mo bucket)
-- Cumulative duration capacity at 42mo+: $300M
+- Hold $500M JAAA (SPTP = 1,260 days, requires bucket 84)
+- Cumulative duration capacity at bucket 84+: $300M
 
 | Portion | Amount | Treatment | CRR | Capital Required |
 |---------|--------|-----------|-----|------------------|
 | Matched | $300M | Duration-matched (risk weight) | 5% | $15M |
-| Unmatched | $200M | FRTB (drawdown) | 10% | $20M |
+| Unmatched | $200M | FRTB (drawdown, floored by RW) | 10% | $20M |
 | **Total** | $500M | — | — | **$35M** |
 
 **Calculation:**
@@ -162,7 +163,7 @@ When an asset position exceeds available duration capacity, the position is spli
 Matched Amount = min(Position Size, Available Duration Capacity at required bucket)
 Unmatched Amount = Position Size - Matched Amount
 
-Capital = (Matched Amount × Risk Weight) + (Unmatched Amount × FRTB Drawdown)
+Capital = (Matched Amount × Risk Weight) + (Unmatched Amount × max(Risk Weight, FRTB Drawdown))
 ```
 
 **Key property:** As duration capacity grows (longer-duration liabilities accumulate), more of each position can be matched, reducing overall capital requirements. This creates natural incentive alignment — sticky liabilities enable more efficient capital deployment.

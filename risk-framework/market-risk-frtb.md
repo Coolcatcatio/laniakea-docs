@@ -25,10 +25,19 @@ This is the “market risk drawdown” capital component.
 
 - `frtb_drawdown_CRR` for eligible liquid TradFi assets (or per-asset-class calibration parameters that convert to a CRR)
 
+## Combination Rule
+
+`frtb_drawdown_CRR` is the **forced-sale** capital term for liquid assets. In the capital formula it is combined with fundamental risk (risk weight) via a simple loss envelope:
+
+```
+Unmatched Capital = Position Size × max(Risk Weight, FRTB Drawdown)
+```
+
+See `capital-formula.md` and `matching.md` for the matched/unmatched split.
+
 ## Connections
 
 - Asset primitive definition: `asset-classification.md` (drawdown risk)
 - Matched vs unmatched treatment: `matching.md`
 - Capital composition: `capital-formula.md`
 - Examples: `asset-type-treatment.md`
-

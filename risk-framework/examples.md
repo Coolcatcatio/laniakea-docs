@@ -8,10 +8,10 @@
 
 | Aspect | Current | Proposed |
 |--------|---------|----------|
-| Capital requirement | 1.6% CRR regardless of liability matching | 4-5% if matched to 42mo bucket; ~10% if unmatched |
-| Justification | Fixed percentage | Depends on cumulative duration capacity at 42mo+ |
+| Capital requirement | 1.6% CRR regardless of liability matching | 4-5% if matched to bucket 84; ~10% if unmatched |
+| Justification | Fixed percentage | Depends on cumulative duration capacity at bucket 84+ |
 
-**Implication:** The $1B JAAA position (SPTP = 42mo) is only justifiable at low capital if there's $1B+ of cumulative duration capacity in 42mo through 50mo+ buckets. If only $600M capacity exists at 42mo+, the remaining $400M JAAA requires full FRTB capital.
+**Implication:** The $1B JAAA position (SPTP = 1,260 days) is only justifiable at low capital if there's $1B+ of cumulative duration capacity in bucket 84 through bucket 100. If only $600M capacity exists at bucket 84+, the remaining $400M JAAA requires forced-loss capital (`max(RW, FRTB drawdown)`; the drawdown term dominates in this example).
 
 ### Sparklend
 
@@ -44,12 +44,12 @@
 
 6. **Matched assets get risk weight treatment.** You only need capital for fundamental risk (credit, smart contract, etc.).
 
-7. **Unmatched assets get FRTB treatment.** You need capital for full stressed drawdown over the relevant forced-sale horizon.
+7. **Unmatched assets get forced-loss treatment.** You need capital for `max(RW, stressed drawdown)` over the relevant forced-sale horizon (or `max(RW, gap risk)` for collateralized lending).
 
 8. **Crypto lending is inherently unmatched.** No pull-to-par means no duration matching relief. Capital must cover gap risk based on historical stress analysis.
 
 9. **Correlation groups prevent diversification illusions.** Capital must survive each stress scenario applied to its correlated asset group.
 
-10. **Conservative by default.** When uncertain about liability duration or asset characteristics, assume short-duration liabilities and full drawdown risk.
+10. **Conservative by default.** When uncertain about liability duration or asset characteristics, assume short-duration liabilities and forced-loss (full drawdown) risk.
 
 ---

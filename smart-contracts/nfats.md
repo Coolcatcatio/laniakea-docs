@@ -9,14 +9,15 @@
 
 The Non-Fungible Allocation Token Standard defines a system for bespoke capital deployment deals between Primes and Halos. Unlike LCTS (which pools users into shared generations), NFATS treats each deal as an individual, non-fungible position represented by an NFAT (Non-Fungible Allocation Token).
 
-Capital flows through **NFAT Facilities** — smart contracts that define a "buybox" of acceptable deal parameters. Primes queue sUSDS into a Facility. The Halo (via Sentinel) claims from queues when deals are struck, minting an NFAT that represents a claim on the capital deployment. Each NFAT represents a claim on a distinct **Halo Unit** — a governance-level construct that is bankruptcy remote from other units within the same Halo.
+Capital flows through **NFAT Facilities** — smart contracts that define a "buybox" of acceptable deal parameters. Primes queue sUSDS into a Facility. The Halo (via an LPHA beacon, e.g. `lpha-nfat`) claims from queues when deals are struck, minting an NFAT that represents a claim on the capital deployment. Each NFAT represents a **Halo Unit** (liability side) — a claim on a **Halo Sleeve** (asset side). The sleeve is the bankruptcy-remote boundary: units sharing a sleeve are pari passu on losses (unless tranched), while units on different sleeves are fully isolated.
 
-Deal terms (APY, duration, maturity conditions) are tracked offchain in the **Synome**, while the onchain NFAT tracks only custody and ownership.
+Deal terms (APY, duration, maturity conditions) are tracked offchain in the **Synome**, while the onchain NFAT tracks only custody and ownership. Sleeve contents are tracked in the Synome via attestations from an independent **Attestor** operating the `lpha-attest` beacon.
 
 **Key principles:**
 - **Onchain** = custody, ownership, facility parameters
-- **Offchain (Synome)** = deal terms, yield schedules, maturity conditions
-- **Each NFAT = claim on one Halo Unit** = bankruptcy remote isolation
+- **Offchain (Synome)** = deal terms, yield schedules, maturity conditions, sleeve contents (via attestor)
+- **Halo Unit** (NFAT) = liability side — a claim on a Halo Sleeve
+- **Halo Sleeve** = asset side — the collateral backing one or more units; bankruptcy-remote boundary
 
 ---
 
@@ -46,18 +47,20 @@ NFATS solves a different problem than LCTS:
 
 ## Halo Class Structure
 
-An **NFAT Facility** is a **Halo Class** — a grouping of Halo Units (individual NFAT deals) that share the same smart contract infrastructure and legal framework (buybox).
+An **NFAT Facility** is a **Halo Class** — containing both **Halo Units** (liability side — the NFATs) and **Halo Sleeves** (asset side — the collateral backing those units). All share the same smart contract infrastructure and legal framework (buybox).
 
 ### What a Halo Class (NFAT Facility) Shares
 
 | Component | Description |
 |-----------|-------------|
 | **PAU** | Controller + ALMProxy + RateLimits for the Facility |
-| **Sentinel** | lpha-nfat formation manages all NFATs in the Facility |
+| **LPHA Beacons** | `lpha-nfat` manages NFAT claims and redemptions; `lpha-attest` posts attestations |
 | **Legal Buybox** | Acceptable parameter ranges, counterparty requirements, recourse mechanisms |
 | **Queue + Redeem Contracts** | Shared infrastructure for capital flows |
 
-### What Individual NFATs (Halo Units) Can Vary
+### Halo Units (Liability Side)
+
+Each NFAT is a **Halo Unit** — a claim on a Halo Sleeve. Units represent the liability side of the Halo Class: what the Halo owes to NFAT holders.
 
 | Parameter | Variation Within Buybox |
 |-----------|------------------------|
@@ -67,7 +70,40 @@ An **NFAT Facility** is a **Halo Class** — a grouping of Halo Units (individua
 | **Counterparty** | Different Primes for each NFAT |
 | **Specific Terms** | Bespoke conditions within buybox constraints |
 
-This structure enables scalable bespoke deals: one legal framework, one sentinel, many individual positions with varying terms.
+### Halo Sleeves (Asset Side)
+
+Each **Halo Sleeve** is a bankruptcy-remote container holding the actual assets that back one or more Halo Units. Sleeves represent the asset side of the Halo Class: what the Halo actually holds.
+
+| Property | Description |
+|----------|-------------|
+| **Bankruptcy remoteness** | The sleeve is the isolation boundary — units sharing a sleeve share fate; units on different sleeves are fully isolated |
+| **Loss distribution** | Pari passu across all units on the same sleeve (unless tranched) |
+| **Privacy** | Multiple assets can be blended in a sleeve, preventing outsiders from inferring individual loan terms from NFAT data |
+| **Composition** | Whole assets per sleeve — a single asset is not split across sleeves |
+| **Recursive** | A sleeve can hold Halo Units from other sleeves as assets, enabling structured layering |
+
+### Unit-to-Sleeve Mapping
+
+The mapping between units and sleeves is flexible:
+
+| Pattern | Description | Use Case |
+|---------|-------------|----------|
+| **1:1** | One unit, one sleeve, one asset | Simple bilateral deal |
+| **Many units : one sleeve** | Multiple NFATs backed by the same blended collateral pool | Privacy protection — individual loan terms can't be inferred |
+| **Recursive** | Assets in Sleeve A are Halo Units from Sleeve B | Structured products, tranching across sleeves |
+
+**Privacy example:** A sleeve holds 5 different loans blended together. 10 NFATs are issued against the sleeve. Each NFAT holder knows their own terms (APY, duration, size) but cannot determine the individual terms of the 5 underlying loans — only the blended risk characteristics as attested by the Attestor.
+
+### Terms Source
+
+NFAT terms can come from two sources:
+
+| Mode | Description |
+|------|-------------|
+| **General buybox** | Halo Class defines acceptable ranges; individual units fall within the buybox without predetermined terms. Halo has flexibility in structuring. |
+| **Ecosystem accord** | Pre-negotiated agreement specifying individual unit and sleeve terms. Overrides the general buybox. More constrained, more predictable for the Prime. |
+
+This structure enables scalable bespoke deals: one legal framework, one beacon-operated workflow, many individual positions with varying terms, and flexible asset-side composition with built-in privacy.
 
 ---
 
@@ -105,11 +141,13 @@ This structure enables scalable bespoke deals: one legal framework, one sentinel
 ┌─────────────────────────────────────────────────────────────────────────┐
 │                           MINTED NFATs                                   │
 │                                                                          │
-│   NFAT #1: 25M, Prime X, Facility A  →  Halo Unit (bankruptcy remote)   │
-│   NFAT #2: 15M, Prime Y, Facility A  →  Halo Unit (bankruptcy remote)   │
-│   NFAT #3: 20M, Prime Y, Facility B  →  Halo Unit (bankruptcy remote)   │
+│   NFAT #1: 25M, Prime X, Facility A  →  Halo Unit → Sleeve α            │
+│   NFAT #2: 15M, Prime Y, Facility A  →  Halo Unit → Sleeve α            │
+│   NFAT #3: 20M, Prime Y, Facility B  →  Halo Unit → Sleeve β            │
 │                                                                          │
-│   Terms stored in Synome (APY, maturity date, payment schedule)          │
+│   Units on same sleeve (α) are pari passu on losses                      │
+│   Units on different sleeves (α vs β) are fully isolated                 │
+│   Terms stored in Synome (APY, maturity, payment schedule, sleeve)       │
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 ```
@@ -208,7 +246,7 @@ Transfer: sUSDS from queue to depositor
 - Available anytime (no lock period — unlike LCTS, there's no batch settlement lock window)
 - Complete withdrawal only (like LCTS "claim and exit")
 
-**Claim (Sentinel only):**
+**Claim (`lpha-nfat` beacon only):**
 
 ```
 claim(address target, uint256 amount)
@@ -234,7 +272,7 @@ Mint: NFAT to target
 
 ### 3. Deal NFAT (ERC-721)
 
-Minted when Halo claims from a queue. Each NFAT represents a claim on one bespoke deal, corresponding to a separate **Halo Unit** (a governance-level construct, bankruptcy remote from other units).
+Minted when Halo claims from a queue. Each NFAT is a **Halo Unit** (liability side) — a claim on a **Halo Sleeve** (asset side). Bankruptcy remoteness is at the sleeve level: units sharing a sleeve are pari passu on losses; units on different sleeves are fully isolated.
 
 **Onchain data (minimal):**
 
@@ -250,7 +288,8 @@ Minted when Halo claims from a queue. Each NFAT represents a claim on one bespok
 - Deal terms (APY, duration, special conditions)
 - Payment schedule (bullet, amortizing, periodic interest)
 - Maturity date and conditions
-- Underlying deployment details
+- Sleeve assignment (which Halo Sleeve backs this unit)
+- Sleeve contents (via attestor — risk characteristics, not individual borrower details)
 
 **Transferability:**
 - NFATs are transferable by default
@@ -299,6 +338,123 @@ The patterns above describe the core mechanisms, but payment delivery should be 
 
 ---
 
+## Halo Sleeves and the Attestor
+
+### Sleeve Lifecycle
+
+Sleeves progress through a defined set of phases. Each phase transition requires action from specific beacons.
+
+```
+┌──────────┐    NFATs swept in     ┌──────────┐
+│ CREATED  │ ─────────────────────▶│ FILLING  │
+│ (empty)  │                       │ (USDS)   │◄─── can keep adding NFATs
+└──────────┘                       └────┬─────┘
+                                        │
+                           lpha-attest posts attestation
+                           THEN lpha-nfat changes status
+                                        │
+                                        ▼
+                                  ┌───────────┐
+                                  │ DEPLOYING │  Schrödinger's risk
+                                  │(obfuscated)│  High CRR
+                                  └─────┬─────┘
+                                        │
+                           lpha-attest posts "at rest" attestation
+                                        │
+                                        ▼
+                                  ┌──────────┐
+                                  │ AT REST  │  Confirmed characteristics
+                                  │(deployed) │  Medium CRR
+                                  └─────┬─────┘
+                                        │
+                           Ongoing re-attestation
+                           (cadence per asset type, affects CRR)
+                                        │
+                           Assets mature / return
+                                        │
+                                        ▼
+                                  ┌──────────┐
+                                  │ UNWINDING│  Halo funds Redeem Contract
+                                  └─────┬─────┘
+                                        │
+                           NFAT holders burn to claim
+                                        │
+                                        ▼
+                                  ┌──────────┐
+                                  │  CLOSED  │
+                                  └──────────┘
+```
+
+**Phase: Created** — Sleeve exists but is empty. No assets, no units.
+
+**Phase: Filling** — NFAT subscriptions are swept into the sleeve. Each sweep mints an NFAT (Halo Unit) and adds the capital to the sleeve's asset side. During this phase, the sleeve holds USDS earning agent rate — fully transparent and trackable in the Synome. Additional NFATs can be added as subscriptions come in.
+
+**Phase: Deploying (obfuscated)** — Assets are offboarded (USDS → USDC → deployed to borrowers). The Synome does not receive precise real-time updates about which specific assets have been deployed, to whom, or when. This is intentional: blending multiple deployments in a sleeve prevents outsiders from inferring individual loan terms. From the Synome's perspective, the assets are in a "Schrödinger's risk" state — they could be anywhere from still cash to fully deployed. The deployment phase has a **higher CRR** to compensate for this uncertainty.
+
+**Phase: At Rest** — Fully deployed. The attestor has confirmed the risk characteristics of the deployed assets. The Synome knows the risk profile (credit quality, duration, asset type) but not individual borrower identities or specific deal terms. CRR is lower than during deployment but still reflects the risk characteristics of the deployed assets.
+
+**Phase: Unwinding** — Assets return to the sleeve. Halo funds the Redeem Contract from sleeve proceeds. NFAT holders burn to claim.
+
+**Phase: Closed** — All units redeemed, sleeve wound down.
+
+### The Attestor and `lpha-attest`
+
+The **Attestor** is a company whitelisted by Sky governance to provide risk attestations about sleeve contents. It operates the `lpha-attest` beacon.
+
+| Property | Description |
+|----------|-------------|
+| **Type** | LPHA (Low Power, High Authority) — deterministic, rule-based |
+| **Operator** | Attestor company (whitelisted by Sky governance) |
+| **Capability** | Write attestations into Synome |
+| **Cannot** | Move capital, mint NFATs, change sleeve status directly |
+| **Accountability** | Subject to its own govops supply chain of checks and audits |
+
+**Two-beacon deployment gate:** Neither `lpha-attest` nor `lpha-nfat` can trigger deployment alone. The attestor must first post an attestation into the Synome via `lpha-attest`; only then can `lpha-nfat` change the sleeve's status. This separation of concerns ensures independent validation.
+
+```
+ATTESTOR                          SYNOME                          HALO
+(lpha-attest)                                                   (lpha-nfat)
+    │                                │                               │
+    │  1. Upload attestation         │                               │
+    │  "Sleeve X: assets will        │                               │
+    │   deploy into [characteristics]│                               │
+    │   over [timeframe], legal      │                               │
+    │   rails confirmed"             │                               │
+    │  ─────────────────────────────▶│                               │
+    │                                │                               │
+    │                                │  2. Attestation present ✓     │
+    │                                │     lpha-nfat can now         │
+    │                                │     change sleeve status      │
+    │                                │  ────────────────────────────▶│
+    │                                │                               │
+    │                                │  3. Sleeve → deploying        │
+    │                                │  ◀────────────────────────────│
+    │                                │                               │
+```
+
+**Attestation types:**
+
+| Timing | Attestation Content |
+|--------|---------------------|
+| **Pre-deployment** | "Over the next [timeframe], assets will deploy into assets with [risk characteristics]. Legal rails analyzed and confirmed." |
+| **Post-deployment** | "Assets are now deployed and at rest with [confirmed risk characteristics]." |
+| **Ongoing (at rest)** | Periodic re-attestation per asset type. Cadence varies by asset and directly affects CRR — more frequent attestation enables lower CRR. |
+
+### CRR Incentive Structure
+
+The risk model creates economic incentives that balance privacy against transparency without mandating specific behavior:
+
+| Sleeve Phase | CRR Impact | Incentive Created |
+|---|---|---|
+| **Filling** (USDS) | Low CRR | Known asset, no ambiguity |
+| **Deploying** (obfuscated) | High CRR | Minimize deployment duration; stagger deployments across sleeves |
+| **At Rest** (attested) | Medium CRR | Maintain attestation cadence; encourage frequent re-attestation |
+| **Missed re-attestation** | CRR increases | Prompt re-attestation to restore lower capital charge |
+
+Primes and Halos are economically incentivized to keep the obfuscated deployment phase as short as possible (reducing CRR cost) while still delivering adequate borrower privacy.
+
+---
+
 ## Deal Lifecycle
 
 **1. Onboarding**
@@ -309,25 +465,39 @@ The patterns above describe the core mechanisms, but payment delivery should be 
 - Prime deposits sUSDS into their queue within the Facility
 - Queue balance increases; Prime can withdraw anytime before claim
 
-**3. Claim (deal struck)**
-- Halo (via Sentinel) claims from Prime's queue (specifying amount)
-- sUSDS transferred to Halo
-- NFAT minted to Prime (representing a claim on a new Halo Unit)
-- Deal terms recorded in Synome (APY, term, maturity date)
+**3. Sleeve creation**
+- Halo creates a new sleeve (or uses an existing sleeve in filling phase)
+
+**4. Claim (deal struck)**
+- Halo (via `lpha-nfat`) claims from Prime's queue (specifying amount)
+- sUSDS transferred to sleeve (via Facility ALMProxy)
+- NFAT minted to Prime (Halo Unit — claim on the sleeve)
+- Deal terms recorded in Synome (APY, term, maturity date, sleeve assignment)
 - Queue balance reduced by claimed amount
+- Additional NFATs may be swept into the same sleeve over time
 
-**4. Deployment**
-- Halo deploys capital to underlying strategy (RWA, structured credit, custodian, etc.)
-- NFAT holder can transfer/sell position at any time (subject to whitelist if enabled)
+**5. Attestation and deployment**
+- Attestor uploads pre-deployment attestation via `lpha-attest` (risk characteristics, timeframe, legal confirmation)
+- `lpha-nfat` transitions sleeve to deploying status
+- Capital offboarded (USDS → USDC → deployed to borrowers)
+- Deployment is obfuscated — Synome does not track individual deployments in real time
+- Higher CRR applies during this phase
 
-**5. Lifecycle**
+**6. At rest**
+- Attestor uploads post-deployment attestation confirming deployed asset characteristics
+- Sleeve transitions to at-rest status; CRR adjusts downward
+- Ongoing re-attestation at asset-type-specific cadence
+
+**7. Lifecycle**
 - For bullet loans: nothing happens until maturity
 - For other structures: Halo deposits payments per Synome schedule, Prime claims as available
+- Halo must maintain liquidity in the sleeve to fund maturing units
+- NFAT holder can transfer/sell position at any time (subject to whitelist if enabled)
 
-**6. Maturity**
+**8. Maturity**
 - Halo deposits principal + yield into Facility redeem contract (required, penalties if late)
 - Prime burns NFAT to claim funds (at their convenience)
-- Deal closed
+- Deal closed; if all units on a sleeve are redeemed, sleeve closes
 
 ---
 
@@ -342,7 +512,7 @@ The patterns above describe the core mechanisms, but payment delivery should be 
 
 ### NFAT Behaviors
 
-**Halo actions (via Sentinel):**
+**Halo actions (via `lpha-nfat`):**
 - **Claim**: Take sUSDS from a Prime's queue and mint an NFAT
   - Specifies: which Prime, how much to claim
   - Results in: sUSDS moves to Halo, new NFAT minted, Synome records deal terms
@@ -393,7 +563,7 @@ The patterns above describe the core mechanisms, but payment delivery should be 
    - Queue balance: 50M
 
 3. **Claim**
-   - Halo 123 Sentinel claims 25M from Prime X's queue
+   - Halo 123 `lpha-nfat` claims 25M from Prime X's queue
    - NFAT #1 minted to Prime X (25M principal)
    - Synome records: 6-month term, 10% APY, maturity 2025-07-15
    - Queue balance: 25M remaining
@@ -616,9 +786,9 @@ When all depositors have identical terms and transfer restrictions, NFATS effect
 
 ## Integration Notes
 
-### Halo Sentinel
+### Halo LPHA Beacon (`lpha-nfat`)
 
-TBD — Sentinel integration for automated claims, reward distribution, and redemptions.
+TBD — `lpha-nfat` beacon integration for automated claims, reward distribution, and redemptions.
 
 ### ALM Controller Compatibility
 
@@ -714,10 +884,11 @@ An NFAT can optionally be wrapped in a fungible ERC-20 token, allowing the deal 
 
 | Document | Relationship |
 |----------|--------------|
-| `structuring-halo.md` | Business overview of Structuring Halos using NFATS |
+| `term-halo.md` | Business overview of Term Halos using NFATS |
 | `lcts.md` | Alternative token standard for pooled, fungible positions |
-| `sentinel-network.md` | lpha-nfat sentinel specification |
-| `passthrough-halo.md` | Alternative Halo type using LCTS |
+| `sentinel-network.md` | `lpha-nfat` beacon context (LPHA) and relationship to sentinels |
+| `portfolio-halo.md` | Portfolio Halo (LCTS-based alternative) |
+| `beacon-framework.md` | `lpha-nfat` and `lpha-attest` as LPHA beacons |
 
 ---
 

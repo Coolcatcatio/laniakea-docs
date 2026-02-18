@@ -20,6 +20,8 @@ This framework has two layers:
 
 Duration matching (ALDM with Duration Buckets + caps) prevents classic maturity mismatch, but it does not stop the system from concentrating into a single correlated risk type (e.g., "lots of CLO-like credit") by adding more risk capital. This framework makes "we simply don't want more of this risk" enforceable.
 
+**Coverage:** Category caps are the mechanism for all concentration risk, including cross-chain bridge exposure. Bridge risk (protocol risk, liveness risk, censorship risk) is managed by defining bridge-related categories and setting appropriate caps — not through a separate risk module.
+
 ## How Caps Are Set (Scenario Calibration)
 
 The cap system is intentionally simple to enforce. The *choice of cap values* can be updated over time using a scenario stress engine.
@@ -175,7 +177,7 @@ CRR_effective = min(1.0, CRR_base + cap_penalty_addon)
 
 Where `cap_penalty_addon` is sized such that the over-cap portion’s required capital equals its exposure amount.
 
-## Outputs (For Sentinel / Reporting)
+## Outputs (For Beacon Reporting)
 
 Per category `c`:
 - `cap_percent[c]`, `cap_amount[c]`
@@ -193,7 +195,7 @@ Portfolio-level:
 
 ## Open Questions
 
-1. What is the exact “allocation update” function (EMA vs explicit per-epoch reallocation), and where does it live (Sentinel vs on-chain vs governance process)?
+1. What is the exact "allocation update" function (EMA vs explicit per-epoch reallocation), and where does it live (beacon vs on-chain vs governance process)?
 2. How to compute category exposure for multi-category assets without double counting while still enforcing caps (binding category vs portfolio-wide max penalty)?
 3. Should caps be defined per-Prime, per-Prime-type, or only globally across all Primes?
 4. How are categories versioned and migrated when governance changes category definitions?

@@ -11,9 +11,9 @@ This document analyzes two categories of attacks that constrain the choice of In
 
 The key insight is that IRL and SORL are not independent choices—they are constrained by a bootstrap target (e.g., reach 100M/day within 30 days). Higher SORL allows lower IRL and vice versa. The optimization finds the combination that minimizes total weighted harm from both attack types.
 
-**Optimal parameters (for 100M/day target in 30 days):**
-- **SORL: ~25-26%** (when modeling a second bump at `t=18h` within `TTF=24h`)
-- **IRL: ~$97-124K** (implied by `IRL = 100M / (1 + SORL)^30`)
+**Adopted parameters (for 100M/day target in 30 days):**
+- **SORL: 25%**
+- **IRL: $100K**
 
 ---
 
@@ -317,32 +317,35 @@ Optimal SORL percentage is independent of target scale—only absolute values ch
 
 ## Recommendations
 
-### Primary Recommendation
+### Adopted Parameters
 
 | Parameter | Value | Rationale |
 |-----------|-------|-----------|
-| **SORL** | **26%** | Best integer % near the continuous optimum |
-| **IRL** | **~$97K** | Derived from SORL given 30-day bootstrap to 100M |
+| **SORL** | **25%** | Near the continuous optimum (~25.5%); round number for operational clarity |
+| **IRL** | **$100K** | Round number near the derived value ($124K at exactly 25%) |
 
-### Bootstrap Timeline at Recommended Parameters
+### Bootstrap Timeline at Adopted Parameters
 
 | Day | Rate Limit | Notes |
 |-----|------------|-------|
-| 0 | ~$97K | Initial |
-| 7 | ~$491K | Week 1 |
-| 14 | ~$2.48M | Week 2 |
-| 21 | ~$12.5M | Week 3 |
-| 28 | ~$63M | Week 4 |
-| 30 | $100M | Target reached |
+| 0 | $100K | Initial |
+| 7 | ~$476K | Week 1 |
+| 14 | ~$2.27M | Week 2 |
+| 21 | ~$10.8M | Week 3 |
+| 28 | ~$51.4M | Week 4 |
+| 30 | ~$80M | Day 30 |
+| 32 | ~$125M | Target exceeded |
+
+**Note:** With IRL=$100K and SORL=25%, the exact 100M target is reached in ~31 days rather than 30.
 
 ### Operational Risk Capital Requirement
 
-Executor should hold operational risk capital covering worst-case loss:
+Guardian should hold operational risk capital covering worst-case loss:
 
 ```
 ORC ≥ Type 1 Max Loss × N₁
-    = ~$97K × 1.065 × 10
-    = ~$1.04M per executor (for N₁ = 10)
+    = $100K × 1.0625 × 10
+    = ~$1.06M per executor (for N₁ = 10)
 ```
 
 ---
@@ -382,9 +385,9 @@ Total Harm = N₁ × [3 × IRL × (1 + 0.25×SORL) + 6M × (1.25×SORL + 0.25×S
 Subject to: IRL × (1 + SORL)^30 = Target
 ```
 
-**Optimal Solution (100M/day target):**
-- SORL = 26%
-- IRL ≈ $97K
+**Adopted Parameters (100M/day target):**
+- SORL = 25%
+- IRL = $100K
 - Total Harm ≈ $2.36M per N₁
 
 ---
@@ -409,7 +412,7 @@ Total at T = 24h:
   = IRL × (1 + 0.25 × SORL)
 ```
 
-For SORL = 26%: Accumulation factor = 1.065
+For SORL = 25%: Accumulation factor = 1.0625
 
 ---
 

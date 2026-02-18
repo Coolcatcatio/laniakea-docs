@@ -40,6 +40,8 @@ What differs between PAU deployments:
 | **Halo** | Mainnet | Prime Layer | RWA strategies, custodians, regulated endpoints |
 | **Foreign** | Altchains | Mainnet Prime (via bridge) | Foreign Halo Layer |
 
+**Relationship to Synome layers:** These four capital-flow layers describe how funds move through smart contracts. They all map to Layer 2 (Synomic Agents) of the five-layer Synome architecture (Synome → Synomic Agents → Teleonomes → Embodiments → Embodied Agents). Generator, Prime, Halo, and Foreign are all Synomic Agent types — the Synome layers describe governance and cognition, while the capital-flow layers describe on-chain fund movement. See `synomics/synome-overview.md`.
+
 ---
 
 ## Layer Details
@@ -183,7 +185,7 @@ The diagram above shows the capital deployment flow. Parallel to this, risk capi
 - **TEJRC** (Tokenized External Junior Risk Capital) — held by end users, issued by Primes via LCTS
 - **TISRC** (Tokenized Isolated Senior Risk Capital) — held by end users, issued by Primes via LCTS
 
-Primes *ingress* (recognize) this external risk capital as part of their capital base. Risk capital holders don't participate in the deployment flow — they provide the buffer that absorbs losses. See `risk-framework/risk-capital-ingression.md` for details.
+Primes *ingress* (recognize) this external risk capital as part of their capital base. Risk capital holders don't participate in the deployment flow — they provide the buffer that absorbs losses. See `accounting/risk-capital-ingression.md` for details.
 
 ---
 
@@ -208,14 +210,14 @@ A factory system that can deploy standardized PAU infrastructure:
 
 ---
 
-## Sentinel Network Integration
+## Beacon and Sentinel Integration
 
-PAUs are designed to be operated by the Sentinel Network — autonomous systems that:
+PAUs are operated by beacons — LPHA beacons (deterministic rule execution) in Phase 1, and HPHA sentinel formations (AI-capable, real-time) in later phases. Beacons:
 - Execute approved operations within rate-limited bounds
 - Monitor positions and trigger rebalancing
 - Respond to market conditions within governance-approved parameters
 
-The governance layer defines what Sentinels can do; Sentinels execute within those bounds.
+The governance layer defines what beacons can do; beacons execute within those bounds.
 
 ---
 

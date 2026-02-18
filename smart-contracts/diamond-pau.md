@@ -158,10 +158,9 @@ The diamond is transparent to the Configurator — it just sees callable functio
 
 Existing legacy PAUs can migrate to Diamond PAU:
 
-1. Deploy Diamond proxy with equivalent facets
-2. Deploy new ALMProxy pointing to Diamond (or upgrade existing)
-3. Migrate RateLimits configuration
-4. Transfer custody from old ALMProxy to new
-5. Update Configurator PAU registration
+1. Deploy Diamond PAU with initial facet set
+2. Migrate positions from legacy ALMProxy to new Diamond
+3. Grant cBEAMs to GovOps for new Diamond
+4. Wind down legacy PAU once migration complete
 
 Migration can be done per-PAU without affecting others.

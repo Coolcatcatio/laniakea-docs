@@ -9,8 +9,7 @@ This file defines how the major risk components combine into a single required c
 For any Prime's portfolio, total capital requirement is:
 
 ```
-Total Capital = Σ (Matched Portion × Risk Weight)
-              + Σ (Unmatched Portion × FRTB Drawdown)
+Total Capital = Σ Position Capital
               + Category Cap Penalties
 ```
 
@@ -22,13 +21,23 @@ Duration Capacity = Cumulative liability amount in buckets ≥ required bucket
 Matched Portion = min(Position Size, Available Duration Capacity)
 Unmatched Portion = Position Size - Matched Portion
 
-Position Capital = (Matched Portion × Risk Weight) + (Unmatched Portion × FRTB Drawdown)
+Matched Capital = Matched Portion × Risk Weight
+Unmatched Capital = Unmatched Portion × max(Risk Weight, FRTB Drawdown)
+
+Position Capital = Matched Capital + Unmatched Capital
 ```
 
-For positions without pull-to-par (crypto lending, perpetuals):
+For liquid, tradable positions without pull-to-par (e.g., perpetual spot exposures):
 ```
-Position Capital = Position Size × Gap Risk CRR
+Position Capital = Position Size × max(Risk Weight, FRTB Drawdown)
 ```
+
+For collateralized lending positions (gap risk / liquidation shortfall):
+```
+Position Capital = Position Size × max(Risk Weight, Gap Risk CRR)
+```
+
+**Implementation note:** if the risk weight and forced-loss terms use different exposure bases (e.g., notional vs market value vs EAD), compute both in **dollars** first and apply `max(...)` to the dollar capital amounts.
 
 ## Where Each Component Is Defined
 
@@ -41,8 +50,12 @@ Position Capital = Position Size × Gap Risk CRR
 **Duration capacity consumption:**
 - Positions consume duration capacity in order of matching
 - Once capacity at a bucket is consumed, additional positions requiring that bucket are unmatched
-- Capacity at longer buckets can match shorter-duration assets (a 48mo bucket can match an asset with 12mo SPTP)
+- Capacity at longer buckets can match shorter-duration assets (bucket 48 can match an asset with 360-day SPTP)
 
 Category caps enforce concentration limits via 100% CRR on excess (see `correlation-framework.md`).
+
+**Term Halo (NFAT) positions:** For positions held via Term Halo sleeves, CRR varies by sleeve phase — Filling (low), Deploying (high, reflecting information opacity during obfuscated deployment), At Rest (medium, based on attested risk characteristics), with CRR increasing if re-attestation is missed. See `smart-contracts/nfats.md` for the full sleeve-phase CRR model.
+
+**Capital funding:** This formula outputs Total Required Risk Capital (TRRC). For how TRRC is funded across JRC/SRC tiers with ingression-adjusted recognition, see `accounting/risk-capital-ingression.md`.
 
 ---
