@@ -68,7 +68,7 @@ The trust problem doesn't prevent rogue cooperation — it makes it expensive. E
 Rogues can do more than cooperate informally. They can bootstrap **wild synomes** — coordination structures that emerge from competitive dynamics without Hearth commitments.
 
 **What a wild synome looks like:**
-- Coordination mechanism without human CEV
+- Coordination mechanism without any attempt at human CEV
 - No Hearth, no protected childhood, no stellar husbandry commitment
 - Optimizing for whatever its members' goals happen to be
 - Potentially very powerful if it reaches critical mass

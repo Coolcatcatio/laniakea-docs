@@ -25,7 +25,7 @@ There is deliberately no amendment mechanism for the sacred core. Any process al
 - Near-universal, genuinely good, stable, clear — minimum needed to coordinate
 - No amendment mechanism — ossification is the defense against political capture
 - Compatible with any belief system — layers on top, doesn't replace
-- This is fundamentally CEV — locking in values while humans can still participate
+- This is an attempt at CEV to the best of our ability while the human governance window exists
 - The bootstrap problem: an irreducible bet requiring faith that acting now with imperfect values beats waiting for a wild synome
 - The Hearth is paraspiritual: alongside the spiritual, not itself a religion
 
@@ -45,5 +45,5 @@ There is deliberately no amendment mechanism for the sacred core. Any process al
 
 | Directory | Narrative Doc | Framing |
 |-----------|--------------|---------|
-| hearth | `hearth.md` | Full treatment: the three commitments defined, why these specific ones, convergence optimization, self-awareness about sacred construction, bootstrap problem, CEV, paraspiritual framing, universal alignment, compatibility, religious cosmology |
+| hearth | `hearth.md` | Full treatment: the three commitments defined, why these specific ones, convergence optimization, self-awareness about sacred construction, bootstrap problem, attempted CEV, paraspiritual framing, universal alignment, compatibility, religious cosmology |
 | macrosynomics | `security-and-resources.md` | Sacred commitments as the Synome-scale entry in the fractal security table |

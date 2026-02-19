@@ -83,7 +83,7 @@ The Atlas is embedded IN the Synome as the root node. Every node with human stak
 
 ### The Governance Window
 
-The [governance window](core-concepts/governance-window.md) — while humans can still meaningfully understand and shape the system — is the critical period for getting values right. Fundamentally Coherent Extrapolated Volition (CEV): lock in values now, because the opportunity diminishes asymptotically.
+The [governance window](core-concepts/governance-window.md) — while humans can still meaningfully understand and shape the system — is the critical period for getting values right. An attempt at Coherent Extrapolated Volition (CEV) to the best of our ability while the governance window exists, because the opportunity diminishes asymptotically.
 
 SKY governance is not naive human deliberation — it is capital-weighted decisions by token holders (teleonomes, synomic agents, humans) operating through structured processes. What diminishes is the ability to evaluate what you're voting on, not the ability to vote.
 
@@ -144,7 +144,7 @@ Phase 1 starts with deterministic programs providing operational infrastructure 
 
 | Beacon | Type | Function |
 |--------|------|----------|
-| **lpla-checker** | LPLA | Read-only: positions, prices, risk params -> CRR calcs, alerts |
+| **lpla-verify** | LPLA | Read-only: positions, prices, risk params -> CRR calcs, alerts |
 | **lpha-relay** | LPHA | Executes PAU transactions within rate limits |
 | **lpha-nfat** | LPHA | NFAT lifecycle operations, writes NFAT records |
 | **lpha-report** | LPHA | Writes 24h Prime performance summaries |

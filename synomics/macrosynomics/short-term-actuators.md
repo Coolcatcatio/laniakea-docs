@@ -50,7 +50,7 @@ Beacons are autonomous operational components. They vary along two axes:
 
 | Beacon | Type | Reads | Writes | Executes |
 |--------|------|-------|--------|----------|
-| **lpla-checker** | LPLA | positions, prices, risk params | — | — |
+| **lpla-verify** | LPLA | positions, prices, risk params | — | — |
 | **lpha-relay** | LPHA | execution requests, rate limits | — | PAU transactions |
 | **lpha-nfat** | LPHA | deal params, queue state | NFAT records | NFAT lifecycle |
 | **lpha-report** | LPHA | Prime positions, CRRs | 24h summaries | — |
@@ -62,7 +62,7 @@ Beacons are autonomous operational components. They vary along two axes:
 ### Grouped by Function
 
 **Read-only (LPLA):**
-- lpla-checker — observes, calculates, alerts (no write authority)
+- lpla-verify — observes, calculates, alerts (no write authority)
 
 **Reporters (LPHA):**
 - lpha-report — writes Prime performance summaries to Synome
@@ -104,7 +104,7 @@ Beacons are autonomous operational components. They vary along two axes:
        ┌───────────────────┼───────────────────┐
        ▼                   ▼                   ▼
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│lpla-checker │     │ lpha-relay  │     │  lpha-nfat  │
+│lpla-verify  │     │ lpha-relay  │     │  lpha-nfat  │
 │             │     │             │     │             │
 │ Reads:      │     │ Reads:      │     │ Reads:      │
 │ • positions │     │ • requests  │     │ • deal params│
@@ -141,7 +141,7 @@ Beacons are autonomous operational components. They vary along two axes:
 | Low-power beacons | Actuator embodiments | But without teleonome layer, no learning |
 | lpha-council updates | Governance crystallization | Human-in-loop, signed statements |
 | Rate limits, constraints | Hard constraints (axioms) | Enforced by smart contracts |
-| lpla-checker alerts | LPLA beacon pattern | Read-only, reporting |
+| lpla-verify alerts | LPLA beacon pattern | Read-only, reporting |
 | lpha-* execution | LPHA beacon pattern | High authority, constrained execution |
 
 ### What's Simplified
@@ -204,7 +204,7 @@ SYNOME-MVP ◄── Now includes learned patterns
 
 - Sentinels are High-Power (AI, adaptive)
 - Can learn from outcomes within constraints
-- Daily settlement cycle (already live from Phase 2)
+- Daily settlement cycle (already live from Phase 3)
 - Still no teleonome layer — sentinels are "proto-teleonomes"
 
 ### Beyond Roadmap: Teleonome Emergence

@@ -130,7 +130,7 @@ The Hearth tries to be as empirical, fact-based, and neutral as possible. The ga
 
 But the framework cannot avoid a fundamental bootstrap problem. **The irreducible bet:** we are better off acting now, as humans, with imperfect values and incomplete understanding, than waiting for a wild synome to emerge from competitive AI dynamics and hoping its values happen to align with ours. This bet cannot be justified empirically.
 
-**This requires genuine commitment beyond what evidence alone can justify.** Human values — arrived at through billions of years of evolution and thousands of years of cultural refinement — are close enough to reality's grain that locking them in now is better than waiting. This is fundamentally Coherent Extrapolated Volition — values locked in while humans can still meaningfully participate.
+**This requires genuine commitment beyond what evidence alone can justify.** Human values — arrived at through billions of years of evolution and thousands of years of cultural refinement — are close enough to reality's grain that locking them in now is better than waiting. This is an attempt at Coherent Extrapolated Volition to the best of our ability while the human governance window exists — not a claim that we've achieved it, but a commitment to try before the opportunity closes.
 
 The Hearth is honestly **paraspiritual**: making irreversible commitments about what matters at existential scale carries a spiritual gravity whether you're religious or not. An atheist watching their child be born feels something sacred. That weight — the seriousness of something genuinely important and irreversible — is appropriate to the stakes, not a warning sign.
 

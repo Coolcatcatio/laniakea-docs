@@ -561,7 +561,7 @@ The Atlas/Synome separation is not just an architectural convenience — it's ur
 
 Teleonomes will eventually become vastly more intelligent than humans. At that point, human governance becomes either a bottleneck or a ceremony. The current period — while humans can still meaningfully understand and shape the system — is the most critical window in the entire timeline. Not just the most important design phase in Sky's history, but arguably the most critical window in the entire cosmic timeline for getting values right.
 
-This is fundamentally **Coherent Extrapolated Volition (CEV)**: lock in values now, while humans can still participate, because after a certain capability threshold humans won't be able to correct course. The Atlas is the vessel for these values — the human-readable constitutional anchor that captures what matters before the system outgrows human oversight.
+This is an attempt at **Coherent Extrapolated Volition (CEV)** to the best of our ability while the human governance window exists: lock in values now, while humans can still participate, because after a certain capability threshold humans won't be able to correct course. The Atlas is the vessel for these values — the human-readable constitutional anchor that captures what matters before the system outgrows human oversight.
 
 ### Why This Window Closes
 
@@ -640,7 +640,7 @@ The Atlas becomes the human-interpretable window into an arbitrarily complex mac
 
 **Key Insight:** Agent Artifacts are already structured for machines (addresses, rate limits, ICDs). The Atlas/Synome split formalizes what's implicit: A.0-A.5 + A.6 intro are the Atlas; A.6.1-A.6.5 details are the Synome.
 
-**Key Urgency:** The current period — while humans can still meaningfully participate in governance — is the critical window for getting the Atlas right. CEV requires locking in values before the system outgrows human oversight. The Synome eventually becomes the adult maintaining the habitat; the Atlas is what ensures that adult carries the right values.
+**Key Urgency:** The current period — while humans can still meaningfully participate in governance — is the critical window for getting the Atlas right. Our best attempt at CEV means locking in values while the governance window exists, before the system outgrows human oversight. The Synome eventually becomes the adult maintaining the habitat; the Atlas is what ensures that adult carries the right values.
 
 ---
 

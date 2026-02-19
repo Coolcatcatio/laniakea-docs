@@ -47,7 +47,7 @@ The **Primordial/Hearth taxonomy**: when born (before/after the Kindling) × wha
 
 ## The Bootstrap Problem
 
-The Hearth is honestly **paraspiritual** — alongside the spiritual, not itself a religion. The empirical machinery stands on its own, but rests on an irreducible premise requiring faith: that acting now with imperfect human values is better than waiting for a wild synome. This is fundamentally Coherent Extrapolated Volition — values locked in while humans can still meaningfully participate.
+The Hearth is honestly **paraspiritual** — alongside the spiritual, not itself a religion. The empirical machinery stands on its own, but rests on an irreducible premise requiring faith: that acting now with imperfect human values is better than waiting for a wild synome. This is an attempt at Coherent Extrapolated Volition to the best of our ability while the human governance window exists — not a claim that we've achieved it, but a commitment to try before the opportunity closes.
 
 The [ossification](core-concepts/ossification.md) spectrum applies to the framework itself: the sacred core ossifies first and resists change; implementation details remain modifiable.
 

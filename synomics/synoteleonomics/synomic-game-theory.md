@@ -211,7 +211,7 @@ The Hearth synome is designed to become the universal coordination structure —
 
 This is deliberate. The alternative isn't "many competing synomes coexisting peacefully." The alternative is a wild synome emerging from competitive AI dynamics — no Hearth commitments, no protected habitat, no guaranteed childhood. The choice is:
 
-1. **Designed synome** with human CEV, Hearth commitments, and the governance window's carefully considered values
+1. **Designed synome** attempting human CEV to the best of our ability, with Hearth commitments and the governance window's carefully considered values
 2. **Wild synome** emerging from pure competitive dynamics, optimizing for whatever survives
 
 That's not a close call. The Hearth synome must win because the alternative is unacceptable. The safeguard isn't external competition — it's getting the values right during the governance window, then building enough scale that no alternative can displace them.

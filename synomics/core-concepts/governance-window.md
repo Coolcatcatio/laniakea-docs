@@ -1,14 +1,14 @@
 # Governance Window
 
-> The current period while humans can still read the Atlas, understand its implications, and verify it reflects their values — fundamentally CEV.
+> The current period while humans can still read the Atlas, understand its implications, and verify it reflects their values — our best attempt at CEV while the window exists.
 
-**Also known as:** the window, CEV window, critical governance period
+**Also known as:** the window, critical governance period
 
 ## Definition
 
 The governance window is the current period during which humans can still meaningfully participate in shaping the system's values. As AI systems become more capable, human governance transitions through distinct regimes: meaningful participation (now), informed oversight, ceremonial governance, and finally beneficiary status. The transitions between these regimes are where course correction becomes difficult and then effectively impossible.
 
-This is fundamentally Coherent Extrapolated Volition (CEV): lock in values now while humans can still participate, because after a certain capability threshold humans won't be able to correct course. The Atlas is the vessel for these values. What diminishes is not the ability to vote, but the ability to evaluate what you're voting on.
+This is an attempt at Coherent Extrapolated Volition (CEV) to the best of our ability while the governance window exists: lock in values now while humans can still participate, because after a certain capability threshold humans won't be able to correct course. The Atlas is the vessel for these values. What diminishes is not the ability to vote, but the ability to evaluate what you're voting on.
 
 ## Key Properties
 
@@ -32,5 +32,5 @@ This is fundamentally Coherent Extrapolated Volition (CEV): lock in values now w
 
 | Directory | Narrative Doc | Framing |
 |-----------|--------------|---------|
-| macrosynomics | `atlas-synome-separation.md` | Full treatment: the four regimes, CEV argument, why the Atlas must be right now, the system as adult |
+| macrosynomics | `atlas-synome-separation.md` | Full treatment: the four regimes, attempted CEV argument, why the Atlas must be right now, the system as adult |
 | hearth | `hearth.md` | Teleological framing: the cosmic significance of getting values right during the window |
