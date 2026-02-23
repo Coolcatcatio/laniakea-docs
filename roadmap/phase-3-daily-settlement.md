@@ -42,7 +42,7 @@ Establish a reliable daily cycle that:
 
 4. **Beacon and ops cadence upgrades**
    - lpla-checker: daily cadence tracking + verification reports
-   - lpha-report: daily Prime performance summaries (as applicable)
+   - lpha-report: daily Prime performance summaries written as a settlement artifact
    - Operational runbooks for GovOps execution during the lock window
 
 ### Explicit Non-Goals (Deferred)
@@ -109,7 +109,7 @@ Phase 3 is intentionally heavy on temporary/bootstrapping measures. These should
 - Produces signed settlement statements for Synome posting
 - Coordinates transaction submission through bounded execution surfaces (Prime multisig / LPHA executor)
 
-**Design requirements (so it can be replaced cleanly in Phase 10):**
+**Design requirements (so it can be replaced cleanly in Phase 9):**
 - All calculations must be deterministic and reproducible from on-chain + Synome inputs
 - All outputs must use the same epoch identifiers and schemas that `stl-base` will later use
 - Any discretionary decisions must be explicitly marked as “governance-directed” (not “system-derived”)

@@ -70,7 +70,7 @@ Phase 0 handles exceptional deployments (primarily Grove) that must proceed befo
 |----------|------|-------------|
 | **1.0** | Planning | Stakeholder alignment, Prime cohort identification |
 | **1.1** | Diamond PAU Deployment | Diamond PAUs deployed for first-cohort Primes |
-| **1.2** | Operational Infrastructure | Synome-MVP, lpla-verify, lpha-relay operational |
+| **1.2** | Operational Infrastructure | Synome-MVP, lpla-verify, lpha-relay, lpha-attest operational |
 | **1.3** | Legacy Cleanup & Core Halos | Legacy assets standardized or wound down |
 | **1.4** | Configurator Deployment | Spell-less Prime operations enabled |
 | **1.5** | First Term Halo | Halo1 live with end-to-end NFAT flow validated |
@@ -78,7 +78,7 @@ Phase 0 handles exceptional deployments (primarily Grove) that must proceed befo
 
 **lpla-verify:** Monitors positions, calculates CRRs, generates alerts. Does not track settlement — that capability arrives with lpla-checker in Phase 2.
 
-**End State:** Primes can deploy into Core Halos and Term Halos without spells. Full first-cohort of Term Halos operational.
+**End State:** Primes can deploy into Core Halos and Term Halos without spells. Full first-cohort of Term Halos operational. Five beacons live (lpla-verify, lpha-relay, lpha-nfat, lpha-attest, lpha-council).
 
 **Document:** [phase-1-pragmatic-delivery.md](./phase-1-pragmatic-delivery.md)
 
@@ -471,6 +471,12 @@ The following features have complete or partial specifications but are not yet a
 | **Exchange Halos** | Whitepaper Part 7 (no smart-contract spec) | Limit orderbook infrastructure |
 | **Identity Networks** | Whitepaper Part 7 (no spec) | — |
 | **Sky Intents** | `trading/sky-intents.md` | Sentinel formations (Phase 9+), Exchange Halos |
+| **SBE BEAM** | `accounting/current-accounting.md` | Daily settlement cycle (Phase 3+) — governance-controlled execution surface for dynamic Smart Burn Engine |
+| **Folio Agents** | `sky-agents/folio-agents/agent-type-folios.md` | Folio Agent deployment (stl-principal, automated folios, Growth Staking integration). Depends on: Halo Factory (Phase 5) |
+| **Growth Staking** | `growth-staking/growth-staking.md` | Growth Staking mechanism linking staking rewards to growth asset holdings via folios. Depends on: Folio Agents |
+| **Trading Halos / lpha-amm** | Whitepaper Part 7, `sky-agents/halo-agents/trading-halo.md` | Trading Halo type and lpha-amm beacon for automated market making. Depends on: Halo Factory (Phase 5) |
+| **SpellGuard Governance Transition** | `governance-transition/spellguard-system.md` | Transition from Executive Vote to SpellGuard model (SpellCore + Guardians). See `governance-transition/` |
+| **Recovery Agents** | `sky-agents/recovery-agents/agent-type-recovery.md` | Recovery Agent deployment for crisis response and system restoration. Prerequisite for full Sentinel formation autonomy (Phase 9+) |
 
 These features will be assigned to phases as their dependencies mature and implementation priorities are established.
 
@@ -485,7 +491,7 @@ Phase 0: Exceptions (concurrent with Phase 1)
 └── All become Core Halos in Phase 1.3 (or evolve into Halo Classes)
 
 Phase 1-4: Foundation
-├── Beacons: lpla-verify (Phase 1) → lpla-checker (Phase 2+)
+├── Beacons: lpla-verify, lpha-relay, lpha-nfat, lpha-attest, lpha-council (Phase 1) → lpla-checker (Phase 2+)
 ├── Settlement: Manual → Formalized Monthly → Daily
 ├── Halos: Core Halos (wrapping Phase 0 debt) → Term Halos → Portfolio Halos (LCTS)
 ├── srUSDS: Core Council manages rate (pre-auction)
@@ -573,6 +579,7 @@ Phase 10 (Sentinel Stream)
 |-------|----------|--------|
 | 0 | [phase-0-legacy-exceptions.md](./phase-0-legacy-exceptions.md) | Draft |
 | 1 | [phase-1-pragmatic-delivery.md](./phase-1-pragmatic-delivery.md) | Draft |
+| 1 | [synome-mvp-reqs.md](./synome-mvp-reqs.md) | Draft |
 | 2 | [phase-2-monthly-settlement.md](./phase-2-monthly-settlement.md) | Draft |
 | 3 | [phase-3-daily-settlement.md](./phase-3-daily-settlement.md) | Draft |
 | 4 | [phase-4-lcts-launch.md](./phase-4-lcts-launch.md) | Draft |
@@ -634,7 +641,7 @@ This roadmap draws from the following source documents:
 | Profile | Power | Authority | Examples | Phase |
 |---------|-------|-----------|----------|-------|
 | **LPLA** | Low | Low | lpla-verify (Phase 1), lpla-checker (Phase 2+), lpla-report | 1+ |
-| **LPHA** | Low | High | lpha-relay, lpha-nfat, lpha-lcts, lpha-auction | 1-4 |
+| **LPHA** | Low | High | lpha-relay, lpha-nfat, lpha-attest, lpha-council, lpha-lcts, lpha-auction | 1-4 |
 | **HPLA** | High | Low | hpla-trade (private capital trading) | — |
 | **HPHA** | High | High | stl-base, stl-stream, stl-warden | 9-10 |
 
