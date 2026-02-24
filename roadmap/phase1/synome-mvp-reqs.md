@@ -46,9 +46,11 @@ CREATED ──► FILLING ──► OFFBOARDING ──► DEPLOYING ──► AT
 | **Unwinding** | Assets mature, USDC returns, converted to USDS. Sleeve updated. USDS moved to repayment. | nfat |
 | **Closed** | All units redeemed, sleeve wound down | nfat |
 
+**Attestation principle:** Attestation is required before any state change that makes assets not visible on-chain — leaving the on-chain boundary, entering obfuscated deployment, or entering at-rest.
+
 **Key transitions requiring attestation:**
 
-- **Filling → Deploying:** `lpha-attest` must first post a pre-deployment attestation (expected aggregate risk parameters, confirmation that legal docs check out, maximum deployment duration). Only then can `lpha-nfat` trigger the deploy phase.
+- **Within Offboarding (before external transfer) and Offboarding → Deploying:** `lpha-nfat` can freely transition a sleeve from Filling → Offboarding and convert USDS → USDC on-chain. But before sending USDC to an external account, `lpha-attest` must post a pre-deployment attestation (confirming legal structure is sound, bank account is verified, expected aggregate risk parameters, maximum deployment duration). The same attestation also gates the subsequent transition to Deploying (entering obfuscation). This ensures independent validation before capital leaves the on-chain boundary and before it enters the black-box deployment phase.
 - **Deploying → At Rest:** `lpha-attest` posts at-rest attestation (verifying aggregate risk parameters, confirming legal claims are in place per buybox/deal terms). Then `lpha-nfat` transitions the sleeve and writes the attested aggregate risk data.
 
 **Sleeve data (what's stored):**
@@ -96,7 +98,7 @@ Standalone records written by `lpha-attest`. Referenced by sleeves but stored in
 
 | Type | When | Content |
 |---|---|---|
-| **Pre-deployment** | Before sleeve enters deploying | Expected aggregate risk parameters, legal confirmation, maximum deployment duration |
+| **Pre-deployment** | During offboarding, after USDC conversion but before external transfer | Legal structure verified, bank account verified, expected aggregate risk parameters, maximum deployment duration |
 | **At-rest** | When deployment complete | Confirmed aggregate risk parameters, legal claims verified |
 | **Periodic** | Per schedule (e.g. quarterly) | Re-attestation that sleeve status is nominal, any risk data updates |
 
@@ -176,11 +178,24 @@ If missing: No record linking on-chain NFATs to deal terms. Sleeve asset trackin
 ### Flow 3: Attestation-Gated Deployment
 
 ```
-lpha-attest: post pre-deployment attestation
-    └─ synome: attestation stored (risk params, legal confirmation, max duration)
+lpha-nfat: transition sleeve → OFFBOARDING
+    └─ synome: Sleeve → OFFBOARDING
     │
     ▼
-lpha-nfat: reads attestation, triggers deploy phase
+lpha-nfat: convert USDS → USDC on-chain (no attestation needed)
+    └─ synome: sleeve assets updated (USDC at facility-ALMProxy)
+    │
+    ▼
+lpha-attest: post pre-deployment attestation
+    └─ synome: attestation stored (legal structure verified, bank account
+       verified, risk params, max duration)
+    │
+    ▼
+lpha-nfat: reads attestation, sends USDC externally
+    └─ synome: sleeve assets updated (in-transit → bank account)
+    │
+    ▼
+lpha-nfat: all funds confirmed, transition sleeve → DEPLOYING
     └─ synome: Sleeve → DEPLOYING (no further updates until at-rest)
     │
     ── black box (higher CRR, no sleeve updates) ──
@@ -194,7 +209,7 @@ lpha-nfat: reads attestation, transitions sleeve
     └─ synome: Sleeve → AT REST, aggregate risk data written
 ```
 
-If missing: No attestation gate means nfat beacon could deploy without independent verification. CRR calculations during deployment have no basis.
+If missing: No attestation gate means nfat beacon could send capital off-chain without independent verification of legal structure and bank account. CRR calculations during deployment have no basis.
 
 ### Flow 4: Periodic Re-Attestation
 
@@ -299,7 +314,7 @@ Some parts of the data model are not yet fully defined. Synome-MVP must accommod
 
 ## Links
 
-- Phase 1 overview: [`phase-1-pragmatic-delivery.md`](./phase-1-pragmatic-delivery.md)
-- NFAT specification: [`../smart-contracts/nfats.md`](../smart-contracts/nfats.md)
-- Term Halo overview: [`../sky-agents/halo-agents/term-halo.md`](../sky-agents/halo-agents/term-halo.md)
-- Beacon framework: [`../synomics/macrosynomics/beacon-framework.md`](../synomics/macrosynomics/beacon-framework.md)
+- Phase 1 overview: [`phase-1-overview.md`](phase-1-overview.md)
+- NFAT specification: [`../../smart-contracts/nfats.md`](../../smart-contracts/nfats.md)
+- Term Halo overview: [`../../sky-agents/halo-agents/term-halo.md`](../../sky-agents/halo-agents/term-halo.md)
+- Beacon framework: [`../../synomics/macrosynomics/beacon-framework.md`](../../synomics/macrosynomics/beacon-framework.md)

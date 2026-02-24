@@ -143,5 +143,5 @@ At completion of Phase 0:
 ## Links
 
 - Roadmap overview: [roadmap-overview.md](./roadmap-overview.md)
-- Phase 1 (standardized infrastructure): [phase-1-pragmatic-delivery.md](./phase-1-pragmatic-delivery.md)
-- Core Halos and legacy cleanup: Phase 1.3 in [phase-1-pragmatic-delivery.md](./phase-1-pragmatic-delivery.md#phase-13-legacy-cleanup--core-halos)
+- Phase 1 (standardized infrastructure): [phase-1-overview.md](./phase1/phase-1-overview.md)
+- Core Halos and legacy cleanup: Phase 1.3 in [phase-1-overview.md](./phase1/phase-1-overview.md#phase-13-legacy-cleanup--core-halos)

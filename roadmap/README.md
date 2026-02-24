@@ -10,8 +10,10 @@ Start with [`roadmap-overview.md`](roadmap-overview.md) for the complete summary
 |---|---|
 | [roadmap-overview.md](roadmap-overview.md) | Master overview with phase summary, dependencies, milestones, and document index |
 | [phase-0-legacy-exceptions.md](phase-0-legacy-exceptions.md) | Grove pre-standardization deployments; acknowledged technical debt (runs concurrently with Phase 1) |
-| [phase-1-pragmatic-delivery.md](phase-1-pragmatic-delivery.md) | MVP beacons (lpla-verify), Diamond PAU, Configurator, NFAT infrastructure; manual settlement |
-| [synome-mvp-reqs.md](synome-mvp-reqs.md) | Phase 1 requirements for Synome-MVP (inputs/outputs, APIs, schemas, and non-goals) |
+| [phase1/](phase1/) | **Phase 1 subdirectory** — all Phase 1 specifications |
+| [phase1/phase-1-overview.md](phase1/phase-1-overview.md) | Phase 1 overview — deliverables, substages, end state |
+| [phase1/synome-mvp-reqs.md](phase1/synome-mvp-reqs.md) | Phase 1 requirements for Synome-MVP (inputs/outputs, APIs, schemas, and non-goals) |
+| [phase1/halo-sleeve-deep-dive.md](phase1/halo-sleeve-deep-dive.md) | Halo Sleeve implementation spec for Phase 1 (lifecycle, Synome schema, offboarding, creation policy) |
 | [phase-2-monthly-settlement.md](phase-2-monthly-settlement.md) | Full lpla-checker with settlement tracking; formalized monthly settlement cycle |
 | [phase-3-daily-settlement.md](phase-3-daily-settlement.md) | Transition from monthly to daily settlement cycle |
 | [phase-4-lcts-launch.md](phase-4-lcts-launch.md) | srUSDS and first Portfolio Halo (LCTS); Core Council manages srUSDS rate pre-auction |

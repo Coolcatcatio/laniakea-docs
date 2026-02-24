@@ -147,7 +147,7 @@ Phase 2 is considered complete when:
 ## Links (Relevant Specs)
 
 - Roadmap overview: [roadmap-overview.md](./roadmap-overview.md)
-- Phase 1 (infrastructure + lpla-verify): [phase-1-pragmatic-delivery.md](./phase-1-pragmatic-delivery.md)
+- Phase 1 (infrastructure + lpla-verify): [phase-1-overview.md](./phase1/phase-1-overview.md)
 - Phase 3 (daily settlement): [phase-3-daily-settlement.md](./phase-3-daily-settlement.md)
 - Daily settlement spec (target cadence): [daily-settlement-cycle.md](../accounting/daily-settlement-cycle.md)
 - Beacon taxonomy: [beacon-framework.md](../synomics/macrosynomics/beacon-framework.md)

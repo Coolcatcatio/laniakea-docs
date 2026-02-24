@@ -139,7 +139,7 @@ Synome-MVP is the shared operational database for Halo operations. It tracks hal
 
 **Phase 1 mental model:** Synome-MVP is the shared database; beacons are the app layer.
 
-See [`synome-mvp-reqs.md`](./synome-mvp-reqs.md) for the full Phase 1 requirements (data model, end-to-end flows, and explicit non-goals).
+See [`synome-mvp-reqs.md`](./phase1/synome-mvp-reqs.md) for the full Phase 1 requirements (data model, end-to-end flows, and explicit non-goals).
 
 ### What Synome-MVP Stores
 

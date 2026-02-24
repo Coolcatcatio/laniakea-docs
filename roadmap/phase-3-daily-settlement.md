@@ -161,7 +161,7 @@ Phase 3 is considered complete when:
 ## Links (Relevant Specs)
 
 - Roadmap overview: [roadmap-overview.md](./roadmap-overview.md)
-- Phase 1: [phase-1-pragmatic-delivery.md](./phase-1-pragmatic-delivery.md)
+- Phase 1: [phase-1-overview.md](./phase1/phase-1-overview.md)
 - Phase 2: [phase-2-monthly-settlement.md](./phase-2-monthly-settlement.md)
 - Daily settlement spec: [daily-settlement-cycle.md](../accounting/daily-settlement-cycle.md)
 - Beacon taxonomy (for lock-aware roles): [beacon-framework.md](../synomics/macrosynomics/beacon-framework.md)
