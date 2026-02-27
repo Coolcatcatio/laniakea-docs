@@ -2,544 +2,467 @@
 
 **Status:** Draft for team review
 **Prepared by:** Claude (Archon session)
-**Last Updated:** 2026-02-23
+**Last Updated:** 2026-02-27
 
 ---
 
 ## Methodology note
 
-This document was produced by reading the full `laniakea-docs/` corpus and applying the spine-topic selection process described in the task brief. The Phase 1 scope document (`roadmap/phase-1-pragmatic-delivery.md`) was treated as the authoritative scoping filter. All candidate topics were subject to a cross-domain gate (≥2 distinct domains) and a hard-anchor gate (≥1 explicit table, schema, or open question in the repo).
+This document was produced by reading the full `laniakea-docs/` corpus and applying the spine-topic selection process described in the task brief. `roadmap/phase-1-pragmatic-delivery.md` is treated as the authoritative scoping filter. All 9 topics either map directly to a Phase 1 deliverable or are prerequisites that block one.
 
 **Phase 1 deliverables used as the scope filter** (from `roadmap/phase-1-pragmatic-delivery.md`):
-1. Diamond PAU Deployment (substage 1.1)
-2. Synome-MVP (substage 1.2)
-3. MVP Beacons: lpla-verify, lpha-relay, lpha-nfat, lpha-report, lpha-council (substages 1.2–1.5)
-4. Core Halos and Legacy Cleanup (substage 1.3)
-5. Configurator Unit (substage 1.4)
-6. NFAT Smart Contracts (substage 1.5)
-7. Term Halo Legal (substage 1.5, legal prerequisite)
 
-**Phase 1 note on settlement:** Phase 1 continues using the existing *manual* settlement process. lpla-verify monitors positions and calculates CRRs but does not track settlement — that capability arrives with lpla-checker in Phase 2.
+| Substage | Deliverable |
+|----------|-------------|
+| 1.1 | Diamond PAU Deployment |
+| 1.2 | Synome-MVP + Verify Beacon (lpla-verify) + Relay Beacon (lpha-relay) |
+| 1.3 | Core Halos and Legacy Cleanup |
+| 1.4 | Configurator Unit |
+| 1.5 | NFAT Smart Contracts + NFAT Beacon (lpha-nfat) + First Term Halo (Halo1) |
+| 1.5 (prereq) | Term Halo Legal |
+| 1.6 | Term Halo Cohort (Halo2–Halo6) |
+
+**Key Phase 1 constraints from the scope doc:**
+
+- Phase 1 continues using the existing **manual settlement process**. lpla-verify monitors positions and calculates CRRs but does not track settlement. That capability (lpla-checker) arrives in Phase 2.
+- The 14-day BEAMTimeLock delay is a **critical-path scheduling dependency**: inits and cBEAM grants must be submitted before Phase 1.4 can start. This is not just an implementation detail — it is a calendar constraint that requires early action.
+- Sealed-bid OSRC and Duration auctions do not begin until after `stl-base` is deployed (Phase 9+). Phase 1 uses **manual top-down ALDM allocation**.
 
 ---
 
-## Glossary of terms used in this document
+## Glossary
 
 | Term | Plain-language definition |
 |------|--------------------------|
-| **Spine topic** | A cross-domain interface or constraint where ambiguity has high downstream cost and resolving it unlocks parallel execution |
-| **PAU** | Parallelized Allocation Unit — the standard building block (Controller + ALMProxy + RateLimits) used at every layer |
-| **CRR** | Capital Ratio Requirement — the capital a Prime must hold per dollar of a given position, based on the risk framework |
-| **TRRC** | Total Required Risk Capital — the sum of CRR × position size across a Prime's full portfolio |
-| **Synome-MVP** | The operational database for Phase 1, storing risk parameters, NFAT records, and position data |
-| **aBEAM / cBEAM / pBEAM** | Admin / Configurator / Process BEAM — tiered on-chain authorized roles controlling PAU operations |
-| **SORL** | Second-Order Rate Limit — a constraint that limits how fast a rate limit can be increased (default: 25% per 18h) |
-| **NFAT** | Non-Fungible Allocation Token — an ERC-721 representing a bespoke deal claim between a Prime and a Halo |
-| **Buybox** | The acceptable parameter ranges (duration, size, APY, asset types) for deals within an NFAT Facility |
-| **Halo Sleeve** | The asset-side container backing one or more NFATs; the bankruptcy-remoteness boundary |
-| **lpla-verify** | Low Power, Low Authority verify beacon — monitors positions, calculates CRRs, generates alerts (read-only) |
-| **lpha-nfat** | Low Power, High Authority NFAT beacon — executes NFAT Facility lifecycle operations |
-| **lpha-attest** | Low Power, High Authority attestation beacon — posts risk attestations about Halo Sleeve contents into Synome |
-| **Attestor** | A company whitelisted by Sky governance to provide risk attestations; operates lpha-attest |
-| **Init** | A pre-approved rate limit or controller action that GovOps can activate on a PAU via the Configurator |
-| **EIP-2535** | Ethereum Improvement Proposal for the diamond proxy pattern — a modular, upgradeable contract architecture |
-| **CoreHaloFacet** | A Diamond PAU facet that enables Prime deployment into legacy assets wrapped as Core Halos |
+| **Spine topic** | A cross-domain interface or constraint where ambiguity has high downstream cost, and resolving it unlocks parallel execution across multiple domains |
+| **PAU** | Parallelized Allocation Unit — the standard building block (Controller + ALMProxy + RateLimits) through which capital is deployed |
+| **Synome-MVP** | The Phase 1 operational database: stores risk parameters, NFAT records, and position data; serves as source of truth for all MVP beacons |
+| **NFAT** | Non-Fungible Allocation Token — an ERC-721 representing a Prime's claim on a specific capital deployment in a Term Halo |
+| **BEAM** | Bounded External Access Module — an on-chain authorized role. aBEAM = admin (Core Council); cBEAM = configurator (GovOps); pBEAM = process (execution) |
+| **CRR** | Capital Ratio Requirement — the required risk capital per position, derived from risk weights, duration matching, and asset classification |
+| **Buybox** | The set of acceptable deal parameters (duration, size, APY, counterparty, asset type) for an NFAT Facility. Deals within the buybox can be executed by lpha-nfat without governance approval |
+| **Halo Sleeve** | The asset-side bankruptcy-remote container backing one or more NFATs; the isolation boundary for loss distribution |
+| **lpha-nfat** | The LPHA (Low Power, High Authority) beacon that operates NFAT Facility lifecycle: claims capital from queues, mints NFATs, manages sleeve status, deploys funds, processes redemptions |
+| **lpha-attest** | An independent LPHA beacon operated by an Attestor company; posts risk attestations about Halo Sleeve contents into the Synome |
+| **Init** | A pre-approved rate-limit or controller-action configuration that accordant GovOps can activate for their PAUs; additions require 14-day timelock |
+| **SORL** | Second-Order Rate Limit — constrains how fast rate limits can increase (default: 25% per 18 hours) |
 
 ---
 
-## A) Candidate Spine Topics Table
+## A) Candidate Spine Topics
 
-| Rank | Spine topic | Phase relevance | 1-sentence definition | Why it's a spine topic | Primary domains/functions | Evidence (repo anchors) | Key sub-decisions |
-|------|-------------|-----------------|----------------------|------------------------|--------------------------|------------------------|------------------|
-| 1 | **Synome-MVP: data schema, write authorization model, and API contract** | Phase 1 | The shared operational database for risk parameters, NFAT records, and position data — its schema, who can write what, and the interface beacons use to read/write it | Every Phase 1 beacon (lpla-verify, lpha-nfat, lpha-report, lpha-council) reads from or writes to Synome-MVP; if schema or write authorization is undefined, none can be built without conflicting assumptions | Data/infra (Archon), Risk (BA Labs), GovOps (Atlas Axis / OEA teams), Technical (PullUp) | `phase-1-pragmatic-delivery.md` §Synome-MVP (data flow table, "What Synome-MVP Stores" table); `governance-transition/council-beam-authority.md` (Synome write rights table); `smart-contracts/nfats.md` (onchain vs offchain data split table) | Schema fields per record type; signing/authentication mechanism for writes; API shape for beacon reads; versioning policy; how signed statements are validated |
-| 2 | **Configurator Unit: aBEAM/cBEAM provision plan and init catalog for Phase 1** | Prerequisite for Phase 1 | The plan for which Core Council actions (inits, cBEAM grants) must be scheduled through the 14-day timelock, and which GovOps teams become accordant to which PAUs, in order to enable spell-less Prime operations by substage 1.4 | The 14-day BEAMTimeLock means aBEAM actions must be initiated 14 days before any GovOps team can operate; this must be coordinated across Core Council, multiple GovOps teams, and smart contract deployers well before substage 1.4 | Technical (PullUp/Dewiz/Sidestream), GovOps (Amatsu/Soter/Endgame Edge/Redline), Governance (Atlas Axis) | `smart-contracts/configurator-unit.md` (Role Capabilities table, Invariants list, Default Parameters table); `phase-1-pragmatic-delivery.md` §Configurator Unit (aBEAM/cBEAM flow diagram, SORL table); `governance-transition/council-beam-authority.md` (BEAM hierarchy table) | Which inits are pre-approved for Core Halos vs NFAT Facilities; SORL default values (hop, maxChange); 14-day timelock scheduling plan; cBEAM-to-GovOps-to-PAU mapping; pBEAM (relayer) grant protocol for LPHA beacons |
-| 3 | **CRR calculation engine: lpla-verify data interface, formula mapping, and alert output** | Phase 1 | The specification of what on-chain and Synome data lpla-verify ingests, which risk-framework formula applies to each asset type (Core Halo, NFAT sleeve phase), and what format its outputs (CRR alerts, TRRC, Encumbrance Ratio) take | lpla-verify must be operational at substage 1.2 to unblock Core Halo deployment monitoring; the risk framework specifies formulas, but lpla-verify's exact data inputs from Synome-MVP and output contract are not specified in the corpus — BA Labs must provide this for Archon to build | Risk (BA Labs), Data/infra (Archon), GovOps (Atlas Axis and all OEA teams as consumers) | `risk-framework/sentinel-integration.md` (CRR/TRRC/TRC/Encumbrance Ratio definition table); `risk-framework/capital-formula.md` (per-position formulas); `smart-contracts/nfats.md` (sleeve-phase CRR table); `risk-framework/README.md` (open item: "Beacon implementation — Formulas and algorithms for lpla-checker calculations") | Exact input fields pulled from Synome vs on-chain; price feed sources and update frequency; CRR formula per sleeve phase (Filling/Deploying/At Rest/Missed re-attestation); TRRC and Encumbrance Ratio output format; alert threshold definitions and escalation path |
-| 4 | **NFAT Facility onboarding mechanism and Configurator integration** | Phase 1 | How a Prime gets approved to deposit into a specific NFAT Facility — the governance and Configurator integration path from Prime synomic approval through to queue deposit — which is explicitly marked as an open question in the NFATS spec | This open question blocks all Term Halo deployment (substage 1.5); Archon cannot build lpha-nfat's pBEAM logic, GovOps cannot operate, and PullUp/Dewiz/Sidestream cannot finalize contracts without knowing the approval flow | Technical (PullUp/Dewiz/Sidestream), Data/infra (Archon), GovOps (Amatsu/Soter/Endgame Edge/Redline), Governance (Atlas Axis) | `smart-contracts/nfats.md` L204–206 (explicit open question: "The exact onboarding mechanism for Primes to Facilities is an open design question"); `phase-1-pragmatic-delivery.md` §NFAT Smart Contracts; `smart-contracts/configurator-unit.md` (cBEAM/init model) | Whether Facility onboarding uses Configurator inits or a separate governance spell; who triggers onboarding and via which contract; what constitutes Prime synomic governance approval; how lpha-nfat receives pBEAM for a new Facility |
-| 5 | **Term Halo legal infrastructure: buybox template, entity structure, and recourse mechanics** | Phase 1 | The legal framework that must be in place before lpha-nfat can execute deals autonomously — buybox templates defining acceptable deal parameters, pre-signed master agreements for Prime participation, and Fortification Conserver intervention procedures | Without the legal infrastructure, lpha-nfat cannot execute deals without per-deal governance approval, blocking the autonomous operation model for all 6 Term Halos in substages 1.5–1.6; Frontier Foundation and OEA GovOps are likely to hold different assumptions about the legal entity structure | Legal (Frontier Foundation), GovOps (Redline/Endgame Edge as Operational Facilitators), Risk (BA Labs for CRR treatment of assets within buybox), Technical (PullUp/Dewiz/Sidestream for smart contract parameters) | `phase-1-pragmatic-delivery.md` §Term Halo Legal (Design Principles table, Buybox table, Deliverables list); `sky-agents/halo-agents/term-halo.md` (Governance Artifacts table, Bankruptcy Remoteness section); `smart-contracts/nfats.md` (Terms Source table, Ecosystem accord mode) | Legal entity structure for Halo Sleeves (serialized LLC equivalent — jurisdiction and structure TBD); which parameters constitute the buybox for Halo1; form of pre-signed Prime master agreement; Fortification Conserver trigger conditions and intervention procedure; whether Unit Artifact is a legal document or a Synome record |
-| 6 | **Core Halo classification decisions, CoreHaloFacet interface, and oracle data requirements** | Phase 1 | The decisions about which legacy assets are promoted to Core Halos versus wound down, the standardized CoreHaloFacet function set that wraps them, and the oracle/position data each Core Halo must expose for lpla-verify and lpha-collateral | Phase 1.3 (legacy cleanup) is a prerequisite for 1.4 (Configurator deployment with Core Halo allocation targets); inconsistent or missing oracle data breaks CRR calculations for all wrapped legacy positions; different GovOps teams may hold different views on which assets are "worth retaining" | GovOps (Endgame Edge/Redline/Amatsu/Soter as operators of respective Primes), Technical (PullUp/Dewiz/Sidestream for CoreHaloFacet), Risk (BA Labs for asset classification and CRR), Data/infra (Archon for lpla-verify data ingestion) | `phase-1-pragmatic-delivery.md` §Core Halos (Decision Tree diagram, Cleanup Targets table, Acceptance Criteria); `smart-contracts/architecture-overview.md` (Prime → Core Halos connection table; "CoreHaloFacet — Deploy into Core Halo positions"); `risk-framework/asset-type-treatment.md` (asset classification framework) | Which specific assets (Morpho vaults, SparkLend, Aave pools, Spark, Phase 0 Grove assets) are promoted vs wound down; CoreHaloFacet function set covering DeFi-specific interfaces (Aave, Morpho, Curve); oracle data fields required per Core Halo type for CRR calculation; Halo Unit Artifact template fields |
-| 7 | **Attestor governance: selection, whitelisting, and lpha-attest Synome interface** | Phase 1 | The governance process for selecting and whitelisting the Attestor company that will operate lpha-attest, and the attestation schema (fields, format, cadence) they must write into Synome to trigger CRR phase transitions for NFAT sleeves | Without a whitelisted Attestor and an agreed attestation schema, no NFAT sleeve can transition from Filling to Deploying (the two-beacon gate blocks all capital deployment); BA Labs and Archon need the schema to tie CRR phase transitions to attestation events | Governance (Frontier Foundation for Attestor selection and whitelisting; Atlas Axis/Core Council for governance approval), Data/infra (Archon builds lpha-attest), Risk (BA Labs specifies CRR per attestation state), GovOps (OEA teams as NFAT operators) | `smart-contracts/nfats.md` (The Attestor and lpha-attest section; two-beacon deployment gate diagram; attestation types table; CRR Incentive Structure table); `sky-agents/halo-agents/term-halo.md` (lpha-attest beacon section); `risk-framework/capital-formula.md` (Term Halo NFAT CRR reference) | Attestor selection criteria and governance whitelisting process; attestation schema (required fields for pre-deployment and post-deployment attestations); re-attestation cadence per asset type; what data lpha-attest writes to Synome; how lpla-verify reads attestation state to determine which CRR formula to apply |
-| 8 | **Diamond PAU architecture: Phase 1 facet set, audit requirements, and migration protocol** | Prerequisite for Phase 1 | The specific set of EIP-2535 facets included in Phase 1 Diamond PAUs, the testing and audit criteria before migration, and the transaction sequence (deploy → migrate → grant cBEAMs → wind down legacy) across the first-cohort Primes | All Phase 1 deliverables depend on Diamond PAUs being deployed and operational at substage 1.1; PullUp/Dewiz/Sidestream must agree on the facet set, GovOps needs the migration procedure, and Core Council must time the cBEAM re-grants through the 14-day timelock | Technical (PullUp/Dewiz/Sidestream for contract development and deployment), GovOps (Amatsu/Soter/Endgame Edge/Redline for migration execution), Governance (Atlas Axis/Core Council for cBEAM re-grants) | `phase-1-pragmatic-delivery.md` §Diamond PAU Deployment (Architecture table, Phase 1 Action Facets table, Migration Path 4-step sequence, substage 1.1 task table); `smart-contracts/diamond-pau.md`; `smart-contracts/architecture-overview.md` (Legacy PAU vs Diamond PAU comparison table) | Which Primes are in the first cohort for 1.1 vs deferred to later substages; complete facet list for Phase 1 Diamond PAU including LegacyMigrationFacet scope; audit requirements (separate audit or reuse of existing ALM controller audits?); migration transaction sequence and rollback procedure; cBEAM re-grant scheduling relative to migration |
-| 9 | **Phase 1 manual settlement continuity: lpla-verify output contract and inter-team handoff** | Phase 1 | The specification of what lpla-verify outputs (CRR reports, position verifications, alerts) are usable by the manual settlement process, and which teams consume which outputs — since lpla-verify cannot track settlement itself in Phase 1 | Phase 1 has multiple GovOps teams (Atlas Axis, Amatsu, Soter, Endgame Edge, Redline) and BA Labs all potentially involved in the monthly manual settlement; the Phase 1 doc explicitly notes that lpla-verify does not track settlement, yet does not specify how its outputs feed the settlement calculation — each team may assume a different handoff | Risk (BA Labs — settlement methodology), GovOps (Atlas Axis as Core Council GovOps; Amatsu/Soter/Endgame Edge/Redline as OEA GovOps), Data/infra (Archon — lpla-verify implementation) | `phase-1-pragmatic-delivery.md` §Executive Summary ("Phase 1 continues using the existing manual settlement process"); `accounting/prime-settlement-methodology.md` (five-step calculation; data inputs per step); `roadmap/roadmap-overview.md` (Phase 1 "lpla-verify: monitors positions, calculates CRRs, generates alerts. Does not track settlement"); `risk-framework/sentinel-integration.md` (lpla-checker metrics table) | What lpla-verify writes vs doesn't write relative to settlement; who reads lpla-verify outputs for the five-step settlement calculation; settlement execution responsibility across teams; data format handoff between Synome-MVP outputs and BA Labs settlement calculation; when in the month lpla-verify outputs are considered authoritative |
-
----
-
-## B) Detail Sections
+| Rank | Spine topic | Phase relevance | 1-sentence definition | Why it's a spine topic | Primary domains/functions | Evidence (2–5 repo anchors) | Key sub-decisions (3–7) |
+|------|-------------|-----------------|----------------------|------------------------|--------------------------|----------------------------|------------------------|
+| 1 | **Synome-MVP: data schema, write permissions, and signed-statement protocol** | Phase 1 | Define what Synome-MVP stores, who may write to it, in what format, and how signed statements are authenticated — the shared data contract that all MVP beacons depend on. | Every MVP beacon (lpla-verify, lpha-relay, lpha-nfat, lpha-report, lpha-council) either reads or writes Synome-MVP; ambiguity in schema or write permissions causes beacon-level rework and integration failure across Archon, BA Labs, and all GovOps teams. | Archon (builds Synome + beacons), BA Labs (risk params), Atlas Axis (Core Council GovOps), Amatsu / Soter Labs / Redline (Operational GovOps) | `phase-1-pragmatic-delivery.md` §Synome-MVP data flows table; `phase-1-pragmatic-delivery.md` §What Synome-MVP Stores (3 categories); `council-beam-authority.md` Synome Write Rights table (6 write-right types); `phase-1-pragmatic-delivery.md` architecture diagram (signed statements from Core Council GovOps + Operational GovOps) | (1) Schema for risk parameters (fields, types, units); (2) Schema for NFAT records (which fields are required at claim time); (3) Position data format and update cadence; (4) Signed-statement authentication mechanism (who signs, what format); (5) Versioning and backward-compatibility policy; (6) Which beacon holds which write right at Phase 1 |
+| 2 | **CRR calculation interface: risk-framework parameters to lpla-verify inputs/outputs** | Phase 1 | Define what inputs lpla-verify needs from Synome-MVP (risk params, price feeds, on-chain positions), what CRR formulas it applies, what outputs it writes back, and what constitutes an alert — the contract between BA Labs (risk framework design) and Archon (beacon implementation). | lpla-verify is live at substage 1.2 and is the only protocol-level monitoring for the rest of Phase 1; if BA Labs and Archon hold different models of what lpla-verify should compute or output, the alert infrastructure is wrong at launch with no in-Phase-1 correction mechanism. | BA Labs (risk formulas), Archon (lpla-verify implementation), Atlas Axis (consumes outputs), Core Council | `risk-framework/sentinel-integration.md` metrics table (CRR, TRRC, TRC, Encumbrance Ratio definitions); `risk-framework/capital-formula.md` (per-position formula with matched/unmatched split); `phase-1-pragmatic-delivery.md` §Verify Beacon responsibility table; `phase-1-pragmatic-delivery.md` §SOFR Hedging validation ("Primes without valid hedging…cannot deploy into duration NFATs") | (1) Input schema: which risk-param fields lpla-verify reads from Synome-MVP; (2) Price-feed sources and freshness requirements; (3) SOFR hedging validation rule: what constitutes a valid hedge declaration in Synome; (4) Output schema: CRR per position, TRRC, TRC, Encumbrance Ratio fields; (5) Alert threshold definitions (e.g., encumbrance ratio ≥90%); (6) Frequency and trigger model (event-driven vs. scheduled) |
+| 3 | **Configurator Unit authority model and 14-day timelock sequencing** | Phase 1 | Agree who holds aBEAMs, which inits must be created before Phase 1.4 begins, which GovOps teams receive which cBEAMs, and when timelock timers must start — the governance scheduling contract for spell-less operations. | The 14-day BEAMTimeLock delay means init creation and cBEAM grants for Core Halos and Halo1 must be submitted ~14 days before Phases 1.4 and 1.5 need to start; if teams don't agree on this schedule, substages 1.4 and 1.5 are delayed by weeks with no workaround. | Atlas Axis (aBEAM/Core Council), Amatsu / Soter Labs / Redline (cBEAM recipients), PullUp / Dewiz / Sidestream (PAU registration), Archon | `smart-contracts/configurator-unit.md` Default Parameters table (14-day timelock, 18h hop, 25% SORL); `smart-contracts/configurator-unit.md` Invariants list (7 invariants); `governance-transition/council-beam-authority.md` BEAM Hierarchy table (4 levels, aBEAM grants cBEAM via 14-day delay); `phase-1-pragmatic-delivery.md` §Configurator Unit flow diagram (aBEAM → BEAMTimeLock → BEAMState → Configurator) | (1) Which entity holds aBEAM in Phase 1 (Core Council multisig vs. Council Beacon); (2) Init library needed before 1.4: which allocation targets (Core Halos) require inits and in what order; (3) cBEAM assignments: which GovOps team is accordant to which Prime PAU; (4) Timer start dates for 1.4 and 1.5 relative to substage start targets; (5) Emergency freeze/cancel holder in Phase 1 (any single CC Guardian per council-beam-authority.md) |
+| 4 | **Diamond PAU facet interface standards and legacy migration protocol** | Phase 1 | Define which action facets exist, how the Configurator sees Diamond PAU functions, and the per-Prime migration sequence from legacy ALMProxy to Diamond — the technical interface that all Phase 1 builds depend on. | Diamond PAU is substage 1.1 and every downstream substage (Configurator, NFAT contracts, beacons) builds against it; if facet boundaries, selector routing, or the migration ordering are ambiguous, spell and Configurator builds break mid-Phase-1. | PullUp / Dewiz / Sidestream (facet dev + spell crafting), Atlas Axis (governance approval for diamondCut), Amatsu / Soter Labs / Redline (migration ops) | `phase-1-pragmatic-delivery.md` §Diamond PAU Action Facets table (NfatDepositFacet, NfatWithdrawFacet, CoreHaloFacet, LegacyMigrationFacet); `phase-1-pragmatic-delivery.md` §Migration Path (4-step sequence); `smart-contracts/diamond-pau.md` Legacy vs Diamond comparison table; `smart-contracts/diamond-pau.md` Configurator Integration section ("Diamond is transparent to Configurator") | (1) Facet boundary criteria: what logic goes in which facet; (2) Shared storage slot namespace conventions per facet to avoid collisions; (3) Migration ordering: which Primes migrate first and any ordering constraints; (4) Governance approval path for diamondCut (spell vs. aBEAM); (5) What constitutes "migration complete" for a given Prime (acceptance criteria) |
+| 5 | **NFAT smart contract architecture: Facility + Redeemer contract split and pBEAM authority** | Phase 1 | Define the exact contract-level split between Facility (queue, claim, mint) and Redeemer (receive, notify, redeem), the ERC-721 onchain data model, the rate-limit configuration, and which pBEAMs lpha-nfat holds — the build contract for NFAT contracts and lpha-nfat. | NFAT smart contracts are a prerequisite for Halo1 (substage 1.5); if Archon's beacon implementation and PullUp/Dewiz/Sidestream's contract specification diverge on the Facility/Redeemer interface or pBEAM authority model, integration testing at substage 1.5 fails. | PullUp / Dewiz / Sidestream (contract dev), Archon (lpha-nfat beacon), Amatsu / Soter Labs / Redline (Halo operations) | `phase-1-pragmatic-delivery.md` §NFAT Facility table (Queue/Claim/Mint/Deploy functions); `phase-1-pragmatic-delivery.md` §NFAT Redeemer table (Receive/Notify/Redeem functions); `smart-contracts/nfats.md` ERC-721 onchain fields table (tokenId, facility, principal, depositor, mintedAt); `smart-contracts/nfats.md` Queue State table (totalShares, totalUnderlying, shares[address]); `sky-agents/halo-agents/term-halo.md` Beacon Permissions table (4 pBEAM requirements for lpha-nfat) | (1) Penalty mechanism for late Halo funding at maturity (rate vs. fixed fee, where encoded); (2) Partial redemption ("spend") mechanics for amortizing loans vs. full burn; (3) Rate limit configuration on Facility claims (maxAmount, slope per Facility); (4) pBEAM grant path for lpha-nfat (cBEAM → pBEAM, or direct aBEAM grant); (5) How multiple Facilities per Halo share vs. isolate PAU infrastructure |
+| 6 | **NFAT onchain/offchain data split and Facility onboarding mechanism** | Prerequisite for Phase 1 | Define what must live onchain (custody, ownership, NFAT tokenId) vs. what lives only in Synome (deal terms, payment schedule, sleeve assignment), and how a Prime gets approved to deposit into a Facility — the semantic and governance contract the entire NFAT system rests on. | nfats.md contains an explicit open question: "The exact onboarding mechanism for Primes to Facilities is an open design question." If this is not settled before NFAT contracts are finalized, either the contracts will need post-deployment changes or lpha-nfat will execute deals without a clear authorization path. | PullUp / Dewiz / Sidestream (contract), Archon (lpha-nfat, Synome), Atlas Axis (Core Council approval), Amatsu / Soter Labs / Redline (GovOps onboarding) | `smart-contracts/nfats.md` §ERC-721 onchain fields table (5 fields) vs. §Offchain data list (6 items); `smart-contracts/nfats.md` explicit open question: "The exact onboarding mechanism…is an open design question"; `phase-1-pragmatic-delivery.md` §Deal Lifecycle step 1 ("Prime synomic governance approves deployment into NFAT Facility → Govops onboards Facility via configurator or timelock"); `smart-contracts/nfats.md` §Onboarding (open question) | (1) Minimum onchain fields: are mintedAt and depositor sufficient, or does the contract need more? (2) Synome record schema for NFAT deal terms (APY, duration, sleeve assignment — what fields, what format); (3) Prime onboarding path: is approval via Configurator init or via BEAMTimeLock? Who submits it? (4) Prime synomic governance approval: what document or on-chain action constitutes approval in Phase 1? (5) How Facility-level rate limits interact with individual NFAT claim amounts |
+| 7 | **Term Halo legal framework: buybox templates, pre-signed agreements, and recourse mechanisms** | Prerequisite for Phase 1 | Establish the reusable legal templates (buybox, pre-signed Prime agreements, Fortification Conserver recourse) that allow lpha-nfat to execute deals within governance-approved bounds without per-deal legal review — the legal prerequisite for substage 1.5. | Term Halo Legal is the longest-lead deliverable in Phase 1 and must be ready before Halo1 can go live; if the buybox template or pre-signed agreements are not complete, lpha-nfat cannot execute a single deal autonomously regardless of smart contract readiness. | Frontier Foundation (legal), Atlas Axis (governance artifacts), Amatsu / Soter Labs / Redline (Halo operators), PullUp (smart contract integration for recourse) | `phase-1-pragmatic-delivery.md` §Term Halo Legal design principles table (3 principles: default ownership, standardized structures, pre-signed integration); `phase-1-pragmatic-delivery.md` §Buybox Model parameter table (Duration, Size, APY, Counterparties, Asset Types); `phase-1-pragmatic-delivery.md` §Deliverables list (Buybox Template, Pre-signed Agreements, Recourse Mechanisms, Artifact Templates); `sky-agents/halo-agents/term-halo.md` Governance Artifacts table (Halo Artifact, Unit Artifact, Sleeve Records, Synome Records) | (1) Buybox parameter ranges for Halo1 (exact Duration, Size, APY, Asset Type bounds); (2) Jurisdiction selection and regulatory framework for each Term Halo; (3) Fortification Conserver trigger conditions: what events allow takeover of Facility assets? (4) Required contents of the Halo Artifact vs. Unit Artifact (minimum viable vs. complete); (5) Pre-signing mechanics: which parties must sign before Halo1 can accept its first deposit? (6) Penalty rate for late Halo redemption funding (referenced in nfats.md but not specified) |
+| 8 | **Core Halo classification criteria and data pipeline for MVP beacons** | Phase 1 | Agree on the rules for which legacy Prime exposures become Core Halos vs. are wound down, what data each Core Halo must provide to lpla-verify and lpha-relay, and whether lpha-collateral is needed — the intake contract for substage 1.3 that directly determines Configurator surface area. | Every legacy exposure left unresolved adds complexity to Configurator (more allocation targets), increases CRR calculation load, and creates more potential beacon failure modes; the cleanup criteria and data requirements must be agreed before substage 1.3 to avoid re-doing 1.3 during 1.4. | Amatsu / Soter Labs / Redline (Halo operators, know legacy assets), BA Labs (risk framework, need data for CRR), Archon (lpha-relay, lpha-collateral, lpla-verify), Atlas Axis (Core Council approval) | `phase-1-pragmatic-delivery.md` §Why Cleanup Matters table (4 impact areas); `phase-1-pragmatic-delivery.md` §Cleanup Targets (4 categories: promote/wind down/consolidate/document); `phase-1-pragmatic-delivery.md` §Acceptance Criteria for Phase 1.3 (3 conditions); `phase-1-pragmatic-delivery.md` §Collateral Beacon note ("speculative — may not be needed depending on how Core Halo data flows are structured") | (1) Classification criteria: minimum bar for "worth retaining as Core Halo" (size, liquidity, integration complexity); (2) Required fields per Core Halo Artifact (what properties, parameters, and oracle data are mandatory); (3) lpha-collateral go/no-go decision: is it needed or can data flow from existing sources? (4) Data source per legacy asset type (on-chain readable vs. requires off-chain scrape); (5) Timeline for wind-down of excluded positions relative to 1.3 start |
+| 9 | **lpha-nfat + lpha-attest two-beacon deployment gate: attestation protocol and Synome write interface** | Phase 1 | Define the attestation content format, required fields, Synome write schema, and cadence that lpha-attest must post before lpha-nfat can transition a Halo Sleeve from Filling to Deploying — the interface that unlocks autonomous capital deployment and drives per-sleeve CRR. | The two-beacon gate is the mechanism that makes the Deploying/At-Rest CRR distinction enforceable; if the attestation format or Synome write permission model is unspecified, either lpha-nfat cannot act (deployment blocked) or it acts without attestation (CRR undercharged, risk control violated). | Archon (builds lpha-nfat and lpha-attest), BA Labs (defines CRR per sleeve phase), Frontier Foundation (Attestor selection/whitelisting), Amatsu / Soter Labs / Redline (Halo operators) | `smart-contracts/nfats.md` §Two-beacon deployment gate sequence diagram; `smart-contracts/nfats.md` Attestation types table (pre-deployment, post-deployment, ongoing); `smart-contracts/nfats.md` CRR Incentive Structure table (Filling/Deploying/At Rest/Missed re-attestation vs. CRR impact); `sky-agents/halo-agents/term-halo.md` §lpha-attest description ("cannot move capital, mint NFATs, change sleeve status directly") | (1) Attestor selection and governance-whitelisting process for Phase 1; (2) Attestation schema: required fields for pre-deployment and post-deployment attestations; (3) Re-attestation cadence per asset type and what triggers a CRR increase for missed re-attestation; (4) Synome write permission model for lpha-attest (scoped to which record types); (5) Two-beacon gate enforcement: is it onchain (smart contract checks Synome before allowing status change) or offchain (lpha-nfat checks Synome before submitting transaction)? |
 
 ---
 
-### 1. Synome-MVP: Data Schema, Write Authorization Model, and API Contract
-
-#### 1.1 Definition (plain language)
-
-Synome-MVP is the Phase 1 operational database. It is the source of truth for risk parameters, NFAT deal records, and position data. Every beacon in Phase 1 either reads from it (lpla-verify, lpha-nfat) or writes to it (lpha-report, lpha-council, lpha-nfat). "Schema" here means the structure of each record type — what fields it contains, what types they are, and what they mean. "Write authorization" means which signed statements from which actors are accepted as writes.
-
-#### 1.2 Why it unblocks execution
-
-- lpla-verify cannot calculate CRRs without knowing the exact field names and types for risk parameters in Synome-MVP.
-- lpha-nfat cannot write NFAT records without knowing the required fields (APY, duration, maturity, sleeve assignment, etc.).
-- lpha-council cannot push risk equations without knowing the schema it is updating.
-- lpha-report cannot post performance summaries without knowing the format.
-- Downstream tools (manual settlement, BA Labs dashboards) cannot consume Synome-MVP outputs without a stable schema.
-
-If schema is agreed, all five beacons can be built and tested in parallel. Without it, each team builds against its own guess and integration fails.
-
-#### 1.3 Known ambiguities / mismatch risk
-
-- **Who writes risk parameters:** The Phase 1 doc says "Core Council GovOps" writes signed risk parameter updates, but "Core Council GovOps" maps to Atlas Axis as a team. It's unclear whether Atlas Axis drafts the parameters and lpha-council submits them, or Atlas Axis uses lpha-council as a passthrough, or something else.
-- **NFAT record ownership:** lpha-nfat writes NFAT records to Synome-MVP, but lpha-attest also writes attestations. If both write to the same record, there's a write-conflict risk unless the schema separates them.
-- **Authentication model:** The Phase 1 doc says "signed statements from authorized parties" but doesn't specify the signing scheme (on-chain via BEAM? off-chain key?). Archon may assume a different authentication model than the governance documents intend.
-- **Schema versioning:** The Phase 1 doc says Synome-MVP stores risk parameters "signed by Core Council GovOps" but doesn't specify how schema changes are versioned or how backward compatibility is maintained across Phase 1 → Phase 2.
-
-#### 1.4 What would settle it (v0)
-
-A v0 Synome-MVP schema spec that covers:
-1. Record types and required fields for each (risk parameters, NFAT records, position data, performance summaries, attestations).
-2. Write authorization model: which role/key/BEAM can write which record type.
-3. Read API: the interface beacons and manual tools use to query Synome-MVP.
-4. Validation rules: what makes a write rejected vs accepted.
-
-#### 1.5 Proposed deliverables
-
-- **Synome-MVP Schema v0** — field definitions, types, validation rules for each record type
-- **Write Authorization Table** — maps record type to authorized writer (role/key/BEAM)
-- **Read API Spec** — query interface for beacon ingestion and manual tooling
-- **Schema Versioning Policy** — how schema changes will be managed through Phase 1 without breaking running beacons
-
-#### 1.6 Evidence
-
-| Source | Anchor |
-|--------|--------|
-| `roadmap/phase-1-pragmatic-delivery.md` §Synome-MVP | Data flow table (Source/Data/Consumer); "What Synome-MVP Stores" table (3 record types) |
-| `governance-transition/council-beam-authority.md` | Synome write rights table (6 write right types, grantors) |
-| `smart-contracts/nfats.md` | Onchain vs offchain data split table (Deal NFAT onchain fields vs Synome fields) |
-| `roadmap/phase-1-pragmatic-delivery.md` §Council Beacon | "Enable Core Council to update risk equations and specify report formats" |
+## B) Detail sections
 
 ---
 
-### 2. Configurator Unit: aBEAM/cBEAM Provision Plan and Init Catalog for Phase 1
+### Topic 1: Synome-MVP schema, write permissions, and signed-statement protocol
 
-#### 2.1 Definition (plain language)
+**Phase relevance:** Phase 1
 
-The Configurator Unit is the governance layer that lets GovOps teams manage Prime operations without full governance spells. For it to work, the Core Council must have pre-approved a set of "inits" (allowed rate limit values and controller actions) via a 14-day timelock, and must have granted "cBEAMs" (operational roles) to the right GovOps teams for the right PAUs — also via the 14-day timelock. This spine topic is about what the init catalog should contain, which GovOps teams get which cBEAMs for which PAUs, and the scheduling plan so the 14-day timelock doesn't become a Phase 1 blocker.
+**1. Definition (plain language)**
 
-#### 2.2 Why it unblocks execution
+Synome-MVP is the single operational database that all Phase 1 beacons read from and write to. It holds three categories of data: risk parameters (signed by Core Council GovOps), NFAT records (written by lpha-nfat at deal execution), and position data (written by lpha-report). Before any beacon can be built or tested, the schema, write permissions, and signed-statement format must be specified as a shared contract.
 
-Phase 1.4 (substage "Configurator Deployment") requires:
-- All Core Halo allocation targets pre-registered with inits
-- cBEAMs granted to respective GovOps teams
+**2. Why it unblocks execution**
 
-Since every aBEAM action has a 14-day timelock, these actions must be initiated at least 14 days before substage 1.4. If the init catalog isn't agreed in advance, Core Council cannot initiate the timelock on time. If GovOps teams don't know which PAUs they'll be accordant to, they can't prepare their relayer infrastructure.
+- lpla-verify cannot be built until BA Labs and Archon agree on the risk-parameter field names, types, and units it will read.
+- lpha-nfat cannot write NFAT records until the record schema is frozen.
+- lpha-report cannot post performance summaries until the schema for CRR fulfillment and encumbrance ratio output is defined.
+- lpha-council cannot update risk equations until its write permissions are scoped.
+- All five MVP beacons are blocked at specification time, not just integration time.
 
-#### 2.3 Known ambiguities / mismatch risk
+**3. Known ambiguities / mismatch risk**
 
-- **Init values:** The Configurator spec lists default parameters (hop=18h, maxChange=25%) but doesn't specify what initial maxAmount or slope values are appropriate for Core Halos. BA Labs needs to inform these values; Core Council needs to approve them; GovOps needs to operate within them. Three different teams likely have different expectations.
-- **cBEAM assignments:** It's not clear which OEA GovOps team (Amatsu, Soter, Endgame Edge, or Redline) will receive cBEAMs for which specific Prime PAUs. The team-to-Prime mapping isn't specified in the corpus.
-- **NFAT Facility inits:** The Phase 1 doc says GovOps "creates Halo1 inits, grants cBEAMs" at substage 1.5, but the Configurator spec distinguishes between global inits (any PAU) and restricted inits (specific PAU). Which type is appropriate for Facilities is unspecified.
-- **pBEAM grants for LPHA beacons:** How lpha-relay and lpha-nfat receive pBEAMs (relayer role) on their respective PAUs is not spelled out. The Configurator spec says GovOps "sets relayer address via setRelayer" — but who gives pBEAMs to the beacon programs, and under what oversight?
+- BA Labs likely thinks in terms of formula inputs (risk weights, SPTP buckets, category caps) while Archon thinks in terms of API schema (field names, JSON vs. database records). These are different abstractions of the same content.
+- "Signed statements" from Core Council GovOps are mentioned repeatedly but the signing mechanism (multisig on-chain, off-chain key, oracle) is not specified.
+- Versioning policy is unspecified: if BA Labs changes a risk parameter definition, do existing beacons break?
 
-#### 2.4 What would settle it (v0)
+**4. What would settle it (v0)**
 
-1. Init catalog v0: list of all inits required for Phase 1 Core Halos and NFAT Facilities, with initial maxAmount and slope values (requires BA Labs input).
-2. cBEAM assignment map: which GovOps team is accordant to which PAUs (requires team coordination).
-3. Timelock schedule: aBEAM action schedule aligned with Phase 1 substage dates.
-4. pBEAM grant procedure: how LPHA beacons receive relayer roles on PAUs.
+A single document specifying: (a) field-level schema for each of the 3 data categories, (b) which entity holds write rights per category (mapping to the council-beam-authority.md Synome Write Rights table), (c) the signed-statement format and authentication method, (d) a versioning policy covering at minimum the Phase 1 period.
 
-#### 2.5 Proposed deliverables
+**5. Proposed deliverables**
 
-- **Phase 1 Init Catalog** — all required inits with values, for Core Halos and NFAT Facilities
-- **cBEAM Assignment Map** — PAU-to-GovOps-team mapping
-- **aBEAM Scheduling Plan** — timelock actions with target dates relative to substage milestones
-- **pBEAM Grant Procedure** — how LPHA beacons receive and maintain relayer authority
+- `synome-mvp-schema-v0.md`: field-level schema for risk params, NFAT records, and position data
+- `synome-mvp-write-rights-v0.md`: maps each write right to the holding entity and the beacon that exercises it
+- `synome-mvp-signed-statement-spec.md`: authentication format and verification procedure
 
-#### 2.6 Evidence
+**6. Evidence**
 
-| Source | Anchor |
-|--------|--------|
-| `smart-contracts/configurator-unit.md` | Role Capabilities table (aBEAM and cBEAM actions); Invariants list (7 explicit invariants); Default Parameters table (hop=18h, maxChange=25%, timelock=14 days) |
-| `phase-1-pragmatic-delivery.md` §Configurator Unit | aBEAM/cBEAM flow diagram; "typical flow" 5-step description; SORL safety property table |
-| `governance-transition/council-beam-authority.md` | BEAM hierarchy table (Council Beacon → aBEAM → cBEAM → pBEAM → PAU) |
-| `phase-1-pragmatic-delivery.md` §Phase 1.4 | Task table for substage 1.4 ("Register Core Halos", "Grant cBEAMs") |
+- `roadmap/phase-1-pragmatic-delivery.md`, §Synome-MVP Data Flows table: "Core Council GovOps → signed risk parameter updates → lpla-verify (for CRR calculations)"
+- `roadmap/phase-1-pragmatic-delivery.md`, §What Synome-MVP Stores: three explicit categories (risk parameters, NFAT records, position data)
+- `governance-transition/council-beam-authority.md`, Synome Write Rights table: 6 distinct write-right types with different grant chains
+- `roadmap/phase-1-pragmatic-delivery.md`, Synome-MVP architecture diagram: shows both Core Council GovOps and Operational GovOps as writers; lpla-verify and lpha-nfat as readers
 
 ---
 
-### 3. CRR Calculation Engine: lpla-verify Data Interface, Formula Mapping, and Alert Output
+### Topic 2: CRR calculation interface — risk-framework parameters to lpla-verify inputs/outputs
 
-#### 3.1 Definition (plain language)
+**Phase relevance:** Phase 1
 
-lpla-verify is the Phase 1 monitoring beacon. To run, it needs to know exactly what data to pull from Synome-MVP and on-chain, which risk-framework formula to apply per position type, and what to output (CRR per position, TRRC, Encumbrance Ratio, alerts). The risk framework specifies the formulas in detail (in `risk-framework/`), but the interface between the framework and the beacon implementation is an open item explicitly flagged in `risk-framework/README.md`.
+**1. Definition (plain language)**
 
-#### 3.2 Why it unblocks execution
+lpla-verify is the Phase 1 monitoring system. It takes risk parameters from Synome-MVP, on-chain position data, and price feeds; applies the capital formula; and produces CRR per position, TRRC, TRC, and Encumbrance Ratio. It also validates SOFR hedging declarations. This topic defines the precise inputs, calculation rules, outputs, and alert thresholds — the interface between BA Labs (who owns the risk framework) and Archon (who builds lpla-verify).
 
-lpla-verify must be operational at substage 1.2 to enable Core Halo monitoring. BA Labs owns the risk framework formulas; Archon builds the beacon. Without a v0 interface spec:
-- Archon cannot start building lpla-verify without making assumptions about data inputs.
-- BA Labs cannot validate correctness without knowing what lpla-verify will compute.
-- GovOps teams cannot act on alerts whose format is undefined.
+**2. Why it unblocks execution**
 
-This is a classic two-team interface gap: the formula owners and the implementation owners haven't specified the handoff contract.
+lpla-verify goes live at substage 1.2, before Core Halos, Configurator, and NFAT contracts exist. If the calculation interface is wrong at launch, every CRR report in Phase 1 is unreliable with no in-Phase correction path (lpla-checker, the corrected replacement, is Phase 2). The encumbrance ratio enforcement mechanism (`risk-monitoring.md`: "target ≤90%") cannot be operationalized until the output schema is agreed.
 
-#### 3.3 Known ambiguities / mismatch risk
+**3. Known ambiguities / mismatch risk**
 
-- **NFAT sleeve phase data:** lpla-verify must know the current sleeve phase (Filling/Deploying/At Rest/Missed re-attestation) to apply the right CRR. This data comes from lpha-attest writing attestations to Synome-MVP. If the attestation schema isn't agreed (see spine topic 7), lpla-verify can't determine sleeve phase.
-- **Price feed sources:** The capital formula requires "dollars first" for position sizes. Which oracle feeds provide prices for Core Halo assets (Morpho, SparkLend, etc.) is unspecified.
-- **Alert format and recipients:** Who receives CRR alerts from lpla-verify, in what format, via what channel, is not specified. GovOps teams may have different expectations about alert immediacy.
-- **SOFR validation:** lpla-verify must "validate that Primes deploying into duration NFATs have declared either hedge positions or SOFR plus terms" (Phase 1 doc §SOFR Hedging). The format of this declaration is unspecified.
+- The capital formula (`capital-formula.md`) has multiple branches (matched/unmatched, pull-to-par, gap risk, category caps) that require different inputs. Archon may implement a subset; BA Labs may expect the full formula from day one.
+- The SOFR hedging validation rule says Primes "cannot deploy into duration NFATs via the ALDM system" without a valid hedge — but what a "valid hedge declaration" looks like in Synome is not specified.
+- Encumbrance ratio enforcement ("rate limit reduction, new deployment freeze") is marked "governance proposal required" in `risk-monitoring.md`. It is unclear if lpla-verify Phase 1 must support automated enforcement or only alerting.
+- Price feed sources and freshness requirements are not listed.
 
-#### 3.4 What would settle it (v0)
+**4. What would settle it (v0)**
 
-A v0 lpla-verify specification covering:
-1. Input data sources (Synome-MVP fields + on-chain sources + price feeds).
-2. CRR formula mapping per asset type and sleeve phase.
-3. Output format: fields for CRR per position, TRRC, TRC, Encumbrance Ratio, and SOFR validation status.
-4. Alert definitions, thresholds, and routing.
+A two-part spec: (a) an input manifest (which Synome fields lpla-verify reads, which price feeds it consumes, and their freshness SLA), and (b) an output schema (field names and definitions for CRR, TRRC, TRC, Encumbrance Ratio, and alert records written to Synome). SOFR hedging validation rule needs a concrete Synome field spec.
 
-#### 3.5 Proposed deliverables
+**5. Proposed deliverables**
 
-- **lpla-verify Data Interface Spec** — input fields, sources, and refresh cadence
-- **CRR Formula Mapping Table** — formula per asset type and condition (Core Halo type, NFAT sleeve phase, SOFR validation status)
-- **Alert Specification** — threshold definitions, output format, recipient routing
-- **lpla-verify Acceptance Tests** — test cases BA Labs can use to validate implementation correctness
+- `lpla-verify-interface-v0.md`: input manifest + output schema + alert threshold table
+- Decision record: Phase 1 enforcement model (alerting-only vs. automated rate-limit reduction)
+- `sofr-hedge-declaration-spec.md`: what a valid hedge declaration looks like in Synome-MVP
 
-#### 3.6 Evidence
+**6. Evidence**
 
-| Source | Anchor |
-|--------|--------|
-| `risk-framework/README.md` | Open item: "Beacon implementation — Formulas and algorithms for lpla-checker calculations" |
-| `risk-framework/sentinel-integration.md` | Metrics table: CRR, TRRC, TRC, Encumbrance Ratio definitions; lpla-checker use case |
-| `risk-framework/capital-formula.md` | Per-position CRR formulas; Duration Capacity calculation |
-| `smart-contracts/nfats.md` | Sleeve-phase CRR table (Filling=low, Deploying=high, At Rest=medium, Missed re-attestation=increases) |
-| `phase-1-pragmatic-delivery.md` §SOFR Hedging | "lpla-verify validates that Primes deploying into duration NFATs have declared either hedge positions or SOFR plus terms" |
+- `risk-framework/sentinel-integration.md`, Key Metrics table: CRR, TRRC, TRC, Encumbrance Ratio definitions
+- `risk-framework/capital-formula.md`: per-position formula with matched/unmatched/gap-risk branches
+- `roadmap/phase-1-pragmatic-delivery.md`, §Verify Beacon responsibility table: Position Verification / CRR Calculation / Alert Generation
+- `roadmap/phase-1-pragmatic-delivery.md`, §SOFR Hedging: "lpla-verify validates that Primes deploying into duration NFATs have declared either: Hedge positions covering the interest rate exposure [or] SOFR plus terms on the underlying NFAT"
+- `risk-framework/risk-monitoring.md`, §Encumbrance Ratio Enforcement: "governance proposal required"
 
 ---
 
-### 4. NFAT Facility Onboarding Mechanism and Configurator Integration
+### Topic 3: Configurator Unit authority model and 14-day timelock sequencing
 
-#### 4.1 Definition (plain language)
+**Phase relevance:** Phase 1 / Prerequisite for Phase 1
 
-For a Prime to queue capital into an NFAT Facility, something must approve that Prime for that Facility. The NFATS spec describes the flow conceptually ("Prime synomic governance approves the Facility → Prime can deposit into queue → Halo can claim") but explicitly marks the "specific governance and Configurator integration path" as an open design question. This spine topic is about resolving that question: what is the onboarding mechanism, and how does it connect to the Configurator Unit's init/cBEAM model?
+**1. Definition (plain language)**
 
-#### 4.2 Why it unblocks execution
+The Configurator Unit uses a two-tier model: aBEAMs (held by Core Council) create inits and grant cBEAMs; cBEAMs (held by GovOps teams) set rate limits and manage PAU operations. All additions — init creation, cBEAM grants, PAU registration — require a 14-day timelock. Removals are instant. This spine topic defines: who holds which roles, what inits must be created, which GovOps teams receive which cBEAMs, and when those timers must start relative to Phase 1 substage dates.
 
-The open design question directly blocks substage 1.5 (First Term Halo). Archon cannot finalize lpha-nfat's pBEAM grant logic without knowing the approval flow. PullUp/Dewiz/Sidestream cannot finalize the NFAT Facility contracts without knowing whether they need to read from the Configurator. GovOps teams (who will operate Facilities) cannot define their procedures.
+**2. Why it unblocks execution**
 
-The question also has a 14-day timelock dependency: if Facility onboarding goes through BEAMTimeLock, the approval must be initiated 14 days before a Prime can deposit. This creates a hard scheduling constraint relative to substage 1.5.
+- Phase 1.4 cannot start until aBEAMs have created Core Halo inits AND granted cBEAMs to GovOps teams, AND those 14-day timers have elapsed.
+- Phase 1.5 cannot start until Halo1-specific inits and cBEAMs are through the timelock.
+- If teams plan these substages without accounting for the 14-day lead time, they will discover the sequencing issue after contracts are deployed but before operations can begin — a gap with no workaround.
 
-#### 4.3 Known ambiguities / mismatch risk
+**3. Known ambiguities / mismatch risk**
 
-- **Configurator vs separate spell:** Some designs imply Facility onboarding uses the same Configurator init system as Core Halos (same infrastructure, different target). Others imply it uses a separate governance spell specific to NFAT Facilities. These are architecturally different.
-- **Governance approval definition:** "Prime synomic governance approves the Facility" is vague. This could mean the Prime's GovOps team approves (an operational decision), the Core Council approves (a governance spell), or a combination.
-- **Rate limit at the Facility level:** The Phase 1 doc mentions GovOps "creates Halo1 inits, grants cBEAMs" but it's unclear whether these inits are per-Prime or per-Facility.
-- **Interaction with lpha-nfat pBEAM:** lpha-nfat holds pBEAM for Facility operations. How the pBEAM connects to Prime-level approval is unspecified.
+- The Phase 1 scope doc shows aBEAMs as "Core Council" but `council-beam-authority.md` describes the full target model where aBEAMs are set via the Council Beacon (HPHA). It is unclear which model is active at Phase 1 launch — this affects who submits the timelock transactions.
+- cBEAM assignments (which GovOps team is accordant to which Prime PAU) are not specified. Different GovOps teams may have different expectations about their scope.
+- The init library for Core Halos is not enumerated. Teams do not know how many init transactions need to be submitted, or in what order.
 
-#### 4.4 What would settle it (v0)
+**4. What would settle it (v0)**
 
-A v0 Facility onboarding spec:
-1. The governance/approval mechanism (Configurator init? Spell? Synome record?).
-2. The sequence diagram from "Prime wants to deploy into Facility X" to "Prime can deposit into queue."
-3. How lpha-nfat's pBEAM is granted and scoped per Facility.
-4. Whether/how timelock applies to each step.
+A single scheduling document: (a) list of inits needed for all Phase 1.4 Core Halo targets and Phase 1.5 Halo1, (b) cBEAM assignment map (GovOps team → PAUs), (c) PAU registration list, (d) proposed timer start dates back-calculated from substage target dates, (e) who submits each timelock transaction. This is a planning artifact, not a spec — but planning without it is impossible.
 
-#### 4.5 Proposed deliverables
+**5. Proposed deliverables**
 
-- **NFAT Facility Onboarding Spec** — sequence diagram, governance steps, contract interactions
-- **Configurator Integration Decision Record** — whether Facility onboarding uses init/cBEAM model or a separate mechanism
-- **lpha-nfat pBEAM Grant Procedure** — how Archon-operated beacon receives Facility-level execution authority
+- `configurator-onboarding-schedule-v0.md`: timelock submission calendar for Phase 1.4 and 1.5
+- `cbeam-assignment-map-v0.md`: GovOps team → accordant PAUs for Phase 1
+- `init-library-phase1-v0.md`: enumerated inits needed for Core Halos and Halo1
 
-#### 4.6 Evidence
+**6. Evidence**
 
-| Source | Anchor |
-|--------|--------|
-| `smart-contracts/nfats.md` L204–206 | Explicit open question: "The exact onboarding mechanism for Primes to Facilities is an open design question. The flow is: Prime synomic governance approves the Facility → Prime can deposit into queue → Halo can claim. The specific governance and Configurator integration path needs further specification." |
-| `phase-1-pragmatic-delivery.md` §Phase 1.5 | "Onboard to Configurator: Create Halo1 inits, grant cBEAMs" |
-| `smart-contracts/nfats.md` §Deal Lifecycle | "Prime synomic governance approves deployment into NFAT Facility / Govops onboards Facility via configurator (rate limits) or timelock (BEAMstate)" — dual path described but not specified |
+- `smart-contracts/configurator-unit.md`, Default Parameters: "Timelock delay: 14 days"
+- `smart-contracts/configurator-unit.md`, Invariants: "No configuration without init", "Accordant check", "Timelock on additions"
+- `governance-transition/council-beam-authority.md`, BEAM Hierarchy table (4 levels, additions timelocked 14 days, removals instant)
+- `roadmap/phase-1-pragmatic-delivery.md`, §Phase 1.4 tasks: "Register Core Halos: Add Core Halo allocation targets to Configurator" + "Grant cBEAMs: Provision GovOps teams for their respective PAUs"
 
 ---
 
-### 5. Term Halo Legal Infrastructure: Buybox Template, Entity Structure, and Recourse Mechanics
+### Topic 4: Diamond PAU facet interface standards and legacy migration protocol
 
-#### 5.1 Definition (plain language)
+**Phase relevance:** Phase 1
 
-lpha-nfat executes deals autonomously — it can claim from queues and mint NFATs — but only within a pre-agreed legal framework. That framework consists of: (a) the buybox template defining acceptable parameter ranges, (b) a pre-signed master agreement that Primes sign to participate in Facilities, (c) the legal entity structure for Halo Sleeves (described as "serialized LLC equivalent"), and (d) the intervention procedures for the Fortification Conserver if a Halo fails to fund at maturity. All four are listed as Phase 1 deliverables but none are specified in the corpus.
+**1. Definition (plain language)**
 
-#### 5.2 Why it unblocks execution
+Diamond PAU replaces the legacy single-controller design with a proxy that routes calls to modular facets. Phase 1 defines four required facets (NfatDepositFacet, NfatWithdrawFacet, CoreHaloFacet, LegacyMigrationFacet). This topic defines the facet boundaries, the shared storage namespacing convention, how the Configurator and beacons see the Diamond interface, and the per-Prime migration sequence from legacy ALMProxy.
 
-Without the legal infrastructure:
-- lpha-nfat cannot operate autonomously — every deal would require a separate governance approval.
-- No Prime can safely queue capital without a signed agreement governing its recourse rights.
-- Halo partners (Halo1–Halo6) cannot onboard without knowing the entity structure and buybox boundaries.
-- The Halo Sleeve's bankruptcy remoteness claim requires the correct legal structure to be credible.
+**2. Why it unblocks execution**
 
-Legal lead time for entity formation and agreement templates is typically 4–8 weeks (as noted in `term-halo.md`). Given that substage 1.5 requires Halo1 live, legal work must start early in the Phase 1 timeline.
+- Diamond PAU is substage 1.1. Configurator unit integration, lpha-relay beacon builds, and NFAT facet development all build against the Diamond interface.
+- If facet boundaries are ambiguous, selector collisions or shared-storage conflicts are only discovered at integration time.
+- The migration path (4 steps per Prime) requires a sequencing agreement between contract developers (who deploy) and GovOps teams (who execute migration ops and hold cBEAMs). Without this, migrations happen ad hoc and the legacy wind-down in 1.3 is disorganized.
 
-#### 5.3 Known ambiguities / mismatch risk
+**3. Known ambiguities / mismatch risk**
 
-- **Entity jurisdiction:** The Phase 1 doc calls Halo Sleeves "serialized LLC equivalents" but doesn't specify jurisdiction. Delaware LLCs, Cayman SPVs, and UK LLPs each have different formation requirements and recourse mechanics.
-- **Buybox parameter ownership:** The Phase 1 doc lists example ranges but notes these are "example ranges." Who defines the final buybox for each Halo (Frontier Foundation? OEA GovOps? the asset manager?)
-- **Pre-signature mechanics:** "Primes and counterparties pre-sign agreements covering the full buybox parameter range" — it's unclear whether this is a single master agreement or per-Facility, and what happens if a Prime hasn't signed when lpha-nfat tries to execute a deal.
-- **Fortification Conserver:** The term appears in the Phase 1 doc and term-halo.md but is not defined. Who or what is the Fortification Conserver? A legal entity? A multisig? A role held by Core Council?
+- `smart-contracts/diamond-pau.md` says "Configurator Integration: the diamond is transparent to the Configurator — it just sees callable functions." This may not be true if facet-specific access control differs from the legacy Controller model.
+- The diamondCut governance path (spell vs. aBEAM via Configurator) is not specified. Two different teams may assume different paths.
+- The facet list in Phase 1 is defined in `phase-1-pragmatic-delivery.md` but `smart-contracts/diamond-pau.md` lists a different (broader) set. Teams need a canonical Phase 1 facet list.
 
-#### 5.4 What would settle it (v0)
+**4. What would settle it (v0)**
 
-1. Legal entity structure decision: jurisdiction, formation mechanics, and how Sleeves are created/closed.
-2. Buybox template v0 for Halo1: specific parameter ranges and asset type definitions.
-3. Prime master agreement template: the form of pre-signed agreement.
-4. Fortification Conserver definition and intervention trigger.
+A facet specification document: (a) canonical Phase 1 facet list with function signatures, (b) shared storage namespace convention per facet, (c) diamondCut authorization path, (d) acceptance criteria per Prime migration (what "migration complete" means in verifiable terms), (e) migration ordering plan.
 
-#### 5.5 Proposed deliverables
+**5. Proposed deliverables**
 
-- **Term Halo Legal Framework v0** — entity structure decision, jurisdiction, formation mechanics
-- **Buybox Template v0** — parameter ranges for Halo1 (to be adapted per Halo)
-- **Prime Master Agreement Template** — form document for Prime participation
-- **Recourse and Intervention Procedures** — Fortification Conserver role, trigger conditions, and intervention process
-- **Artifact Templates** — Halo Artifact and Unit Artifact document templates (as listed in Phase 1 deliverables)
+- `diamond-pau-facet-spec-phase1-v0.md`: Phase 1 facets, function signatures, storage namespaces
+- `diamond-pau-migration-plan.md`: per-Prime migration sequence and acceptance criteria
 
-#### 5.6 Evidence
+**6. Evidence**
 
-| Source | Anchor |
-|--------|--------|
-| `phase-1-pragmatic-delivery.md` §Term Halo Legal | Buybox parameter table (Duration 6-24mo, Size 5M-100M, APY 8-15%, etc.); Deliverables list (4 items); "serialized LLC equivalent" quote |
-| `sky-agents/halo-agents/term-halo.md` §Legal Infrastructure | Governance Artifacts table (Halo Artifact, Unit Artifact, Sleeve Records, Synome Records) |
-| `smart-contracts/nfats.md` §Design Rationale | "Pre-signed Integration — Primes and counterparties pre-sign agreements covering the full buybox parameter range" |
-| `phase-1-pragmatic-delivery.md` §Design Principles | "Fortification Conserver can assume control of NFAT Facility assets if legal intervention is needed" |
+- `roadmap/phase-1-pragmatic-delivery.md`, §Phase 1 Action Facets table (NfatDepositFacet, NfatWithdrawFacet, CoreHaloFacet, LegacyMigrationFacet)
+- `roadmap/phase-1-pragmatic-delivery.md`, §Migration Path: 4-step sequence (Deploy → Migrate positions → Grant cBEAMs → Wind down legacy)
+- `smart-contracts/diamond-pau.md`, §Facet Organization table (ERC4626Facet, SwapFacet, MorphoFacet, NFATFacet, AdminFacet)
+- `smart-contracts/diamond-pau.md`, §Configurator Integration: "transparent to the Configurator"
+- `smart-contracts/diamond-pau.md`, §Storage: namespaced storage pattern (keccak256 slot per facet)
 
 ---
 
-### 6. Core Halo Classification Decisions, CoreHaloFacet Interface, and Oracle Data Requirements
+### Topic 5: NFAT smart contract architecture — Facility + Redeemer contract split and pBEAM authority
 
-#### 6.1 Definition (plain language)
+**Phase relevance:** Phase 1
 
-Before the Configurator can register Core Halo allocation targets (substage 1.4), three things must be decided: (1) which specific legacy assets are promoted to Core Halos versus wound down; (2) what the CoreHaloFacet contract exposes — the function set that enables Prime deployment into each type of legacy DeFi position (Morpho, SparkLend, Aave, etc.); and (3) what oracle and position data each Core Halo must expose for lpla-verify (CRR calculation) and lpha-collateral (position reporting).
+**1. Definition (plain language)**
 
-#### 6.2 Why it unblocks execution
+NFAT smart contracts consist of two components: the Facility (holds the queue, executes claims, mints ERC-721 NFATs) and the Redeemer (holds returned funds, allows NFAT holders to burn for principal + yield). This topic defines the contract-level interface — the ERC-721 data model, the queue share accounting, the rate-limit configuration per Facility, and exactly which pBEAMs lpha-nfat must hold to operate each component.
 
-Phase 1.3 (Legacy Cleanup and Core Halos) is a prerequisite for 1.4. If the classification decisions aren't made:
-- GovOps teams can't wind down the right positions.
-- PullUp/Dewiz/Sidestream can't build the CoreHaloFacet for the correct target set.
-- The Configurator's init catalog (spine topic 2) can't be finalized because it depends on knowing which Core Halos exist.
-- BA Labs can't classify Core Halo assets for CRR purposes without knowing what they are.
+**2. Why it unblocks execution**
 
-Different GovOps teams likely have different views on "worth retaining" — positions that are profitable for one Prime may be redundant or risky viewed across all Primes.
+NFAT contracts are the core deliverable of substage 1.5. Archon's lpha-nfat beacon implementation and PullUp/Dewiz/Sidestream's contract specification are built in parallel; if they diverge on the Facility/Redeemer interface, pBEAM model, or penalty mechanics, substage 1.5 integration testing fails. The penalty mechanism for late Halo funding is mentioned in multiple docs but not specified numerically anywhere — it affects legal negotiations and Prime expectations.
 
-#### 6.3 Known ambiguities / mismatch risk
+**3. Known ambiguities / mismatch risk**
 
-- **Phase 0 Grove assets:** Phase 0 explicitly creates several legacy positions (custodial crypto lending, crypto-enabled lending, tokenized RWA trading, bridge) as acknowledged technical debt. Which of these become Core Halos, and how they're classified for CRR purposes, is not specified.
-- **Spark position:** Spark is a Genesis Star operated by Endgame Edge. If Spark allocations are Core Halos controlled by Core Council, there's a potential conflict with Spark's own governance. This tension is implicit but not addressed.
-- **CoreHaloFacet function set:** The Phase 1 doc lists `CoreHaloFacet` as a facet but doesn't specify its functions beyond "Deploy into Core Halo positions." Morpho, SparkLend, Aave, Curve, and Uniswap all have different interfaces.
-- **Oracle data requirements:** lpla-verify needs position data and price data for Core Halos. For DeFi positions, this may come from on-chain reads; for legacy RWA positions (Phase 0 Grove assets), this is unclear.
+- `smart-contracts/nfats.md` §Integration Notes: "lpha-nfat beacon integration: TBD" — the integration spec is explicitly unresolved.
+- The penalty mechanism for late Halo funding is referenced in `phase-1-pragmatic-delivery.md` and `nfats.md` but the rate or structure is not specified.
+- The payment-delivery section of nfats.md says extended flows are "intentionally left undefined" — this is intentional for the standard but must be bounded for Phase 1 contracts.
+- Multiple Facilities per Halo: nfats.md says each Facility has its own PAU, but Phase 1 deploys Halo1-Halo6. The PAU proliferation implications for Configurator surface area are not modeled.
 
-#### 6.4 What would settle it (v0)
+**4. What would settle it (v0)**
 
-1. Core Halo registry: list of all assets in/out, with rationale.
-2. Asset classification for each Core Halo (for CRR purposes).
-3. CoreHaloFacet function list covering all required DeFi interface types.
-4. Oracle/position data specification per Core Halo type.
+An NFAT contract spec: (a) ERC-721 onchain field list (from nfats.md) confirmed as canonical for Phase 1, (b) Facility vs. Redeemer function interface (inputs, outputs, events), (c) pBEAM requirements per lpha-nfat action, (d) penalty rate for late funding, (e) Phase 1 payment patterns supported (bullet loan confirmed; amortizing TBD).
 
-#### 6.5 Proposed deliverables
+**5. Proposed deliverables**
 
-- **Core Halo Classification Register** — enumeration of all assets with in/out decision and rationale
-- **Core Halo Asset Classification** — CRR category for each (for BA Labs risk framework)
-- **CoreHaloFacet Interface Spec** — function list and parameter types for each DeFi target type
-- **Core Halo Oracle Data Spec** — required oracle/position data fields per Core Halo type (for lpla-verify and lpha-collateral)
-- **Halo Unit Artifact Template** — governance documentation fields for Core Halos
+- `nfat-contract-spec-phase1-v0.md`: Facility + Redeemer interface, ERC-721 model, pBEAM requirements
+- Decision record: penalty structure for late Halo funding
+- Decision record: Phase 1 payment patterns in scope (bullet only, or also amortizing)
 
-#### 6.6 Evidence
+**6. Evidence**
 
-| Source | Anchor |
-|--------|--------|
-| `phase-1-pragmatic-delivery.md` §Core Halos | Decision Tree diagram; "Initial scope" description (Morpho vaults, SparkLend, other DeFi integrations); Acceptance Criteria (three bullet points) |
-| `smart-contracts/architecture-overview.md` | "Core Halos — legacy DeFi (Morpho vaults, Aave pools, SparkLend) wrapped as Halo Units under Core Council governance"; Prime→Core Halos connection type (CoreHaloFacet) |
-| `roadmap/phase-0-legacy-exceptions.md` | Phase 0 asset inventory (custodial crypto lending, crypto-enabled lending, tokenized RWA, bridge, Star4) — all become Core Halos in 1.3 |
-| `risk-framework/asset-type-treatment.md` | Asset type treatment framework (relevant to Core Halo classification for CRR) |
+- `roadmap/phase-1-pragmatic-delivery.md`, §NFAT Facility table (Queue/Claim/Mint/Deploy)
+- `roadmap/phase-1-pragmatic-delivery.md`, §NFAT Redeemer table (Receive/Notify/Redeem)
+- `smart-contracts/nfats.md`, ERC-721 onchain fields table (5 fields)
+- `smart-contracts/nfats.md`, Queue State table (totalShares, totalUnderlying, shares[address])
+- `sky-agents/halo-agents/term-halo.md`, Beacon Permissions table (4 pBEAM requirements for lpha-nfat)
+- `smart-contracts/nfats.md`, §Integration Notes: "TBD — lpha-nfat beacon integration"
 
 ---
 
-### 7. Attestor Governance: Selection, Whitelisting, and lpha-attest Synome Interface
+### Topic 6: NFAT onchain/offchain data split and Facility onboarding mechanism
 
-#### 7.1 Definition (plain language)
+**Phase relevance:** Prerequisite for Phase 1
 
-The Attestor is a company whitelisted by Sky governance that provides risk attestations about NFAT Halo Sleeve contents. It operates the lpha-attest beacon. Without an Attestor, no NFAT sleeve can transition from Filling (capital queued) to Deploying (capital deployed) — the "two-beacon deployment gate" requires an lpha-attest attestation before lpha-nfat can change sleeve status. This spine topic covers: who selects the Attestor and how they are whitelisted, what attestation schema lpha-attest must write into Synome, and how BA Labs's CRR phase-transition logic maps to attestation events.
+**1. Definition (plain language)**
 
-#### 7.2 Why it unblocks execution
+The NFAT design splits data: the ERC-721 holds only custody and ownership fields; deal terms (APY, duration, sleeve assignment, payment schedule) live in Synome-MVP. This topic resolves two related ambiguities: (a) exactly which fields are required onchain vs. optional Synome fields, and (b) how a Prime is authorized to deposit into a Facility — a question nfats.md flags as explicitly open.
 
-The two-beacon gate is a hard dependency for all Term Halo capital deployment. Without an Attestor:
-- No sleeve can transition from Filling to Deploying.
-- No capital reaches RWA endpoints.
-- All Term Halos are operationally blocked even if smart contracts are deployed and legal framework is complete.
+**2. Why it unblocks execution**
 
-Additionally, the Attestor must be established and operating *before* Halo1 goes live. Governance whitelisting (likely via a spell or aBEAM action) has its own lead time.
+The onchain/offchain split defines the scope of the NFAT smart contract and the Synome schema simultaneously. Until it is resolved, neither the contracts nor the Synome record spec can be finalized. The onboarding mechanism ambiguity is more acute: if the onboarding path is Configurator (init + cBEAM), it must be in the timelock schedule from Topic 3; if it is BEAMTimeLock directly, it requires a different process. Resolving this unblocks the Phase 1 scheduling work.
 
-#### 7.3 Known ambiguities / mismatch risk
+**3. Known ambiguities / mismatch risk**
 
-- **Attestor identity:** The corpus says "a company whitelisted by Sky governance" but doesn't name a candidate or describe selection criteria. Frontier Foundation likely has a view; Core Council may have different requirements; BA Labs needs the attestation format to match the CRR model.
-- **Attestation schema:** The NFATS spec describes attestation *content* ("assets will deploy into [risk characteristics]...") but not the Synome schema (field names, types, required vs optional). BA Labs and Archon need this agreed before they can connect CRR phase transitions to attestation events.
-- **Re-attestation cadence:** The NFATS spec says "cadence varies by asset and directly affects CRR — more frequent attestation enables lower CRR." Who decides the cadence per asset type? BA Labs (risk calibration) or the Attestor (operational feasibility)?
-- **Privacy vs CRR tradeoff:** The Attestor provides *risk characteristics* about a sleeve, not individual borrower details. BA Labs needs to calibrate CRR based on these risk characteristics — but the attributes they can observe are constrained by the privacy model. This tradeoff needs explicit agreement.
+- nfats.md states the onboarding mechanism is "an open design question" — this is the clearest hard-anchor evidence of unresolved ambiguity in the corpus.
+- "Prime synomic governance approves the Facility" is mentioned in the deal lifecycle but the mechanism is undefined in Phase 1 (Synome governance is a later-phase concept).
+- Some teams may assume deal terms can always be reconstructed from onchain events; others may assume Synome is required to derive the NFAT's value at all.
 
-#### 7.4 What would settle it (v0)
+**4. What would settle it (v0)**
 
-1. Attestor selection process and governance whitelisting procedure.
-2. Attestation schema v0: required fields, types, and semantics for pre-deployment, post-deployment, and re-attestation events.
-3. Re-attestation cadence table: cadence per asset type and resulting CRR impact.
-4. Mapping from attestation state to CRR formula (for BA Labs and Archon alignment).
+Two decisions: (a) a canonical onchain/offchain field assignment for Phase 1 NFAT contracts (freeze the ERC-721 field list; enumerate mandatory Synome fields at claim time), and (b) a Prime onboarding decision record (Configurator init path or BEAMTimeLock path, with ownership of the approval transaction).
 
-#### 7.5 Proposed deliverables
+**5. Proposed deliverables**
 
-- **Attestor Selection and Governance Procedure** — selection criteria, whitelisting mechanism, accountability model
-- **lpha-attest Attestation Schema v0** — Synome record fields for each attestation type
-- **Re-attestation Cadence Table** — per asset type, with CRR impact
-- **Attestation-to-CRR Mapping** — how each attestation state maps to lpla-verify's CRR formula selection
+- Decision record: Phase 1 onchain vs. Synome field assignment for NFAT positions
+- Decision record: Prime-to-Facility onboarding mechanism and approval path
+- `nfat-synome-record-schema-v0.md`: required Synome fields at deal execution
 
-#### 7.6 Evidence
+**6. Evidence**
 
-| Source | Anchor |
-|--------|--------|
-| `smart-contracts/nfats.md` §The Attestor and lpha-attest | Attestor properties table; two-beacon deployment gate diagram; attestation types table (3 types with content) |
-| `smart-contracts/nfats.md` §CRR Incentive Structure | CRR impact table per sleeve phase (4 phases with CRR impact and incentive) |
-| `sky-agents/halo-agents/term-halo.md` §lpha-attest | "Attestor company whitelisted by Sky governance"; two-beacon gate sequence |
-| `risk-framework/capital-formula.md` | "For positions held via Term Halo sleeves, CRR varies by sleeve phase" |
+- `smart-contracts/nfats.md`, §ERC-721 onchain fields table (5 fields: tokenId, facility, principal, depositor, mintedAt) vs. §Offchain data list (6 items: APY, duration, payment schedule, maturity, sleeve assignment, sleeve contents)
+- `smart-contracts/nfats.md`, §Onboarding: "The exact onboarding mechanism for Primes to Facilities is an open design question"
+- `roadmap/phase-1-pragmatic-delivery.md`, §Deal Lifecycle step 1: "Prime synomic governance approves deployment into NFAT Facility → Govops onboards Facility via configurator (rate limits) or timelock (BEAMstate)"
 
 ---
 
-### 8. Diamond PAU Architecture: Phase 1 Facet Set, Audit Requirements, and Migration Protocol
+### Topic 7: Term Halo legal framework — buybox templates, pre-signed agreements, and recourse mechanisms
 
-#### 8.1 Definition (plain language)
+**Phase relevance:** Prerequisite for Phase 1
 
-Diamond PAU (EIP-2535) replaces the legacy PAU architecture at substage 1.1. The diamond proxy pattern allows new functionality to be added as modular "facets" without redeploying the entire contract. For Phase 1, this means specifying exactly which facets are included in the initial deployment, what testing and audit coverage is required before migration, and the step-by-step sequence for migrating each Prime from legacy PAU to Diamond PAU. The migration requires re-granting cBEAMs through the 14-day timelock — creating a hard dependency on substage 1.1 completing before the Configurator timelock can begin.
+**1. Definition (plain language)**
 
-#### 8.2 Why it unblocks execution
+A Term Halo requires legal infrastructure before lpha-nfat can execute any deal: a buybox template defining acceptable deal parameters, pre-signed agreements from participating Primes, and defined recourse mechanisms for the Fortification Conserver in case of default. These are not smart contract components — they are legal documents that must be completed before Halo1 accepts its first deposit.
 
-Diamond PAU deployment (substage 1.1) is the first operational substage after planning. All subsequent infrastructure (Synome-MVP, Configurator, Beacons, Term Halos) assumes Diamond PAUs are in place. Additionally, the 14-day timelock for cBEAM grants after migration (spine topic 2) means the migration timeline sets the earliest possible date for substage 1.4. If migration slips, all downstream substages slip.
+**2. Why it unblocks execution**
 
-#### 8.3 Known ambiguities / mismatch risk
+The Term Halo legal framework is explicitly listed as a Phase 1 deliverable and is the longest-lead item in substage 1.5. It has no technical dependency order — it can be started immediately — but it cannot be parallelized away: without a signed buybox and Prime agreements, lpha-nfat is technically operational but legally prohibited from executing any deal. Since legal drafting, review, and signature collection take weeks, this must start before smart contract development completes.
 
-- **Facet set completeness:** The Phase 1 doc lists `NfatDepositFacet`, `NfatWithdrawFacet`, `CoreHaloFacet`, and `LegacyMigrationFacet`. It's unclear whether additional facets (e.g., for bridge operations, for SOFR hedging validation, for future compatibility) should be included. Including too few requires future facet additions through governance; including too many expands the audit surface.
-- **Audit strategy:** The architecture overview notes "same contracts, different configuration" and that factories can stamp out PAUs — implying audit reuse is a key benefit. Whether Phase 1 Diamond PAUs can rely on existing ALM controller audits or require a full new audit is not specified. This materially affects timeline.
-- **Migration sequencing:** Which Primes are in the "first cohort" for substage 1.1 is not specified in the Phase 1 doc. If multiple Primes need to be migrated simultaneously, operational complexity increases.
-- **Legacy PAU wind-down timing:** The Phase 1 doc says "Wind down legacy PAU once migration complete." But if legacy positions are still active (Phase 0 Grove assets pending Core Halo wrapping), the wind-down timing becomes ambiguous.
+**3. Known ambiguities / mismatch risk**
 
-#### 8.4 What would settle it (v0)
+- The buybox parameter ranges for Halo1 are shown as examples in `phase-1-pragmatic-delivery.md` (6–24 months, 5M–100M, 8–15% APY) but are explicitly marked as illustrative, not final.
+- The "Fortification Conserver" is referenced as the recourse mechanism but its identity, trigger conditions, and operational authority in Phase 1 are not described anywhere in the corpus.
+- Jurisdiction selection for Term Halos is unspecified. Different jurisdictions affect both the legal template design and the asset types in scope.
+- The penalty structure for late Halo funding at maturity is referenced legally but not quantified.
 
-1. Phase 1 facet list: definitive list of facets for initial Diamond PAU deployment.
-2. Audit strategy: new audit vs incremental audit vs existing coverage, with acceptance criteria.
-3. First cohort Prime list: which Primes migrate at substage 1.1.
-4. Migration procedure: step-by-step sequence including cBEAM re-grant timing and legacy PAU wind-down criteria.
+**4. What would settle it (v0)**
 
-#### 8.5 Proposed deliverables
+For Halo1: (a) a finalized buybox with specific parameter ranges, counterparty list, and asset type constraints; (b) a standard Prime participation agreement (the pre-signed form); (c) a recourse procedure document with Fortification Conserver trigger conditions; (d) a Halo Artifact template covering minimum required contents. These are legal artifacts, not technical specs.
 
-- **Phase 1 Diamond PAU Facet Specification** — complete facet list with function signatures and interfaces
-- **Audit Plan** — audit scope, coverage requirements, acceptance criteria
-- **First Cohort Migration Plan** — Prime list, migration sequence, rollback procedure
-- **cBEAM Re-grant Schedule** — timing relative to substage 1.1 completion and substage 1.4 requirements
+**5. Proposed deliverables**
 
-#### 8.6 Evidence
+- `halo1-buybox-v0.md` (or legal equivalent): final parameter ranges, jurisdiction, asset types
+- `prime-participation-agreement-template-v0`: standard form for Phase 1 Primes
+- `recourse-procedure-v0.md`: Fortification Conserver triggers, authority, and contact
+- `halo-artifact-template-v0.md`: minimum required contents of Halo Artifact and Unit Artifact
 
-| Source | Anchor |
-|--------|--------|
-| `phase-1-pragmatic-delivery.md` §Diamond PAU Deployment | Architecture table; Phase 1 Action Facets table (4 facets); Migration Path 4-step sequence |
-| `smart-contracts/architecture-overview.md` | Legacy PAU vs Diamond PAU comparison table; "No new controller code for new layers" principle |
-| `phase-1-pragmatic-delivery.md` §Phase 1.1 | Substage 1.1 task table (3 tasks: factory, first-cohort deployment, migration) |
-| `smart-contracts/configurator-unit.md` §Extra Requirements | "Admin role prerequisites: Before a PAU can be managed through the Configurator Unit, the deployed PAU contracts must grant the Configurator the necessary admin roles" — deployment-time concern |
+**6. Evidence**
+
+- `roadmap/phase-1-pragmatic-delivery.md`, §Term Halo Legal design principles table (3 principles)
+- `roadmap/phase-1-pragmatic-delivery.md`, §Buybox Model parameter table (Duration, Size, APY, Counterparties, Asset Types with example ranges)
+- `roadmap/phase-1-pragmatic-delivery.md`, §Deliverables list (Buybox Template, Pre-signed Agreements, Recourse Mechanisms, Artifact Templates)
+- `sky-agents/halo-agents/term-halo.md`, §Legal Infrastructure / Governance Artifacts table (Halo Artifact, Unit Artifact, Sleeve Records, Synome Records)
 
 ---
 
-### 9. Phase 1 Manual Settlement Continuity: lpla-verify Output Contract and Inter-Team Handoff
+### Topic 8: Core Halo classification criteria and data pipeline for MVP beacons
 
-#### 9.1 Definition (plain language)
+**Phase relevance:** Phase 1
 
-Phase 1 continues using the existing manual settlement process — no automation. lpla-verify monitors positions and calculates CRRs but explicitly does not track settlement progress (that arrives in Phase 2 with lpla-checker). The question this spine topic addresses: what exactly does lpla-verify output that informs the manual monthly settlement calculation (the five-step methodology in `accounting/prime-settlement-methodology.md`), and which team reads those outputs to perform the settlement? Multiple GovOps teams and BA Labs are involved, but the handoff isn't specified.
+**1. Definition (plain language)**
 
-#### 9.2 Why it unblocks execution
+Before substage 1.3, teams must agree on the rules for deciding which legacy Prime exposures are retained as Core Halos (standardized Halo Units) vs. wound down, what data each Core Halo must supply to lpla-verify and lpha-relay, and whether lpha-collateral (marked speculative in the Phase 1 doc) is needed to carry that data or whether existing data flows suffice.
 
-If the handoff isn't agreed before substage 1.2 (Operational Infrastructure):
-- BA Labs may build the settlement calculation expecting inputs that lpla-verify doesn't provide.
-- GovOps teams may wait for BA Labs to run settlement while BA Labs waits for GovOps data.
-- lpla-verify outputs may be in a format that the manual settlement process can't consume without transformation.
+**2. Why it unblocks execution**
 
-The monthly settlement cycle is currently operating. If Phase 1 infrastructure changes disrupt it — even temporarily — the Genesis Capital targets, revenue retention requirements, and Prime interest obligations are all affected.
+Phase 1.4 cannot register Core Halos in Configurator until 1.3 has produced a final list with complete Halo Unit Artifacts. The Configurator init count depends directly on how many Core Halos survive. lpha-relay cannot be built to handle Core Halo deployments until the data format per asset type is defined. If lpha-collateral is needed, it must be built; if not, that build is wasted work. Both decisions must be made early to avoid re-scoping mid-phase.
 
-#### 9.3 Known ambiguities / mismatch risk
+**3. Known ambiguities / mismatch risk**
 
-- **lpla-verify output vs settlement inputs:** The five-step settlement calculation in `prime-settlement-methodology.md` requires Average Ilk Debt, idle asset balances, Sky Direct performance data, and sUSDS spreads. lpla-verify outputs CRRs and position data. The mapping between these is not specified.
-- **Who reads lpla-verify:** Outputs could be consumed by BA Labs (as calculation engine), by Atlas Axis (as Core Council GovOps), by each OEA GovOps team for their own Primes, or some combination. Four teams may all assume a different answer.
-- **Data coverage gap:** Phase 1 Synome-MVP stores "position data" but the settlement calculation requires time-weighted averages over the full month. Whether lpla-verify continuously logs position snapshots, or whether settlement depends on external data, is unspecified.
-- **Phase 0 assets in settlement:** Phase 0 Grove exceptional deployments are outside standardized infrastructure. How these positions feed into the settlement calculation during Phase 1 isn't addressed.
+- The Phase 1 doc lists cleanup targets (promote/wind down/consolidate/document) without specific criteria for "worth retaining." Different GovOps teams may apply different standards to their legacy positions.
+- lpha-collateral is marked "speculative — may not be needed depending on how Core Halo data flows are structured." Different teams may be planning different pipelines for the same data.
+- The data requirements for lpla-verify per Core Halo type (on-chain DeFi vault vs. RWA position) are structurally different; the monitoring cadence and data freshness requirements may not be the same.
 
-#### 9.4 What would settle it (v0)
+**4. What would settle it (v0)**
 
-1. Mapping from settlement five-step inputs to lpla-verify output fields (or alternative data sources).
-2. Responsibility matrix: which team produces/consumes each settlement input.
-3. Synome-MVP data logging requirements: position snapshot frequency and retention for time-weighted average calculation.
-4. Phase 0 asset settlement procedure during Phase 1.
+A classification decision record: (a) explicit retention criteria (size floor, integration complexity ceiling, oracle availability), (b) enumerated list of Phase 1 Core Halos (agreed by relevant GovOps teams and Core Council), (c) mandatory data fields per Core Halo Artifact, (d) lpha-collateral go/no-go decision with rationale.
 
-#### 9.5 Proposed deliverables
+**5. Proposed deliverables**
 
-- **Settlement Input-Output Mapping** — maps five-step settlement inputs to lpla-verify outputs or other data sources
-- **Phase 1 Settlement Responsibility Matrix** — team-by-team responsibility for each settlement step
-- **Synome-MVP Logging Requirements** — what must be logged for monthly settlement calculations
-- **Phase 0 Settlement Procedure** — how Phase 0 exceptional positions are handled in Phase 1 settlement
+- `core-halo-classification-criteria-v0.md`: retention rules and application to known legacy exposures
+- `core-halo-artifact-template-v0.md`: required properties, parameters, and oracle data fields
+- Decision record: lpha-collateral needed/not needed and data source per asset type
 
-#### 9.6 Evidence
+**6. Evidence**
 
-| Source | Anchor |
-|--------|--------|
-| `phase-1-pragmatic-delivery.md` §Executive Summary | "Phase 1 continues using the existing manual settlement process"; "lpla-verify monitors positions and calculates CRRs but does not track settlement progress" |
-| `accounting/prime-settlement-methodology.md` | Five-step calculation with explicit formula for each step; "Transition Path" table (Phase 1 = monthly manual) |
-| `risk-framework/sentinel-integration.md` | lpla-checker metrics table (CRR, TRRC, TRC, Encumbrance Ratio) — what lpla-verify computes |
-| `roadmap/roadmap-overview.md` | "lpla-verify: monitors positions, calculates CRRs, generates alerts. Does not track settlement — that capability arrives with lpla-checker in Phase 2." |
+- `roadmap/phase-1-pragmatic-delivery.md`, §Why Cleanup Matters table (4 impact areas: Configurator, MVP Beacons, Risk Framework, Operations)
+- `roadmap/phase-1-pragmatic-delivery.md`, §Cleanup Targets (4 categories)
+- `roadmap/phase-1-pragmatic-delivery.md`, §Acceptance Criteria for Phase 1.3 (3 conditions: Core Halos defined, no orphan exposures, consistent interfaces)
+- `roadmap/phase-1-pragmatic-delivery.md`, §Collateral Beacon note: "speculative — may not be needed depending on how Core Halo data flows are structured"
 
 ---
 
-## C) Sanity Checks
+### Topic 9: lpha-nfat + lpha-attest two-beacon deployment gate — attestation protocol and Synome write interface
 
-### C.1 Tempting but too granular — and which spine topic they belong under
+**Phase relevance:** Phase 1
 
-| Candidate | Belongs under |
-|-----------|---------------|
-| Exact meaning of `totalUnderlying` field in the NFAT queue | Spine topic 1 (Synome-MVP schema) |
-| Which specific Morpho vault version is supported in CoreHaloFacet | Spine topic 6 (Core Halo classification + interface) |
-| Default `maxAmount` value for a Morpho USDS deposit init | Spine topic 2 (Configurator init catalog) |
-| SOFR hedge declaration format | Spine topic 3 (lpla-verify data interface) |
-| Who holds the Fortification Conserver multisig keys | Spine topic 5 (Term Halo legal wrapper) |
-| Whether NFAT transfers are whitelisted or open for Halo1 | Spine topic 4 (NFAT Facility onboarding + interface) |
-| Specific APY range values for the Halo1 buybox | Spine topic 5 (Term Halo legal infrastructure) |
-| Re-attestation cadence for senior secured loans | Spine topic 7 (Attestor governance) |
-| Which Prime is migrated first in substage 1.1 | Spine topic 8 (Diamond PAU migration protocol) |
-| Whether lpha-council is a script or a beacon with on-chain authority | Spine topic 1 (Synome-MVP write authorization) |
-| Exact gas cost estimates for Diamond PAU facets | Spine topic 8 (sub-decision within audit and deployment) |
+**1. Definition (plain language)**
 
-### C.2 Phase 2+ topics intentionally excluded
+Before lpha-nfat can transition a Halo Sleeve from Filling to Deploying, an independent Attestor must post a pre-deployment attestation into Synome via lpha-attest. A post-deployment attestation is required to transition to At Rest. Ongoing re-attestations drive CRR adjustments. This topic defines the attestation content schema, Synome write permissions for lpha-attest, the two-beacon gate enforcement mechanism, and the Attestor selection and whitelisting process.
 
-The following topics were candidates but are out of Phase 1 scope:
+**2. Why it unblocks execution**
+
+The two-beacon gate is the mechanism that makes the Deploying/At-Rest CRR distinction enforceable. Without a defined attestation schema, Archon cannot build lpha-attest, and the CRR model (`smart-contracts/nfats.md` CRR Incentive Structure table) has no operational backing. The Attestor must be selected and whitelisted by Sky governance before Halo1 can deploy any capital — this is a governance action with a lead time that must be accounted for in the Phase 1.5 schedule. The Attestor also does not appear in the teams appendix, which means their selection and whitelisting process is an open organizational question.
+
+**3. Known ambiguities / mismatch risk**
+
+- The Attestor is described as "a company whitelisted by Sky governance" but no candidate or selection process is described in the corpus. Teams likely hold different assumptions about who this is or when the selection happens.
+- The attestation content fields are described narratively ("risk characteristics, timeframe, legal confirmation") but no schema exists. BA Labs and Archon may operationalize these differently.
+- The two-beacon gate enforcement is described at the process level (attestation must be present before lpha-nfat can act) but the enforcement mechanism — whether it is enforced by Synome access control, by a smart contract check, or by lpha-nfat's internal logic — is not specified.
+- Re-attestation cadence is "per asset type" but no asset-type-specific cadences are defined.
+
+**4. What would settle it (v0)**
+
+A two-part output: (a) attestation schema (required fields for pre-deployment and post-deployment attestations, expressed as Synome record fields), and (b) two-beacon gate enforcement decision (onchain check vs. Synome access control vs. beacon-enforced). The Attestor selection governance process needs to be on the Phase 1.5 critical path with a defined owner.
+
+**5. Proposed deliverables**
+
+- `lpha-attest-schema-v0.md`: attestation record fields, required vs. optional, per attestation type
+- Decision record: two-beacon gate enforcement mechanism
+- `attestor-whitelisting-process-v0.md`: governance steps and lead time to whitelist an Attestor for Halo1
+- Decision record: re-attestation cadence for Phase 1 asset types
+
+**6. Evidence**
+
+- `smart-contracts/nfats.md`, §Two-beacon deployment gate sequence diagram
+- `smart-contracts/nfats.md`, Attestation types table (pre-deployment, post-deployment, ongoing re-attestation)
+- `smart-contracts/nfats.md`, CRR Incentive Structure table (Filling/Deploying/At Rest/Missed re-attestation vs. CRR impact)
+- `sky-agents/halo-agents/term-halo.md`, §lpha-attest: "The Attestor is a company whitelisted by Sky governance"
+
+---
+
+## C) Sanity checks
+
+### Tempting but too granular — rolled into larger spine topics
+
+| Granular item | Belongs under |
+|---------------|---------------|
+| Exact `tokenId` assignment convention for NFATs | Topic 5: NFAT smart contract architecture |
+| Specific CRR weight per asset class (e.g., Morpho vault vs. senior secured RWA) | Topic 2: CRR calculation interface |
+| SORL parameters (25% per 18h default) | Topic 3: Configurator authority model |
+| Exact 14-day timelock delay value | Topic 3: Configurator authority model |
+| Halo1 specific partner identity | Operational, not a spine topic; belongs in Phase 1.0 planning |
+| Specific field: `target_node` in a transaction log | Topic 1: Synome-MVP schema (sub-decision under schema) |
+| PAU registration function signature (`setPauContracts`) | Topic 4: Diamond PAU / Topic 3: Configurator (sub-decision) |
+| Penalty rate for late Halo redemption funding | Topic 5: NFAT contracts (sub-decision); Topic 7: legal framework (sub-decision) |
+| Sleeve privacy: how many assets to blend per sleeve | Operational heuristic for the Halo operator; not a spine topic |
+
+### Phase 2+ topics intentionally excluded
 
 | Topic | Why excluded |
-|-------|-------------|
-| lpla-checker settlement tracking | Explicitly deferred to Phase 2 |
-| Monthly settlement formalization and automation | Phase 2 deliverable |
-| Daily settlement lock/unlock cycle | Phase 3 deliverable |
-| LCTS smart contracts and srUSDS token | Phase 4 deliverable |
-| Sealed-bid OSRC and Duration auctions | Phase 9 deliverable (stl-base required) |
-| Sentinel formation architecture (stl-base, stl-stream, stl-warden) | Phase 9–10 deliverables |
-| Streaming Accord and carry mechanics | Phase 10 deliverable |
-| Generator PAU and single-MCD ilk architecture | Phase 6 deliverable |
-| Halo Factory and Prime Factory automation | Phases 5–7 deliverables |
-| SpellGuard system and Guardian role consolidation | Governance transition, sequencing independent of Phase 1 infrastructure |
-| Risk capital ingression mechanics (EJRC, srUSDS) | Phase 4+ (LCTS required) |
+|-------|--------------|
+| Monthly settlement cycle obligations and deadlines (lpla-checker) | Phase 1 explicitly continues manual settlement; lpla-checker is Phase 2 |
+| Settlement tracking and CRR settlement-window calculations | Same as above |
+| Sealed-bid OSRC and Duration auctions | Phase doc: "begin later once Prime-side `stl-base` is deployed" (Phase 9+) |
+| Daily settlement cycle | Phase 3 target per phase-1-pragmatic-delivery.md |
+| LCTS / Portfolio Halo standard | Not a Phase 1 deliverable; no Portfolio Halo infrastructure in Phase 1 |
+| Risk capital ingression curves (EJRC/SRC/MC-based) | Interesting but does not block any Phase 1 deliverable |
+| stl-base / stl-warden sentinel formations | Phase 9–10; Phase 1 uses only low-power beacons |
+| Generator PAU and Generator Factory | Phase 6–8 |
+| Synome full governance (ossification, crystallization) | Phase 2+; Phase 1 uses Synome-MVP only |
+| LCTS queue generations and batch settlement | Phase 2+ (Portfolio Halos) |
 
-### C.3 Unknowns the repo does not yet answer
+### Unknowns the repo does not yet answer
 
-The following questions require workshops or external inputs that the corpus alone cannot resolve:
+These will require workshops or external inputs before the corresponding spine topics can be settled:
 
-| Unknown | Needed from |
-|---------|-------------|
-| Who is the Attestor company for Phase 1, and what are their selection criteria? | Frontier Foundation / Core Council decision |
-| Which specific Primes are in the "first cohort" for Phase 1.1 Diamond PAU migration? | GovOps teams + Core Council coordination |
-| What jurisdiction and entity structure will be used for Halo Sleeves? | Frontier Foundation legal team |
-| Who is the Fortification Conserver and what is their operational structure? | Frontier Foundation / Core Council decision |
-| Exactly which OEA GovOps team (Amatsu, Soter, Endgame Edge, Redline) is accordant to which Prime PAUs? | All GovOps teams + Core Council |
-| Which Phase 0 Grove assets will be promoted to Core Halos vs wound down? | Endgame Edge (Spark/Grove operator) + Core Council |
-| What are the initial maxAmount and slope values for Core Halo inits? | BA Labs (risk framework) + Core Council approval |
-| What Synome-MVP hosting infrastructure does Archon provide, and what is its availability SLA? | Archon |
-| Is growth staking (in `growth-staking/growth-staking.md`) a Phase 1 deliverable or Phase 2+? | Roadmap owners — the document exists but is not referenced in the Phase 1 scope doc |
+1. **Attestor identity and selection**: Who is the Attestor for Phase 1? The corpus says "a company whitelisted by Sky governance" but names no candidate and specifies no selection process. This is a prerequisite for the Phase 1.5 schedule and must be resolved in Phase 1.0 planning.
 
----
+2. **Synome-MVP technology stack**: The repo describes Synome-MVP functionally (accepts signed statements, serves as source of truth) but does not specify the implementation (database type, API protocol, authentication method). Archon owns this, but external teams need the API contract to build against it.
 
-*This document should be treated as a starting point for workstream formation, not a final decision record. Each spine topic requires a workshop to resolve the sub-decisions listed above, with outputs in the form of v0 specs and decision records.*
+3. **First Prime cohort**: Phase 1.0 planning is supposed to identify "first cohort of Primes participating in initial NFAT deployments." This is not specified. The cohort selection directly determines how many Diamond PAU migrations, Configurator inits, and cBEAM grants are needed in substages 1.1–1.4.
+
+4. **Core Halo enumeration**: The specific legacy assets that will become Core Halos are not listed. The cleanup criteria (Topic 8) must be applied to a real list to produce actionable init and cBEAM requirements.
+
+5. **Fortification Conserver identity and authority**: Referenced as the recourse mechanism for Term Halos but not described operationally. Legal framework work (Topic 7) cannot finalize recourse procedures without knowing who this is and what authority they hold in Phase 1.
+
+6. **Signed-statement authentication**: The Synome-MVP architecture shows "signed statements" from Core Council GovOps but the signing mechanism (multisig, threshold signature, oracle attestation) is not specified. This is a security-critical choice for Topic 1.
+
+7. **Two-beacon gate enforcement location**: Whether the "attestation must exist before lpha-nfat acts" rule is enforced by a smart contract, by Synome access control, or purely by lpha-nfat's own logic has security implications that different teams will resolve differently if not explicitly decided.
