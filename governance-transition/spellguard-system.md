@@ -42,7 +42,7 @@ The top-level spell mechanism. Replaces the current model where SKY tokens direc
 | Voting tokens | Core Council Guardian tokens (not SKY) |
 | Council size | 24 Core Council Guardians |
 | Hat threshold | 16 of 24 (2/3rds supermajority) |
-| Mechanism | A spell gains the hat when 16 Guardians have majority votes pointing to it |
+| Mechanism | A spell gains the hat when 16 of 24 Guardians support it |
 
 A core spell gains the hat and executes when 16 of the 24 Core Council Guardians each have their majority vote pointing to that spell. This is the same "hat" concept from the current system but with Guardian tokens replacing SKY.
 

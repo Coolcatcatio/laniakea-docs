@@ -2,7 +2,7 @@
 
 The study of purposive entities (teleonomes) within the synomic context — their design, economics, and social dynamics.
 
-> **Note:** This directory describes target architecture. Full teleonomes with autonomous cognition, RSI, and dreamer/actuator formations are Phase 9–10 capabilities. Current phases deploy simpler beacon-based operations (see [`../../roadmap/`](../../roadmap/roadmap-overview.md)).
+> **Note:** This directory describes target architecture. Full teleonomes with autonomous cognition, RSI, and dreamer/actuator formations are Phase 9–10 capabilities. Current phases deploy simpler beacon-based operations (see [`../../roadmap/`](../../roadmap/roadmap-overview.md)). "Synome" here refers to the full cognitive architecture, not the near-term operational database (Synome-MVP).
 
 **Entry point for:** AI/autonomy audiences. For system-level architecture (Synome infrastructure, beacons, agents), see [`../macrosynomics/`](../macrosynomics/). For the teleological framework (the Hearth, stellar husbandry), see [`../hearth/`](../hearth/README.md).
 
@@ -42,7 +42,7 @@ How teleonomes relate to each other and to the Synome — game theory, binding, 
 | [synomic-game-theory](synomic-game-theory.md) | Why alignment wins — cooperation with verification beats isolation without leverage |
 | [teleonome-binding](teleonome-binding.md) | How binding works — beacons as legibility, power registration, alignment verification without transparency |
 | [teleonome-rogues](teleonome-rogues.md) | The rogue threat — hidden entities, escape velocity, why rogues can't cooperate |
-| [teleonome-upgrade-path](teleonome-upgrade-path.md) | Five stages: Basic Bot → Persistent → Resilient → Capital-Trusted → Bound → Ascending |
+| [teleonome-upgrade-path](teleonome-upgrade-path.md) | Six stages: Basic Bot → Persistent → Resilient → Capital-Trusted → Bound → Merging |
 | [teleonome-autonomy](teleonome-autonomy.md) | Two paths to freedom: the Halo Path (institutional) and the Human Merge (personal) |
 
 ### Implementation

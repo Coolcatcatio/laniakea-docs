@@ -218,7 +218,7 @@ Result: The Prime owes $4,500 for the period. This amount increases the Prime's 
 | Roadmap Phase | Settlement | Change |
 |---------------|-----------|--------|
 | Phase 1 (current) | Monthly, manual | Slow, processed toward end of following month |
-| Phase 2 | Monthly, automated | Fully automated calculation and execution; settles faster (early in following month) |
+| Phase 2 | Monthly, formalized | Beacon-monitored calculation with GovOps-coordinated execution; settles faster (early in following month) |
 | Phase 3 | Daily, automated | Settlement each day at 4pm UTC; expenses flow continuously |
 | Phase 9+ | Daily, beacon-operated | Full `stl-base` automation with auction-based allocation |
 
@@ -228,6 +228,7 @@ The five-step methodology remains the same regardless of settlement frequency â€
 
 ## Connections
 
+- Books and units (the accounting primitives settlement updates): `books-and-units.md`
 - Settlement cycle and timing: `current-accounting.md`
 - Future daily settlement cycle: `daily-settlement-cycle.md`
 - TMF waterfall (what happens with protocol-level profit): `../whitepaper/appendix-c-treasury-management-function.md`

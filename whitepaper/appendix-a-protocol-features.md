@@ -157,18 +157,20 @@ Use staked SKY as collateral to borrow USDS while continuing to earn staking rew
 
 ---
 
-### SKY Voting Delegation
+### SKY Voting Delegation (Legacy)
 
-Delegate voting power to Aligned Delegates while retaining token custody.
+> **Note:** The Aligned Delegate system has been absorbed into Core Guardians as part of the alignment conserver consolidation. See `governance-transition/guardian-rename.md`. The delegation mechanism below is retained for historical reference.
+
+Delegate voting power to Alignment Conservers while retaining token custody.
 
 | Property | Value |
 |----------|-------|
 | Mechanism | Delegate Contracts |
 | Token Custody | Retained by delegator |
-| Voting Power | Transferred to Aligned Delegate |
+| Voting Power | Transferred to Alignment Conserver |
 | Revocability | Can change or revoke delegation at any time |
 
-**Aligned Delegates:**
+**Alignment Conservers (formerly Aligned Delegates):**
 - Anonymous Alignment Conservers receiving delegated voting power
 - Ranked by delegated voting power (L1, L2, L3)
 - Subject to strict operational security and accountability requirements
@@ -383,7 +385,7 @@ Human-readable governance constitution defining principles, structure, and agent
 
 ---
 
-### Sky Synome (Planned)
+### Sky Synome
 
 The Synome begins as a machine-readable operational database containing all parameters, artifacts, and transaction logs. Over time, it evolves into the cognitive architecture that encompasses the entire Sky ecosystem — much as "Ethereum" refers not just to the blockchain but to the community, tooling, and coordinated intelligence around it. In its mature form, the Synome is the living, self-improving structure through which autonomous agents (teleonomes) accumulate knowledge, coordinate action through beacons, and operate Sky's institutional shells (Synomic Agents). See `synomics/synome-overview.md` for the full architectural vision.
 
@@ -393,9 +395,10 @@ The Synome begins as a machine-readable operational database containing all para
 | Long-term | Cognitive architecture — five-layer system encompassing governance, autonomous agents, embodiments, and recursive self-improvement |
 | Contents | Agent Artifacts, rate limits, penalty schedules, transaction logs (Phase 1); knowledge artifacts, probabilistic mesh, teleonome directives (long-term) |
 | Relationship | Atlas is the single authoritative root node within the Synome; its content propagates as axioms throughout the deontic skeleton |
-| Status | **Synome-MVP in Phase 1; full architecture incremental** |
+| Synome-MVP Status | **Planned** — operational data layer shipping in Phase 1 |
+| Full Cognitive Architecture Status | **Speculative** — five-layer architecture including probabilistic mesh, advanced retrieval, and synlang (see `synomics/synodoxics/`) |
 
-#### Five-Layer Architecture
+#### Five-Layer Architecture (Speculative)
 
 The mature Synome is organized as a five-layer containment hierarchy:
 
@@ -416,7 +419,7 @@ The Synome's knowledge model combines two complementary structures:
 - **Deontic skeleton** — Hard, sparse rules derived from Atlas and Agent Directives. Binary truth values (1,1): either binding or not. Forms the constitutional backbone.
 - **Probabilistic mesh** — Soft, dense knowledge connections with (strength, confidence) truth values. Evidence accumulates; high-confidence patterns may crystallize into deontic rules through governance.
 
-This dual architecture separates what the system *must do* (deontic) from what it *knows* (probabilistic). The crystallization interface — the governance process that converts accumulated evidence into binding rules — bridges the two. See `synomics/synodoxics/probabilistic-mesh.md` for the full epistemological framework.
+This dual architecture separates what the system *must do* (deontic) from what it *knows* (probabilistic). The crystallization interface — the governance boundary where probabilistic evidence is deliberated and converted into deontic commitments, or where deontic rules are softened back to probabilistic status for re-evaluation — bridges the two. See `synomics/synodoxics/probabilistic-mesh.md` for the full epistemological framework.
 
 Long-term, the Synome supports neuro-symbolic cognition: attention allocation, live graph context, and cognitive manipulation loops that enable autonomous agents to reason over the knowledge graph in real time. See `synomics/neurosymbolic/` for the cognition model and `synomics/synoteleonomics/` for the design theory of teleonomes — autonomous goal-directed entities that operate Synomic Agents through beacons.
 
@@ -512,7 +515,7 @@ Process for modifying Atlas documents through governance.
 
 | Property | Value |
 |----------|-------|
-| Trigger | Ranked Delegate with sufficient AD Buffer |
+| Trigger | Core Guardian with sufficient AD Buffer |
 | Protection | Triggering Threshold stake required (lost if rejected) |
 | Vote Type | Governance Poll only (no Executive Vote) |
 

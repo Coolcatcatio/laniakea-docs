@@ -30,7 +30,7 @@ Fewer, standardized positions → simpler infrastructure → faster Phase 1 deli
 
 ## Core Halos
 
-**Core Halos** are legacy or static collateral positions retained under Core Council maintenance. Unlike Term Halos (which have the full sleeve lifecycle with attestor-gated transitions), Core Halos are registered once in Synome-MVP and their state doesn't change — `lpla-verify` fetches live data itself.
+**Core Halos** are legacy or static collateral positions retained under Core Council maintenance. Unlike Term Halos (which have the full book lifecycle with attestor-gated transitions), Core Halos are registered once in Synome-MVP and their state doesn't change — `lpla-verify` fetches live data itself.
 
 | Aspect | Description |
 |---|---|
@@ -43,7 +43,7 @@ Fewer, standardized positions → simpler infrastructure → faster Phase 1 deli
 
 ### Core Halos vs Term Halos
 
-| | Term Halo (Sleeves + Units) | Core Halo |
+| | Term Halo (Books + Units) | Core Halo |
 |---|---|---|
 | **Lifecycle** | Full state machine (created → ... → closed) | Static entry, state doesn't change |
 | **Risk data source** | Attestor provides aggregate risk data | Council sets a fixed risk model + data model; lpla-verify scrapes live data itself |

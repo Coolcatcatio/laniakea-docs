@@ -135,6 +135,14 @@ Guardians demonstrate that trusted execution can exist in a trustless system —
 
 ---
 
+## Recovery Agent as Crisis Successor
+
+When a Guardian collapses or is implicated in misconduct, the Core Council activates a **Recovery Agent** — a rank 1 crisis wrapper that takes over the affected agent tree (the Guardian's accordant Primes, their Halos, and all downstream positions). The Recovery Agent manages resolution: Guardian replacement, orderly wind-down, agent restructuring, or loss absorption.
+
+The Guardian's collateral (ORC) is designed to cover the costs of this transition period. See [`../recovery-agents/agent-type-recovery.md`](../recovery-agents/agent-type-recovery.md) for the full Recovery Agent specification.
+
+---
+
 ## Summary
 
 1. Guardians perform privileged operations with collateral backing
@@ -143,3 +151,4 @@ Guardians demonstrate that trusted execution can exist in a trustless system —
 4. Accountability through skin in the game
 5. Distinct from Primes (strategic), Halos (products), Generators (foundational)
 6. Woven into the Synome with public accountability
+7. Recovery Agents serve as crisis successors when Guardians collapse

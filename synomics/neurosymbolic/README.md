@@ -2,6 +2,8 @@
 
 How cognition works in practice — the concrete mechanisms by which teleonomes think, manage attention, and manipulate their own cognitive state. Where [synodoxics](../synodoxics/README.md) describes the epistemic architecture (what the Synome believes, how it learns), neurosymbolic describes the operational loop (what it looks like from the inside when a teleonome is thinking).
 
+> **Scope note:** "Synome" in this directory refers to the full cognitive architecture (the target state), not the near-term operational database (Synome-MVP). See the [glossary](../../whitepaper/appendix-f-glossary.md) for the phased definition.
+
 The foundational architectural commitment — symbolic-first, synlang-native, context as bottleneck — is in [`synodoxics/neuro-symbolic-cognition.md`](../synodoxics/neuro-symbolic-cognition.md). This directory builds on that commitment with the practical mechanisms.
 
 ---

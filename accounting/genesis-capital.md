@@ -18,11 +18,11 @@ This represents the excess capital backing USDS beyond standard collateral. (The
 
 **Genesis Agents:** The broad category of autonomous entities within the Sky Ecosystem that receive capital to foster growth.
 
-**Stars:** The main type of Sky Agents that allocate USDS collateral on behalf of Sky (e.g., Spark, Grove, Keel).
+**Star Primes:** The main type of Sky Agents that allocate USDS collateral on behalf of Sky (e.g., Spark, Grove, Keel).
 
 **Institutional Primes:** Sky Agents optimized for institutional participants (e.g., Obex).
 
-**Guardian Agents:** Sky Agents tasked with operationalizing and buffering risk related to governance operations and governance security. They negotiate paid Guardian Accords with Stars and Institutional Primes.
+**Guardian Agents:** Sky Agents tasked with operationalizing and buffering risk related to governance operations and governance security (distinct from governance Guardians who vote in SpellGuard — see Glossary: Guardian Role Mapping). They negotiate paid Guardian Accords with Star Primes and Institutional Primes.
 
 ---
 
@@ -43,7 +43,7 @@ An upcoming Atlas Edit Proposal will specify the Genesis Capital Backstop Mechan
 The protocol has established a specific hierarchy of defenses to handle bad liquidations or significant losses:
 
 ### Defense Level 1: Aggregate Backstop Capital
-If a Star experiences losses beyond its collateral, the Aggregate Backstop Capital absorbs the loss first.
+If a Star Prime experiences losses beyond its collateral, the Aggregate Backstop Capital absorbs the loss first.
 
 ### Defense Level 2: SKY Token Inflation
 If Aggregate Backstop Capital goes negative after one or more Sky Agents are fully liquidated, the system will inflate SKY tokens to cover the shortfall.
@@ -69,11 +69,11 @@ If the Genesis Capital Backstop Mechanism is insufficient to recapitalize the sy
 
 To strengthen these defenses, an upcoming Atlas edit proposal includes:
 
-### New Aggregate Backstop Capital Target: $125M
-(Increased from the current $37M)
+### New Aggregate Backstop Capital Target: $125M (Phase 1 Safety Floor)
+(Increased from the current $37M. The long-term target is 1.5% of total USDS supply, per the TMF — see `whitepaper/appendix-c-treasury-management-function.md`.)
 
 ### Revenue Retention Requirement
-Sky will retain a minimum of **25% of net revenue** every Monthly Settlement to grow the Aggregate Backstop Capital.
+Sky will retain a minimum of **25% of net revenue after Security and Maintenance allocation** every Monthly Settlement to grow the Aggregate Backstop Capital.
 
 ### What Happens When Target Is Met
 Once the $125M target is reached:
@@ -126,7 +126,7 @@ ADDITIONAL: +$1M phased out for every $10M of Aggregate Backstop Capital above $
 
 The planned number of Genesis Agents has been consolidated to simplify and accelerate the Genesis phase.
 
-### Five Genesis Stars
+### Five Genesis Star Primes
 1. **Spark** — Already capitalized
 2. **Grove** — DeFi credit infrastructure
 3. **Keel** — Ecosystem development
@@ -137,7 +137,7 @@ The planned number of Genesis Agents has been consolidated to simplify and accel
 - **Obex** — Already capitalized
 
 ### Three Genesis Guardian Agents
-Each slated to receive $25M in Genesis Capital
+Each slated to receive $25M in Genesis Capital (Guardian Agents are a Genesis Capital class, distinct from governance Guardians — see Glossary: Guardian Role Mapping)
 
 **No other agents beyond this limited group will receive Genesis Capital.**
 
@@ -212,7 +212,7 @@ This promises a substantial boost to:
 3. **Insolvency defense hierarchy:** Backstop → SKY inflation → Genesis reclaim → USDS haircut
 4. **Target:** $125M Aggregate Backstop Capital, achieved through 25% revenue retention
 5. **Phase-out:** Genesis Capital decreases over time as agents launch liquid tokens
-6. **Nine Genesis Agents:** 5 Stars + 1 Institutional Prime + 3 Guardians
+6. **Nine Genesis Agents:** 5 Star Primes + 1 Institutional Prime + 3 Guardians
 7. **Guardian buffers:** $20M ring-fenced per Guardian for Core Council and GovOps support
 8. **Maintenance budget:** Transitioning from 21% to permanent 10% cap by end of 2026
 

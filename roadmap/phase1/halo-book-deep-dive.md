@@ -1,16 +1,16 @@
-# Halo Sleeve Deep Dive — Phase 1 Implementation Specification
+# Halo Book Deep Dive — Phase 1 Implementation Specification
 
 **Status:** Draft
-**Last Updated:** 2026-02-24
+**Last Updated:** 2026-03-01
 **Audience:** Engineering teams building lpha-nfat, Synome-MVP, and lpla-verify
 
 ---
 
 ## Purpose
 
-This document specifies how Halo Sleeves work in Phase 1 at the level of detail needed to build them. It answers: what records exist, who writes them, what triggers each state transition, and what the Synome data looks like at each step.
+This document specifies how Halo Books work in Phase 1 at the level of detail needed to build them. It answers: what records exist, who writes them, what triggers each state transition, and what the Synome data looks like at each step.
 
-Sleeves are the asset-side containers that back Halo Units (NFATs). They exist **only in the Synome** — there is no on-chain sleeve contract. The on-chain NFAT is linked to its sleeve via the Synome's halo unit record.
+Books are the balanced-ledger isolation boundaries within Halos — each book balances assets against liabilities to back Halo Units (NFATs). They exist **only in the Synome** — there is no on-chain book contract. The on-chain NFAT is linked to its book via the Synome's halo unit record.
 
 ---
 
@@ -23,12 +23,12 @@ ON-CHAIN                              SYNOME-MVP
 ─────────                             ──────────
 NFAT (ERC-721)                        Halo Unit record
   tokenId: 42          ◄── same ID ──►  unitId: 42
-  facility: 0xABC...                    sleeveId: "sleeve-7"
+  facility: 0xABC...                    bookId: "book-7"
   principal: 25M                        dealTerms: { ... }
   depositor: 0xPrime...                 state: ACTIVE
 
-                                      Halo Sleeve record
-                                        sleeveId: "sleeve-7"
+                                      Halo Book record
+                                        bookId: "book-7"
                                         haloClass: "facility-A"
                                         state: FILLING
                                         assets: [ ... ]
@@ -36,25 +36,25 @@ NFAT (ERC-721)                        Halo Unit record
                                         attestations: [ ... ]
 ```
 
-**Key linkage rule:** When lpha-nfat mints an NFAT on-chain (assigning it a `tokenId`), it simultaneously creates a halo unit record in the Synome using the same ID, and maps that unit to a sleeve. The NFAT's `tokenId` is the join key between on-chain and off-chain state.
+**Key linkage rule:** When lpha-nfat mints an NFAT on-chain (assigning it a `tokenId`), it simultaneously creates a halo unit record in the Synome using the same ID, and maps that unit to a book. The NFAT's `tokenId` is the join key between on-chain and off-chain state.
 
-A sleeve has no on-chain representation. It is a Synome record that groups halo units and tracks the assets backing them.
+A book has no on-chain representation. It is a Synome record that groups halo units and balances the assets backing them against their corresponding liabilities.
 
 ### Phase 1 Simplification
 
-In Phase 1, **sleeve state is uniform** — the entire sleeve is in one lifecycle phase at a time. A sleeve cannot be partially filling and partially deploying.
+In Phase 1, **book state is uniform** — the entire book is in one lifecycle phase at a time. A book cannot be partially filling and partially deploying.
 
-Long-term, sleeves may have mixed internal states (e.g., a portion in USDC, a portion deployed, a portion obfuscated). Phase 1 does not need to support this.
+Long-term, books may have mixed internal states (e.g., a portion in USDC, a portion deployed, a portion obfuscated). Phase 1 does not need to support this.
 
-### Concurrent Sleeves
+### Concurrent Books
 
-A Halo Class (NFAT Facility) can have **multiple sleeves in different states simultaneously**. For example:
+A Halo Class (NFAT Facility) can have **multiple books in different states simultaneously**. For example:
 
-- Sleeve A: AT REST (deployed 3 months ago, earning yield)
-- Sleeve B: DEPLOYING (capital offboarded last week)
-- Sleeve C: FILLING (gathering deposits for next deployment round)
+- Book A: AT REST (deployed 3 months ago, earning yield)
+- Book B: DEPLOYING (capital offboarded last week)
+- Book C: FILLING (gathering deposits for next deployment round)
 
-lpha-nfat manages all sleeves within its Halo Class and must track each independently.
+lpha-nfat manages all books within its Halo Class and must track each independently.
 
 ### Attestation Principle
 
@@ -68,7 +68,7 @@ The pre-deployment attestation (posted during OFFBOARDING) gates both #1 and #2.
 
 ---
 
-## Sleeve Lifecycle — Phase 1
+## Book Lifecycle — Phase 1
 
 ```
 CREATED ──► FILLING ──► OFFBOARDING ──► DEPLOYING ──► AT REST ──► UNWINDING ──► CLOSED
@@ -80,17 +80,17 @@ Each transition is detailed below with: trigger, who acts, what changes in Synom
 
 ### State: CREATED
 
-**What it is:** An empty sleeve exists in the Synome. No assets, no units linked.
+**What it is:** An empty book exists in the Synome. No assets, no units linked.
 
 **Who creates it:** lpha-nfat
 
-**When:** lpha-nfat decides a new sleeve is needed based on upcoming deal pipeline and deposit demand (see [Sleeve Creation Policy](#sleeve-creation-policy)).
+**When:** lpha-nfat decides a new book is needed based on upcoming deal pipeline and deposit demand (see [Book Creation Policy](#book-creation-policy)).
 
 **Synome record at this point:**
 
 ```json
 {
-  "sleeveId": "sleeve-7",
+  "bookId": "book-7",
   "haloClass": "facility-A",
   "state": "CREATED",
   "assets": [],
@@ -102,30 +102,30 @@ Each transition is detailed below with: trigger, who acts, what changes in Synom
 }
 ```
 
-**CRR:** None — empty sleeve has no capital.
+**CRR:** None — empty book has no capital.
 
 ---
 
 ### State: FILLING
 
-**What it is:** NFATs are being swept into the sleeve. Capital enters as USDS (earning agent rate). Multiple NFATs can be added over time as deposits come in.
+**What it is:** NFATs are being swept into the book. Capital enters as USDS (earning agent rate). Multiple NFATs can be added over time as deposits come in.
 
-**Trigger:** lpha-nfat sweeps the first deposit from a Prime's facility queue into this sleeve.
+**Trigger:** lpha-nfat sweeps the first deposit from a Prime's facility queue into this book.
 
 **What happens (per sweep):**
 
 1. lpha-nfat claims USDS from a Prime's facility queue (on-chain: NFAT minted, USDS moves to Facility ALMProxy)
 2. lpha-nfat writes to Synome (single transaction, two records):
-   - **Create halo unit** — `unitId` matching the on-chain NFAT `tokenId`, linked to this sleeve, with deal terms (APY, maturity, payment schedule = `bullet`)
-   - **Update sleeve** — add unit to `linkedUnits`, update `assets` to reflect increased USDS balance
+   - **Create halo unit** — `unitId` matching the on-chain NFAT `tokenId`, linked to this book, with deal terms (APY, maturity, payment schedule = `bullet`)
+   - **Update book** — add unit to `linkedUnits`, update `assets` to reflect increased USDS balance
 
-This can repeat — more NFATs swept into the same sleeve over days or weeks as deposit demand accumulates.
+This can repeat — more NFATs swept into the same book over days or weeks as deposit demand accumulates.
 
 **Synome record during filling:**
 
 ```json
 {
-  "sleeveId": "sleeve-7",
+  "bookId": "book-7",
   "haloClass": "facility-A",
   "state": "FILLING",
   "assets": [
@@ -144,9 +144,9 @@ This can repeat — more NFATs swept into the same sleeve over days or weeks as 
 }
 ```
 
-**CRR:** Low — the sleeve holds USDS, a known and transparent asset.
+**CRR:** Low — the book holds USDS, a known and transparent asset.
 
-**Key point:** During filling, the sleeve's asset list is simply a USDS balance. Full transparency. Anyone reading the Synome can see exactly how much capital is staged and where it sits.
+**Key point:** During filling, the book's asset list is simply a USDS balance. Full transparency. Anyone reading the Synome can see exactly how much capital is staged and where it sits.
 
 ---
 
@@ -154,11 +154,11 @@ This can repeat — more NFATs swept into the same sleeve over days or weeks as 
 
 **What it is:** Capital is being converted from USDS → USDC and moved off-chain to the Halo's bank account. This is a multi-step process with several Synome updates as the asset composition changes.
 
-**Trigger:** lpha-nfat decides the sleeve is fully filled and ready for deployment. No attestation is required to begin offboarding — lpha-nfat can freely transition to OFFBOARDING and convert assets on-chain. The attestation gate comes later, before capital leaves the on-chain boundary.
+**Trigger:** lpha-nfat decides the book is fully filled and ready for deployment. No attestation is required to begin offboarding — lpha-nfat can freely transition to OFFBOARDING and convert assets on-chain. The attestation gate comes later, before capital leaves the on-chain boundary.
 
 **Offboarding sub-steps:**
 
-Each sub-step is a distinct lpha-nfat action that updates the sleeve's asset list in the Synome.
+Each sub-step is a distinct lpha-nfat action that updates the book's asset list in the Synome.
 
 **Step 1 — Convert USDS → USDC (no attestation required):**
 
@@ -185,7 +185,7 @@ Before USDC can be sent to an external account, lpha-attest must post a **pre-de
 {
   "attestationId": "att-101",
   "type": "PRE_DEPLOYMENT",
-  "sleeveId": "sleeve-7",
+  "bookId": "book-7",
   "content": {
     "legalStructureVerified": true,
     "bankAccountVerified": true,
@@ -237,7 +237,7 @@ Synome update:
 
 **CRR:** Transitional — the CRR during offboarding should reflect that assets are moving from transparent (USDS) to less transparent (bank account). The risk framework will define the exact treatment; implementers should track the current sub-step so lpla-verify can apply the correct rate.
 
-**Key point:** Offboarding is where the asset list on the sleeve gets interesting. It's not a single atomic operation — it's a sequence of real-world steps, each reflected as a Synome update to the sleeve's assets. The sleeve's asset list is the source of truth for "where is the money right now."
+**Key point:** Offboarding is where the asset list on the book gets interesting. It's not a single atomic operation — it's a sequence of real-world steps, each reflected as a Synome update to the book's assets. The book's asset list is the source of truth for "where is the money right now."
 
 ---
 
@@ -245,13 +245,13 @@ Synome update:
 
 **What it is:** Capital has been offboarded to the Halo's bank account and is now being deployed into real-world deals (loans, bonds, etc.). This is the **obfuscated phase** — the Synome does not receive granular updates about which specific borrowers receive funds, when, or on what terms.
 
-**Trigger:** lpha-nfat transitions the sleeve after offboarding is complete (all funds confirmed received in bank account).
+**Trigger:** lpha-nfat transitions the book after offboarding is complete (all funds confirmed received in bank account).
 
 **What the Synome knows during deployment:**
 
 ```json
 {
-  "sleeveId": "sleeve-7",
+  "bookId": "book-7",
   "state": "DEPLOYING",
   "assets": [
     {
@@ -269,13 +269,13 @@ Synome update:
 
 **CRR:** **High** — "Schrodinger's risk." The assets could be anywhere from still sitting as cash to fully deployed into risky positions. The elevated CRR creates an economic incentive to minimize time in this state.
 
-**No writes during deploying:** Neither lpha-nfat nor lpha-attest updates the sleeve during the deploying phase. The sleeve record is intentionally static. This is the obfuscation mechanism.
+**No writes during deploying:** Neither lpha-nfat nor lpha-attest updates the book during the deploying phase. The book record is intentionally static. This is the obfuscation mechanism.
 
 ---
 
 ### State: AT REST
 
-**What it is:** All capital has been deployed and the attestor has confirmed the risk characteristics of the deployed assets. The sleeve now has attested aggregate risk data — not individual deal details, but blended risk characteristics.
+**What it is:** All capital has been deployed and the attestor has confirmed the risk characteristics of the deployed assets. The book now has attested aggregate risk data — not individual deal details, but blended risk characteristics.
 
 **Trigger — attestation gate:**
 
@@ -285,7 +285,7 @@ lpha-attest posts an **at-rest attestation** confirming the deployed assets' cha
 {
   "attestationId": "att-102",
   "type": "AT_REST",
-  "sleeveId": "sleeve-7",
+  "bookId": "book-7",
   "content": {
     "confirmedRiskParameters": { ... },
     "legalClaimsVerified": true,
@@ -295,11 +295,11 @@ lpha-attest posts an **at-rest attestation** confirming the deployed assets' cha
 }
 ```
 
-Then lpha-nfat transitions the sleeve and writes the attested aggregate risk data:
+Then lpha-nfat transitions the book and writes the attested aggregate risk data:
 
 ```json
 {
-  "sleeveId": "sleeve-7",
+  "bookId": "book-7",
   "state": "AT_REST",
   "assets": [
     {
@@ -318,13 +318,13 @@ Then lpha-nfat transitions the sleeve and writes the attested aggregate risk dat
 
 **CRR:** Medium — lower than deploying because the attestor has confirmed characteristics, but still reflects the inherent risk of deployed real-world assets.
 
-**Periodic re-attestation:** While at rest, lpha-attest posts periodic attestations (e.g., quarterly) confirming the sleeve remains nominal. lpha-nfat updates the sleeve record to reflect the fresh attestation. If re-attestation is missed, CRR increases until a new attestation is posted.
+**Periodic re-attestation:** While at rest, lpha-attest posts periodic attestations (e.g., quarterly) confirming the book remains nominal. lpha-nfat updates the book record to reflect the fresh attestation. If re-attestation is missed, CRR increases until a new attestation is posted.
 
 ```json
 {
   "attestationId": "att-103",
   "type": "PERIODIC",
-  "sleeveId": "sleeve-7",
+  "bookId": "book-7",
   "content": {
     "statusNominal": true,
     "riskDataUpdate": { ... }
@@ -339,7 +339,7 @@ Then lpha-nfat transitions the sleeve and writes the attested aggregate risk dat
 
 **What it is:** Underlying assets are maturing or being liquidated. Funds flow back: borrower → Halo bank account → USDC → USDS → Facility Redeem Contract.
 
-**Trigger:** lpha-nfat initiates unwinding when the first assets in the sleeve begin returning.
+**Trigger:** lpha-nfat initiates unwinding when the first assets in the book begin returning.
 
 **Unwinding sub-steps (mirrors offboarding in reverse):**
 
@@ -391,7 +391,7 @@ lpha-nfat simultaneously updates each linked halo unit's state to REPAYMENT_AVAI
 
 ### State: CLOSED
 
-**What it is:** All linked halo units have been redeemed (NFATs burned). The sleeve is fully wound down.
+**What it is:** All linked halo units have been redeemed (NFATs burned). The book is fully wound down.
 
 **Trigger:** lpha-nfat transitions to CLOSED when the last linked unit is redeemed.
 
@@ -399,7 +399,7 @@ lpha-nfat simultaneously updates each linked halo unit's state to REPAYMENT_AVAI
 
 ```json
 {
-  "sleeveId": "sleeve-7",
+  "bookId": "book-7",
   "state": "CLOSED",
   "assets": [],
   "linkedUnits": [42, 43, 44],
@@ -415,35 +415,35 @@ lpha-nfat simultaneously updates each linked halo unit's state to REPAYMENT_AVAI
 }
 ```
 
-The sleeve record is retained as an archive — full history preserved for audit.
+The book record is retained as an archive — full history preserved for audit.
 
 ---
 
-## Sleeve Creation Policy
+## Book Creation Policy
 
-lpha-nfat decides when to create new sleeves and which deposits to group together. This is a **business decision** driven by:
+lpha-nfat decides when to create new books and which deposits to group together. This is a **business decision** driven by:
 
 ### Decision Factors
 
 | Factor | Description |
 |---|---|
-| **Deal pipeline** | Upcoming borrower demand and deal opportunities inform how much capital a sleeve should target |
+| **Deal pipeline** | Upcoming borrower demand and deal opportunities inform how much capital a book should target |
 | **Deposit demand** | Current queue balances across Primes — how much capital is available to sweep |
-| **Diversity target** | Sleeves should contain enough deposits to back a diversity of underlying assets, enabling borrower term obfuscation |
-| **Privacy threshold** | A sleeve with only one NFAT and one underlying asset provides no obfuscation — lpha-nfat should target multiple units per sleeve where possible |
-| **Timing** | Deposits may arrive over days or weeks; lpha-nfat holds a sleeve in FILLING until it reaches a target size |
+| **Diversity target** | Books should contain enough deposits to back a diversity of underlying assets, enabling borrower term obfuscation |
+| **Privacy threshold** | A book with only one NFAT and one underlying asset provides no obfuscation — lpha-nfat should target multiple units per book where possible |
+| **Timing** | Deposits may arrive over days or weeks; lpha-nfat holds a book in FILLING until it reaches a target size |
 
 ### Phase 1 Expectations
 
-In Phase 1, lpha-nfat is a **low-power, rule-based beacon** — it does not make complex AI-driven decisions. The sleeve creation logic will be straightforward:
+In Phase 1, lpha-nfat is a **low-power, rule-based beacon** — it does not make complex AI-driven decisions. The book creation logic will be straightforward:
 
-- Halo operations team configures target sleeve sizes and diversity parameters
+- Halo operations team configures target book sizes and diversity parameters
 - lpha-nfat follows these configured rules to bucket deposits
-- Edge cases (e.g., a single large deposit that fills an entire sleeve) are handled by the rules, not by judgment
+- Edge cases (e.g., a single large deposit that fills an entire book) are handled by the rules, not by judgment
 
 The goal is to balance two competing needs:
-1. **Don't wait forever** — Primes want their capital deployed, not sitting in a filling sleeve
-2. **Don't deploy too thin** — A sleeve with a single asset provides no privacy benefit
+1. **Don't wait forever** — Primes want their capital deployed, not sitting in a filling book
+2. **Don't deploy too thin** — A book with a single asset provides no privacy benefit
 
 ### Example
 
@@ -451,37 +451,37 @@ The goal is to balance two competing needs:
 Deal pipeline: 3 senior secured loans expected, 25M each = 75M needed
 Queue state: Spark has 30M queued, Grove has 50M queued, Keel has 20M queued
 
-lpha-nfat creates sleeve-7 and sweeps:
+lpha-nfat creates book-7 and sweeps:
   - 30M from Spark → NFAT #42
   - 25M from Grove → NFAT #43
   - 20M from Keel  → NFAT #44
-  Total: 75M in sleeve-7
+  Total: 75M in book-7
 
-Remaining 25M from Grove stays in queue for next sleeve.
+Remaining 25M from Grove stays in queue for next book.
 ```
 
 ---
 
 ## Loss Distribution
 
-If a sleeve enters unwinding with **less value than expected** (partial default), proceeds are distributed **pro rata by principal** across all linked units.
+If a book enters unwinding with **less value than expected** (partial default), proceeds are distributed **pro rata by principal** across all linked units.
 
 ### Example
 
 ```
-Sleeve-7 holds 3 units:
+Book-7 holds 3 units:
   NFAT #42: 30M principal
   NFAT #43: 25M principal
   NFAT #44: 20M principal
   Total: 75M principal
 
-Sleeve returns only 60M (80% recovery):
+Book returns only 60M (80% recovery):
   NFAT #42 receives: 60M × (30/75) = 24M
   NFAT #43 receives: 60M × (25/75) = 20M
   NFAT #44 receives: 60M × (20/75) = 16M
 ```
 
-Each unit bears losses in proportion to its share of the sleeve's total principal. This is the pari passu guarantee: units sharing a sleeve share fate equally.
+Each unit bears losses in proportion to its share of the book's total principal. This is the pari passu guarantee: units sharing a book share fate equally.
 
 **Phase 1 note:** Phase 1 uses bullet loans. The partial-default scenario is handled through legal recourse (Fortification Conserver intervention, Halo Artifact default procedures) rather than automated smart contract distribution. However, the Synome should track the pro-rata entitlements so that any resolution process has clear data to work from.
 
@@ -489,7 +489,7 @@ Each unit bears losses in proportion to its share of the sleeve's total principa
 
 ## Aggregate Risk Data — Phase 1 Approach
 
-The exact fields for aggregate risk data on at-rest sleeves are **not yet defined**. They will be developed in partnership with the Phase 1 halo cohort, because the risk parameters depend on the actual asset types being deployed.
+The exact fields for aggregate risk data on at-rest books are **not yet defined**. They will be developed in partnership with the Phase 1 halo cohort, because the risk parameters depend on the actual asset types being deployed.
 
 ### What Implementers Should Build
 
@@ -516,22 +516,22 @@ The exact fields for aggregate risk data on at-rest sleeves are **not yet define
 
 Synome-MVP should **not** validate the semantic content of the risk data (e.g., "is this CRR reasonable?"). That's lpla-verify's job.
 
-**lpla-verify contract:** lpla-verify reads the risk framework (published by lpha-council) to know what fields to expect, then reads the sleeve's aggregate risk data to compute CRR. If the schema version doesn't match what the risk framework expects, lpla-verify should flag an alert.
+**lpla-verify contract:** lpla-verify reads the risk framework (published by lpha-council) to know what fields to expect, then reads the book's aggregate risk data to compute CRR. If the schema version doesn't match what the risk framework expects, lpla-verify should flag an alert.
 
 ---
 
-## Synome-MVP Schema — Sleeve Record
+## Synome-MVP Schema — Book Record
 
-The canonical sleeve record in Synome-MVP:
+The canonical book record in Synome-MVP:
 
 | Field | Type | Description |
 |---|---|---|
-| `sleeveId` | string | Unique identifier |
+| `bookId` | string | Unique identifier |
 | `haloClass` | string | Parent Halo Class (NFAT Facility) identifier |
 | `state` | enum | CREATED, FILLING, OFFBOARDING, DEPLOYING, AT_REST, UNWINDING, CLOSED |
 | `assets` | array[Asset] | Current asset composition (see below) |
-| `linkedUnits` | array[unitId] | NFAT token IDs of all halo units mapped to this sleeve |
-| `attestations` | array[attestationId] | References to attestations on this sleeve |
+| `linkedUnits` | array[unitId] | NFAT token IDs of all halo units mapped to this book |
+| `attestations` | array[attestationId] | References to attestations on this book |
 | `timestamps` | object | Timestamp for each state transition |
 | `metadata` | object | Versioned flexible JSON — aggregate risk data, operational notes |
 
@@ -549,7 +549,7 @@ Each entry in the `assets` array:
 | `confirmedAt` | timestamp? | For bank-confirmed assets: when receipt was confirmed |
 | `riskData` | object? | For aggregate-deployed assets: versioned risk data from attestor |
 
-**Design intent:** The asset list is a journal of "what does this sleeve hold right now." It changes as capital moves through the offboarding and unwinding pipelines. During DEPLOYING, it's a single entry saying "this much capital is being deployed." During OFFBOARDING, it tracks the real-world movement step by step.
+**Design intent:** The asset list is a journal of "what does this book hold right now." It changes as capital moves through the offboarding and unwinding pipelines. During DEPLOYING, it's a single entry saying "this much capital is being deployed." During OFFBOARDING, it tracks the real-world movement step by step.
 
 ---
 
@@ -557,44 +557,44 @@ Each entry in the `assets` array:
 
 | Operation | Who Writes | Preconditions |
 |---|---|---|
-| Create sleeve | lpha-nfat | — |
-| Add unit to sleeve (sweep) | lpha-nfat | Sleeve is in FILLING state |
-| Update sleeve assets (offboarding sub-steps) | lpha-nfat | Sleeve is in OFFBOARDING state |
+| Create book | lpha-nfat | — |
+| Add unit to book (sweep) | lpha-nfat | Book is in FILLING state |
+| Update book assets (offboarding sub-steps) | lpha-nfat | Book is in OFFBOARDING state |
 | Transition FILLING → OFFBOARDING | lpha-nfat | — (no attestation required) |
-| Convert USDS → USDC (offboarding step 1) | lpha-nfat | Sleeve is in OFFBOARDING state |
-| Post pre-deployment attestation | lpha-attest | Sleeve is in OFFBOARDING state, USDC conversion complete |
+| Convert USDS → USDC (offboarding step 1) | lpha-nfat | Book is in OFFBOARDING state |
+| Post pre-deployment attestation | lpha-attest | Book is in OFFBOARDING state, USDC conversion complete |
 | Send USDC externally (offboarding step 2) | lpha-nfat | Pre-deployment attestation exists from lpha-attest |
 | Transition OFFBOARDING → DEPLOYING | lpha-nfat | Pre-deployment attestation exists; all funds confirmed received in bank account |
-| Post at-rest attestation | lpha-attest | Sleeve is in DEPLOYING state |
+| Post at-rest attestation | lpha-attest | Book is in DEPLOYING state |
 | Transition DEPLOYING → AT REST | lpha-nfat | At-rest attestation exists from lpha-attest |
-| Write aggregate risk data to sleeve | lpha-nfat | At-rest attestation provides the data |
-| Post periodic attestation | lpha-attest | Sleeve is in AT_REST state |
-| Update sleeve with periodic attestation | lpha-nfat | New periodic attestation exists |
+| Write aggregate risk data to book | lpha-nfat | At-rest attestation provides the data |
+| Post periodic attestation | lpha-attest | Book is in AT_REST state |
+| Update book with periodic attestation | lpha-nfat | New periodic attestation exists |
 | Transition AT REST → UNWINDING | lpha-nfat | Assets returning |
-| Update sleeve assets (unwinding sub-steps) | lpha-nfat | Sleeve is in UNWINDING state |
+| Update book assets (unwinding sub-steps) | lpha-nfat | Book is in UNWINDING state |
 | Transition UNWINDING → CLOSED | lpha-nfat | All linked units redeemed |
 
-**Read access:** lpla-verify reads everything. lpha-attest reads sleeve state to know when attestation is needed.
+**Read access:** lpla-verify reads everything. lpha-attest reads book state to know when attestation is needed.
 
 ---
 
 ## End-to-End Example — Phase 1 Happy Path
 
-This traces a single sleeve through the entire lifecycle.
+This traces a single book through the entire lifecycle.
 
-### Day 0: Sleeve Created
+### Day 0: Book Created
 
-lpha-nfat sees 75M in deposit demand across Primes and a pipeline of 3 senior secured deals. Creates sleeve-7.
+lpha-nfat sees 75M in deposit demand across Primes and a pipeline of 3 senior secured deals. Creates book-7.
 
 ### Days 1-5: Filling
 
-- Day 1: Sweep 30M from Spark → NFAT #42 created, sleeve-7 assets: 30M USDS
-- Day 2: Sweep 25M from Grove → NFAT #43 created, sleeve-7 assets: 55M USDS
-- Day 4: Sweep 20M from Keel → NFAT #44 created, sleeve-7 assets: 75M USDS
+- Day 1: Sweep 30M from Spark → NFAT #42 created, book-7 assets: 30M USDS
+- Day 2: Sweep 25M from Grove → NFAT #43 created, book-7 assets: 55M USDS
+- Day 4: Sweep 20M from Keel → NFAT #44 created, book-7 assets: 75M USDS
 
 ### Day 6: Offboarding Begins
 
-lpha-nfat transitions sleeve-7 to OFFBOARDING (no attestation needed for this transition).
+lpha-nfat transitions book-7 to OFFBOARDING (no attestation needed for this transition).
 
 - Step 1: Convert 75M USDS → 75M USDC (on-chain via PAU relay). Synome: assets = 75M USDC at facility-ALMProxy.
 
@@ -609,23 +609,23 @@ Now lpha-nfat can send USDC externally:
 
 ### Day 7: Deploying
 
-lpha-nfat transitions sleeve-7 to DEPLOYING. From this point, no Synome updates on the sleeve. Assets are being deployed into deals — the black box.
+lpha-nfat transitions book-7 to DEPLOYING. From this point, no Synome updates on the book. Assets are being deployed into deals — the black box.
 
-CRR is elevated. lpla-verify reports the sleeve as "deploying — high CRR."
+CRR is elevated. lpla-verify reports the book as "deploying — high CRR."
 
 ### Day 21: At Rest
 
 Attestor completes diligence on deployed assets. lpha-attest posts attestation att-102: confirmed risk parameters, legal claims verified, deployment complete.
 
-lpha-nfat transitions sleeve-7 to AT_REST and writes aggregate risk data from the attestation.
+lpha-nfat transitions book-7 to AT_REST and writes aggregate risk data from the attestation.
 
 CRR drops to medium level. lpla-verify reads the attested risk data and computes CRR accordingly.
 
 ### Day 90 (Quarterly): Periodic Re-attestation
 
-lpha-attest posts attestation att-103: status nominal, no material changes. lpha-nfat updates the sleeve.
+lpha-attest posts attestation att-103: status nominal, no material changes. lpha-nfat updates the book.
 
-If this attestation were missed, lpla-verify would flag the sleeve and CRR would increase until re-attestation occurs.
+If this attestation were missed, lpla-verify would flag the book and CRR would increase until re-attestation occurs.
 
 ### Day 180: Unwinding Begins
 
@@ -646,7 +646,7 @@ lpha-nfat updates each halo unit to REPAYMENT_AVAILABLE:
 - Grove burns NFAT #43, receives 26.25M USDS.
 - Keel burns NFAT #44, receives 21.0M USDS.
 
-lpha-nfat transitions sleeve-7 to CLOSED. Record archived.
+lpha-nfat transitions book-7 to CLOSED. Record archived.
 
 ---
 
@@ -714,31 +714,31 @@ lpha-nfat transitions sleeve-7 to CLOSED. Record archived.
 
 If the USDC transfer fails or bank receipt is not confirmed within a timeout:
 
-- lpha-nfat should flag the issue in the sleeve's metadata
+- lpha-nfat should flag the issue in the book's metadata
 - lpla-verify should generate an alert
-- The sleeve remains in OFFBOARDING until resolved
-- Worst case: funds can be converted back to USDS and the sleeve reverted to FILLING (operational decision, not automated)
+- The book remains in OFFBOARDING until resolved
+- Worst case: funds can be converted back to USDS and the book reverted to FILLING (operational decision, not automated)
 
 ### Missed Re-attestation
 
 If lpha-attest does not post a periodic attestation by the expected date:
 
-- lpla-verify escalates CRR for the sleeve
-- lpha-nfat does NOT automatically change sleeve state — the sleeve remains AT_REST
+- lpla-verify escalates CRR for the book
+- lpha-nfat does NOT automatically change book state — the book remains AT_REST
 - The CRR penalty creates economic pressure for the attestor to re-attest
 
 ### Partial Return (Default Scenario)
 
-If the sleeve returns less value than the total principal:
+If the book returns less value than the total principal:
 
 - lpha-nfat computes pro-rata entitlements based on principal
 - lpha-nfat writes the actual return amounts to each halo unit
 - Legal recourse procedures (per Halo Artifact) determine recovery process
-- The sleeve can remain in UNWINDING until recovery is resolved
+- The book can remain in UNWINDING until recovery is resolved
 
-### Sleeve with Single Unit
+### Book with Single Unit
 
-A sleeve with only one NFAT provides no privacy obfuscation. This is acceptable in Phase 1 (especially for the first deals), but lpha-nfat should prefer multi-unit sleeves where deposit demand allows.
+A book with only one NFAT provides no privacy obfuscation. This is acceptable in Phase 1 (especially for the first deals), but lpha-nfat should prefer multi-unit books where deposit demand allows.
 
 ---
 
@@ -748,8 +748,8 @@ A sleeve with only one NFAT provides no privacy obfuscation. This is acceptable 
 |---|---|---|
 | 1 | What are the exact fields in the aggregate risk data schema? | Blocked on Phase 1 halo cohort engagement |
 | 2 | What is the periodic re-attestation cadence for Phase 1 asset types? | TBD — likely quarterly |
-| 3 | What are the specific CRR multipliers for each sleeve state? | Owned by risk framework — `risk-framework/capital-formula.md` |
-| 4 | How does the yield distribution work — does the sleeve track yield accrual, or is it just the return amount at maturity? | For Phase 1 bullet loans, yield is bundled with principal at maturity. Yield tracking is Phase 2+. |
+| 3 | What are the specific CRR multipliers for each book state? | Owned by risk framework — `risk-framework/capital-formula.md` |
+| 4 | How does the yield distribution work — does the book track yield accrual, or is it just the return amount at maturity? | For Phase 1 bullet loans, yield is bundled with principal at maturity. Yield tracking is Phase 2+. |
 | 5 | What timeout triggers an offboarding failure alert? | TBD — operational parameter configured per Halo Class |
 
 ---
@@ -760,7 +760,7 @@ A sleeve with only one NFAT provides no privacy obfuscation. This is acceptable 
 |---|---|
 | [`synome-mvp-reqs.md`](synome-mvp-reqs.md) | Synome-MVP data model and end-to-end flows |
 | [`phase-1-overview.md`](phase-1-overview.md) | Phase 1 overview and substages |
-| [`../../sky-agents/halo-agents/halo-class-sleeve-unit.md`](../../sky-agents/halo-agents/halo-class-sleeve-unit.md) | Architectural overview of Class/Sleeve/Unit |
+| [`../../sky-agents/halo-agents/halo-class-book-unit.md`](../../sky-agents/halo-agents/halo-class-book-unit.md) | Architectural overview of Class/Book/Unit |
 | [`../../sky-agents/halo-agents/term-halo.md`](../../sky-agents/halo-agents/term-halo.md) | Term Halo business overview |
 | [`../../smart-contracts/nfats.md`](../../smart-contracts/nfats.md) | NFAT smart contract specification |
 | [`../../synomics/macrosynomics/beacon-framework.md`](../../synomics/macrosynomics/beacon-framework.md) | Beacon taxonomy (lpha-nfat and lpha-attest are LPHA) |

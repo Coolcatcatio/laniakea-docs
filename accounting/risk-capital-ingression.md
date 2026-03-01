@@ -361,12 +361,14 @@ Effective JRC = IJRC + Σ(EJRC_i × EJRC_ingression_rate_i)
 
 Effective SRC = Σ(SRC_j × SRC_ingression_rate_j)
 
-Total Effective Risk Capital = (Effective JRC + Effective SRC) × MC_multiplier
+Total Risk Capital (TRC) = (Effective JRC + Effective SRC) × MC_multiplier
 
-Capital Adequacy = Total Effective Risk Capital ≥ Required Risk Capital
+Capital Adequacy = TRC ≥ Total Required Risk Capital (TRRC)
 ```
 
-Where Required Risk Capital comes from the Risk Framework (duration matching, gap risk, etc.).
+Where TRRC comes from the Risk Framework (duration matching, gap risk, etc. — see `risk-framework/capital-formula.md`).
+
+> **Note:** This equation covers portfolio risk capital only. Operational Risk Capital (ORC) is a separate, guardian-funded requirement outside this adequacy check — see `risk-framework/operational-risk-capital.md`.
 
 ---
 
@@ -422,4 +424,4 @@ All curves use the same quarter-circle shape with 3:1 max-to-anchor ratio.
 
 ---
 
-*This document defines the continuous ingression rate model. For LCTS queue mechanics, see `smart-contracts/lcts.md`. For capital requirements, see `risk-framework/README.md`.*
+*This document defines the continuous ingression rate model. Ingression creates units — cross-book links that appear as liabilities on the Prime's book and assets on the capital provider's book; see `books-and-units.md` for the foundational book/unit pattern. For LCTS queue mechanics, see `smart-contracts/lcts.md`. For capital requirements, see `risk-framework/README.md`.*

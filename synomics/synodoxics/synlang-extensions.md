@@ -267,6 +267,18 @@ This area needs:
 
 ---
 
+## Related Work
+
+| Document | Relationship |
+|----------|--------------|
+| [`neuro-symbolic-cognition.md`](neuro-symbolic-cognition.md) | The neural-symbolic hybrid already described — emo narrows search space, symbolic system verifies. Directly relevant to pattern matching at scale. |
+| [`probabilistic-mesh.md`](probabilistic-mesh.md) | The mesh these extensions would operate on — truth values, evidence dynamics, ossification |
+| [`../macrosynomics/synome-layers.md`](../macrosynomics/synome-layers.md) | The Synome data model — extensions must work across all five layers |
+| [`../neurosymbolic/attention-allocation.md`](../neurosymbolic/attention-allocation.md) | Attention allocation as a concrete use case for probabilistic pattern matching at scale |
+| [`../neurosymbolic/short-term-experiments.md`](../neurosymbolic/short-term-experiments.md) | Near-term experiments that may prototype probabilistic reasoning approaches |
+
+---
+
 ## Summary
 
 1. Synlang will likely need probabilistic logic and scale pattern matching

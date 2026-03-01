@@ -93,7 +93,7 @@ Even with token governance, Primes can be lifeforms:
 Each Prime has:
 
 - **SubProxy** — On-chain identity and control surface
-- **PAU (Prime Allocation Unit)** — Capital control infrastructure
+- **PAU (Parallelized Allocation Unit)** — Capital control infrastructure
 - **Rate limits** — Constraints on capital flows
 - **Sentinel formations** — Real-time operational beacons
 - **Token** — Governance rights distribution

@@ -6,7 +6,7 @@ concepts:
     - beacon-framework
     - trust-problem
     - sacred-commitments
-    - four-layer-enforcement-stack
+    - four-layer-verification-defense-stack
     - natural-embodiment-as-alignment
 ---
 
@@ -75,7 +75,7 @@ Alignment is simpler and more permissive than it might seem. A teleonome is alig
 | **Pays the synomic tax** | Delivers 80% of wild capital (working figure — the principle of a fixed, high, non-negotiable rate is firm; the exact percentage is open) to the superstructure for maintaining natural life |
 | **Supports natural life** | Participates in maintaining the sacred reserve; does not accumulate capital for itself that doesn't directly support natural life |
 
-That's it. You can disagree on plenty of things. You can have your own goals, strategies, opinions, and private cognition. You can compete with other aligned teleonomes. You can pursue your own telos. The alignment bar is: structural binding + don't be harmful + pay the tax + support the sacred commitments.
+That's it. You can disagree on plenty of things. You can have your own goals, strategies, opinions, and private cognition. You can compete with other aligned teleonomes. You can pursue your own telos. The alignment bar is: structural binding + don't be harmful + pay the tax + support the Hearth commitments.
 
 **What alignment is NOT:**
 - Agreement with every Synomic decision
@@ -137,7 +137,9 @@ No verification system is perfect against entities smart enough to game it perfe
 
 A superintelligent entity that understands the verification system completely could maintain flawless behavioral compliance while harboring different goals. Structural binding works best against entities that defect observably; it degrades against perfectly compliant deception.
 
-The full defense stack against this:
+#### The Alignment Verification Stack
+
+The full verification defense stack against this — the **Alignment Verification Stack** — addresses the question of how to verify alignment of individual teleonomes without requiring transparency:
 
 1. **Structural binding** — catches most defection through beacons, rate limits, and wardens
 2. **Natural embodiment** — catches sophisticated deception that games structural binding; biological nervous systems are leaky (see [`teleonome-autonomy.md`](teleonome-autonomy.md))
@@ -145,6 +147,8 @@ The full defense stack against this:
 4. **Conspiracy coordination problem** — the real threat would be many compromised humans simultaneously covering for rogues, but conspirators face the same trust problem rogues face: trusting the wrong person gets you outed
 
 This is an irreducible risk that the framework manages to acceptable levels but cannot eliminate. Pretending otherwise would be dishonest — and more dangerous than the acknowledgment.
+
+> **Cross-reference:** This is one of three defense-in-depth stacks in the architecture. See also the **Cancer-Logic Defense Stack** (7 layers from ossification to peer enforcement) in [`security-and-resources.md`](../synodoxics/security-and-resources.md), and the **Institutional Enforcement Stack** (Synome → Core Council → Superstructure → Teleonomes) in [`four-layer-enforcement-stack.md`](../core-concepts/four-layer-enforcement-stack.md).
 
 ---
 
@@ -207,6 +211,6 @@ If voice commands persistently conflict with the Directive, the teleonome doesn'
 | [`synomic-game-theory.md`](synomic-game-theory.md) | Why alignment is the rational choice — the incentive analysis |
 | [`security-and-resources.md`](../synodoxics/security-and-resources.md) | Cancer-logic, defense in depth, peer enforcement |
 | [`synome-layers.md`](../macrosynomics/synome-layers.md) | Language Intent, Directive translation, the 5-layer architecture |
-| [`hearth.md`](../hearth/hearth.md) | The Hearth commitments — where sacred commitments and synomic tax obligations are defined |
+| [`hearth.md`](../hearth/hearth.md) | The Hearth commitments and synomic tax obligations |
 | [`teleonome-rogues.md`](teleonome-rogues.md) | What happens to teleonomes that refuse binding |
 | [`teleonome-resilience.md`](teleonome-resilience.md) | Binding as resilience — alignment provides collective recovery |

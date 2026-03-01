@@ -57,7 +57,7 @@ telart ────────────── Mission-specific (derived from
 embart ────────────── Local observations (least vetted, most contextual)
 ```
 
-> **Terminology note:** "synart/telart/embart" refer to the curated probabilistic knowledge at each level — structured, queryable, with (strength, confidence) values. This is distinct from "Local Data" (raw logs/observations) and "ephemeral context" (runtime scratchpad). See [`synome-layers.md`](../macrosynomics/synome-layers.md) for definitions.
+> **Terminology note:** A synart is the full Layers 1+2 artifact — it contains both deontic (hard rules, axioms, governance) and probabilistic (knowledge, patterns, evidence) content. See [`synome-layers.md`](../macrosynomics/synome-layers.md) for the authoritative definition. The probabilistic mesh provides the L2 (probabilistic) component of synarts; the terms "synart/telart/embart" as used in this hierarchy refer to the curated probabilistic knowledge at each level — structured, queryable, with (strength, confidence) values. This is distinct from "Local Data" (raw logs/observations) and "ephemeral context" (runtime scratchpad).
 
 **When an embodiment makes a decision, it can reference:**
 

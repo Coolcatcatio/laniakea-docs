@@ -63,10 +63,10 @@ Bespoke arrangements through Non-Fungible Allocation Tokens:
 - **Custom terms** — Duration, size, conditions vary per deal
 - **Facility model** — Halo provides the facility, NFATs are individual drawdowns
 - **Queue-based origination** — Deposits queue, NFATs match to borrowers
-- **Asset-liability separated** — Halo Sleeves (asset side) back Halo Units (liability side)
-- **Privacy-preserving** — Blended sleeves prevent inference of individual loan terms
+- **Asset-liability balanced** — Halo Books (balanced ledger) back Halo Units (liability side)
+- **Privacy-preserving** — Blended books prevent inference of individual loan terms
 
-Example: A lending facility where 5 loans are blended into a sleeve, and 10 NFATs are issued against the blended collateral.
+Example: A lending facility where 5 loans are blended into a book, and 10 NFATs are issued against the blended collateral.
 
 #### Trading Halos (AMM-based)
 
@@ -85,25 +85,24 @@ Special Halos have additional regulatory or operational requirements beyond stan
 
 - **Identity Network Halo** — Operates identity verification infrastructure (KYC registries)
 - **Exchange Halo** — Operates intent-based exchange infrastructure (orderbooks, matching engines)
-- **Staking Halo** — Personal Growth Staking vehicle for SKY holders
 
 ---
 
-## Halo Classes, Units, and Sleeves
+## Halo Classes, Books, and Units
 
-Halos are organized hierarchically with a separation between liability side (units) and asset side (sleeves):
+Halos are organized hierarchically with a separation between liability side (units) and asset side (books):
 
 ```
 Halo Class (shared infrastructure)
     │
     ├── LIABILITY SIDE: Halo Units
-    │   ├── Halo Unit 1 (NFAT — claim on Sleeve A)
-    │   ├── Halo Unit 2 (NFAT — claim on Sleeve A)
-    │   └── Halo Unit 3 (NFAT — claim on Sleeve B)
+    │   ├── Halo Unit 1 (NFAT — claim on Book A)
+    │   ├── Halo Unit 2 (NFAT — claim on Book A)
+    │   └── Halo Unit 3 (NFAT — claim on Book B)
     │
-    └── ASSET SIDE: Halo Sleeves
-        ├── Halo Sleeve A (Loan X + Loan Y — backs Units 1, 2)
-        └── Halo Sleeve B (Loan Z — backs Unit 3)
+    └── ASSET SIDE: Halo Books
+        ├── Halo Book A (Loan X + Loan Y — backs Units 1, 2)
+        └── Halo Book B (Loan Z — backs Unit 3)
 ```
 
 **Halo Class:**
@@ -114,14 +113,14 @@ Halo Class (shared infrastructure)
 **Halo Units (liability side):**
 - Individual claims within the class (NFATs for Term Halos, shares for Portfolio Halos)
 - Different risk/return profiles
-- Each unit is a claim on a specific sleeve
+- Each unit is a claim on a specific book
 
-**Halo Sleeves (asset side):**
-- Bankruptcy-remote containers holding the actual assets backing units
-- Units sharing a sleeve are pari passu on losses (unless tranched)
-- Units on different sleeves are fully isolated
-- Multiple assets can be blended in a sleeve for borrower privacy
-- In the simplest case, one unit maps directly to one sleeve (1:1)
+**Halo Books (asset side):**
+- Balanced ledgers (assets = liabilities) that back units
+- Units sharing a book are pari passu on losses (unless tranched)
+- Units on different books are fully isolated
+- Multiple assets can be blended in a book for borrower privacy
+- In the simplest case, one unit maps directly to one book (1:1)
 
 ---
 
@@ -147,10 +146,10 @@ Halos typically nest under Primes:
 Prime (e.g., Grove)
     ├── Halo Class A (CLO exposure)
     │   ├── Units: Unit 1 (senior), Unit 2 (junior)
-    │   └── Sleeves: Sleeve α (CLO tranche pool — backs Units 1, 2)
+    │   └── Books: Book α (CLO tranche pool — backs Units 1, 2)
     └── Halo Class B (RWA exposure)
         ├── Units: Unit 1 (single position)
-        └── Sleeves: Sleeve β (single RWA — backs Unit 1)
+        └── Books: Book β (single RWA — backs Unit 1)
 ```
 
 Primes provide:
@@ -200,9 +199,8 @@ Halos provide:
 1. Halos are general-purpose Synomic Agents — the fractal layer
 2. Range from minimal (no token, just existing) to complex (governed, tranched)
 3. Three standard class types: Portfolio (LCTS, pooled), Term (NFAT, bespoke), Trading (AMM, instant liquidity)
-4. Organized into Classes (shared infra), Units (liability side), and Sleeves (asset side)
-5. Sleeves are the bankruptcy-remote boundary; units sharing a sleeve are pari passu
+4. Organized into Classes (shared infra), Units (liability side), and Books (asset side)
+5. Books are the balanced ledger boundary; units sharing a book are pari passu
 6. Typically nest under Primes but can exist independently
 7. Minimal Halos are autonomous lifeforms that just exist
 8. Halos proliferate to meet demand — unlimited scalability
-

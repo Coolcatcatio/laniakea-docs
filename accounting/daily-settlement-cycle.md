@@ -50,12 +50,14 @@ Day N                              Day N+1
    - Category cap reallocation — update per-Prime category allocations based on penalized exposures (see `../risk-framework/correlation-framework.md`)
    - Prepayments made (interest, distributions)
    - Verification and compliance checks
+   - Active Stability Capital (ASC) requirements — including peg defense allocation and DAB — interact with settlement. See `risk-framework/asc.md`
 
 3. **Moment of Settlement** (16:00)
    - New OSRC allocations take effect
    - New Duration capacity published
    - srUSDS exchange rate updated
    - LCTS queues settle
+   - Encumbrance ratio (allocated / available capital) monitored against the ≤90% target from the risk framework (see `risk-framework/capital-formula.md`)
    - Penalties begin accruing for non-compliant actors
 
 ### Optional Skips (e.g., Weekends)
@@ -687,6 +689,7 @@ All results known → Prepayments calculated + submitted
 
 | Document | Relationship |
 |----------|--------------|
+| `books-and-units.md` | Settlement updates book states — the balanced ledgers at each layer |
 | `../risk-framework/README.md` | Risk framework index and entry point |
 | `tugofwar.md` | Tug-of-war algorithm is part of this daily cycle |
 | `smart-contracts/lcts.md` | LCTS settlement is triggered by this cycle |

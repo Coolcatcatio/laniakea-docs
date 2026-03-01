@@ -12,7 +12,7 @@ This document analyzes two categories of attacks that constrain the choice of In
 The key insight is that IRL and SORL are not independent choices—they are constrained by a bootstrap target (e.g., reach 100M/day within 30 days). Higher SORL allows lower IRL and vice versa. The optimization finds the combination that minimizes total weighted harm from both attack types.
 
 **Adopted parameters (for 100M/day target in 30 days):**
-- **SORL: 25%**
+- **SORL: 25%** (see `smart-contracts/configurator-unit.md` for canonical SORL parameters)
 - **IRL: $100K**
 
 ---
@@ -104,7 +104,7 @@ T+24h:   Freeze activates
 |-----------|-------|-------------|
 | Target Rate Limit | 100M/day | Steady-state operational rate limit |
 | Bootstrap Time | 30 days | Time to reach target from IRL |
-| Time to Freeze (TTF) | 24 hours | Detection → full shutdown |
+| Time to Freeze (TTF) | 24 hours | Detection → full shutdown (TTS from Phase 2+) |
 | SORL Hop (`hop`) | 18 hours | **Onchain** cooldown between increases |
 | Peacetime SORL cadence | Once per 24h | **Policy**: how often we exercise SORL in normal ops |
 | SORL Cycles in Bootstrap | 30 | One per day for 30 days (peacetime cadence) |

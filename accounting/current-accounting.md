@@ -57,7 +57,7 @@ The current accounting has three major categories of assets that don't yet fit c
 
 **What they are:** The original MakerDAO CDP vaults — ETH-A, ETH-B, ETH-C, WBTC-A, WSTETH-A, and others. These are overcollateralized lending positions where users deposit crypto collateral and borrow USDS (originally DAI).
 
-**Current treatment:** These are being standardized as **Core Halos** under Core Council governance. In Laniakea terms, they sit at the Halo layer but predate the Prime/Halo architecture.
+**Current treatment:** These are being standardized as **Core Controlled Agents** under Core Council governance. In Laniakea terms, they sit at the Halo layer but predate the Prime/Halo architecture.
 
 **Accounting implications:**
 - Revenue from stability fees flows directly to the protocol, not through a Prime
@@ -157,7 +157,7 @@ Where MC is current market capitalization and TMC is a target market cap derived
 
 ### Why the Long-Run SBE Isn't Active Yet
 
-Switching to the dynamic formula requires a **SBE BEAM system** — a governance-controlled execution surface with proper rate limits and parameter management. This BEAM system can only be created after the transition to the daily settlement cycle (Phase 2), because:
+Switching to the dynamic formula requires a **SBE BEAM system** — a governance-controlled execution surface with proper rate limits and parameter management. This BEAM system can only be created after the transition to the daily settlement cycle (Phase 3), because:
 
 - The SBE BEAM needs to operate within the daily settlement cadence for parameter updates and execution windows
 - Proper rate limits and governance controls must be in place before allowing dynamic market-responsive behavior
@@ -208,9 +208,9 @@ The current monthly settlement and legacy exceptions will be replaced over time:
 | Current State | Target State | Phase |
 |--------------|-------------|-------|
 | Monthly settlement | Daily settlement cycle | Phase 3 |
-| Legacy core vaults | Core Halos under Prime management | Phase 1 |
+| Legacy core vaults | Core Controlled Agents under Prime management | Phase 1 |
 | PSM managed by Sky Core | Grove-operated ASC asset | Phase 1–3 |
-| Legacy RWA (bespoke deals) | Portfolio/Term Halos | Phase 3+ |
+| Legacy RWA (bespoke deals) | Term Halos (Phase 1.5+) / Portfolio Halos (Phase 4+) | Phase 1.5–4+ |
 | SBE fixed buyback | Dynamic burn rate via SBE BEAM | Phase 2+ |
 | Manual revenue accounting | Automated beacon-operated settlement | Phase 9+ |
 
@@ -224,5 +224,5 @@ Until these transitions complete, the current accounting described here remains 
 - Genesis Capital and Aggregate Backstop Capital: `genesis-capital.md`
 - TMF waterfall specification: `../whitepaper/appendix-c-treasury-management-function.md`
 - ASC / PSM transition: `../risk-framework/asc.md`
-- Core Halos: `../roadmap/phase-1-pragmatic-delivery.md`
+- Core Controlled Agents: `../roadmap/phase1/phase-1-overview.md`
 - Future daily settlement: `daily-settlement-cycle.md`

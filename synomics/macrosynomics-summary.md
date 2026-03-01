@@ -140,26 +140,26 @@ Sentinels are a distinguished HPHA subclass operating as coordinated formations:
 
 Phase 1 starts with deterministic programs providing operational infrastructure without autonomous agency.
 
-### The Six Phase 1 Beacons
+### Phase 1 Beacons
 
 | Beacon | Type | Function |
 |--------|------|----------|
 | **lpla-verify** | LPLA | Read-only: positions, prices, risk params -> CRR calcs, alerts |
 | **lpha-relay** | LPHA | Executes PAU transactions within rate limits |
 | **lpha-nfat** | LPHA | NFAT lifecycle operations, writes NFAT records |
-| **lpha-report** | LPHA | Writes 24h Prime performance summaries |
-| **lpha-collateral** | LPHA | Writes Core Halo / legacy RWA data (speculative) |
-| **lpha-council** | LPHA | Core Council interface: updates risk equations, report formats |
+| **lpha-council** | LPHA | Core Council interface: updates risk equations, report formats, disclosures |
 
-All beacons are Low-Power (deterministic). Human governance provides all configuration. Monthly settlement cycle.
+Phase 3 introduces `lpha-report` to write daily Prime performance summaries as settlement artifacts.
+
+All beacons are Low-Power (deterministic). Human governance provides all configuration. Settlement remains manual in Phase 1; monthly settlement is formalized in Phase 2.
 
 **Simplified:** No teleonome layer, no learning, no dreamer/actuator split, no probabilistic mesh.
 **Preserved:** Beacon taxonomy, authority hierarchy, rate limits, audit trail, separation of concerns.
 
 ### Evolution Pathway
 
-1. **Phase 1** — Teleonome-less beacons, monthly settlement, Synome-MVP
-2. **Phases 2-8** — Daily settlement, LCTS, governed allocations, factory stack
+1. **Phase 1** — Teleonome-less beacons, manual settlement, Synome-MVP
+2. **Phases 2-8** — Settlement formalization + acceleration, LCTS, governed allocations, factory stack
 3. **Phases 9-10** — Sentinel introduction (High-Power, AI, adaptive)
 4. **Beyond roadmap** — Teleonome emergence, full probabilistic mesh, RSI at all levels
 

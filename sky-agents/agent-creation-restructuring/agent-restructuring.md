@@ -25,39 +25,39 @@ All restructuring actions require a **Guardian Accord** — the initiating agent
    - **If B is a Halo:** Agent A receives admin ownership (un-tokenized Halo controlled by a single admin owner)
    - **If B is a Prime:** Agent A receives admin ownership. The Prime does not issue tokens at creation — it starts as an admin-controlled entity. The Prime's Sky Agent Primitives (capital deployment from Sky Protocol, ingression, etc.) are not accessible until tokens are issued. Token issuance happens later at the owner's discretion, at which point the owner receives 95% of tokens (5% agent creation fee to the protocol).
 
-**Availability:** All agents, including Staking Halos.
+**Availability:** All agents, including Folio Agents.
 
 **Use cases:**
 
-- A Staking Halo holder decides to formalize their growth asset portfolio into a Standard Halo — assets transfer out, admin control transfers back
-- A Staking Halo holder with a strong thesis seeds a new Prime — assets transfer out, admin control transfers back. Prime remains in a waiting period until the owner issues tokens, at which point Sky Agent Primitives become accessible and the Staking Halo receives 95% of tokens (growth assets at SF 0.4×)
+- A Folio Agent holder decides to formalize their growth asset portfolio into a Standard Halo — assets transfer out, admin control transfers back
+- A Folio Agent holder with a strong thesis seeds a new Prime — assets transfer out, admin control transfers back. Prime remains in a waiting period until the owner issues tokens, at which point Sky Agent Primitives become accessible and the Folio Agent receives 95% of tokens (growth assets at GF 2.5×)
 - An existing Prime spins off a specialized strategy into a new Halo subsidiary
 - A Halo creates a new Halo to isolate a specific asset class or geography
 
-**Example — Staking Halo seeds a Prime:**
+**Example — Folio Agent seeds a Prime:**
 
 ```
 Before:
-  Staking Halo
+  Folio Agent
     ├── Staked SKY: $100k
     └── Assets: $500k (mixed portfolio)
 
 Type 1 Restructure → creates Prime "Alpha"
 
 Immediately after:
-  Staking Halo
+  Folio Agent
     ├── Staked SKY: $100k
     └── Admin control of Alpha Prime
 
   Alpha Prime (new, admin-controlled, no tokens yet)
-    └── Assets: $500k (transferred from Staking Halo)
+    └── Assets: $500k (transferred from Folio Agent)
     └── Sky Agent Primitives: LOCKED (waiting period)
 
 After token issuance:
-  Staking Halo
+  Folio Agent
     ├── Staked SKY: $100k
     └── Growth Assets: 95% of Alpha Prime tokens
-        (valued at min(book, market) for SF purposes)
+        (valued at min(book, market) for staking factor purposes)
 
   Alpha Prime (tokenized, Sky Agent Primitives active)
     └── Assets: $500k
@@ -78,7 +78,7 @@ After token issuance:
 
 Agent A retains its identity and token throughout. The infrastructure is what moves.
 
-**Availability:** All agents except Staking Halos.
+**Availability:** All agents except Folio Agents.
 
 **Use cases:**
 
@@ -109,11 +109,11 @@ After:
 
 ## Relationship to Growth Staking
 
-Type 1 Restructure is the natural mechanism by which Staking Halo holders graduate into the Agent layer:
+Type 1 Restructure is the natural mechanism by which Folio Agent holders graduate into the Agent layer:
 
-1. Staker creates a Staking Halo, accumulates assets via Growth Staking rewards
+1. Staker creates a Folio Agent, accumulates assets via Growth Staking rewards
 2. When ready, Type 1 Restructure → creates a Standard Halo or Prime
-3. Agent tokens flow back into the Staking Halo as growth assets (SF 0.4×)
+3. Agent tokens flow back into the Folio Agent as growth assets (GF 2.5×)
 4. The staker now earns Growth Staking rewards via their Agent tokens while their capital is actively deployed
 
 Type 2 Restructure enables Standard Halos to upgrade to Prime status as they mature — preserving token holder continuity while gaining Prime-level capabilities (capital deployment from Sky Protocol, ingression, risk capital origination).

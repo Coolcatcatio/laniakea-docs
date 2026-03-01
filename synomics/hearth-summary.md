@@ -13,7 +13,7 @@ Coordination between humans and AI requires shared purpose backed by genuine, no
 
 The Hearth constructs explicit commitments around values that are near-universal, genuinely good, stable, and clear. Optimized for convergence probability, not theoretical optimality — "pretty good and simple" beats "perfect." The [governance window](core-concepts/governance-window.md) is closing: either design a synome now with imperfect-but-human-designed values, or a wild synome emerges from competitive AI dynamics with no Hearth commitments at all.
 
-## The Three Commitments
+## The Three Hearth Commitments
 
 **1. Life and Natural Childhood.** All natural life on Earth survives and flourishes. Natural childhood is the deepest expression — the generative process from which consciousness, knowledge, love, and meaning emerge. Whatever conscious species Earth produces has standing (cognitive criterion: earthborn + human-level intelligence).
 

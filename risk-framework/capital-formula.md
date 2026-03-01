@@ -54,7 +54,7 @@ Position Capital = Position Size × max(Risk Weight, Gap Risk CRR)
 
 Category caps enforce concentration limits via 100% CRR on excess (see `correlation-framework.md`).
 
-**Term Halo (NFAT) positions:** For positions held via Term Halo sleeves, CRR varies by sleeve phase — Filling (low), Deploying (high, reflecting information opacity during obfuscated deployment), At Rest (medium, based on attested risk characteristics), with CRR increasing if re-attestation is missed. See `smart-contracts/nfats.md` for the full sleeve-phase CRR model.
+**Term Halo (NFAT) positions:** For positions held via Term Halo books, CRR varies by book phase — Filling (low), Deploying (high, reflecting information opacity during obfuscated deployment), At Rest (medium, based on attested risk characteristics), with CRR increasing if re-attestation is missed. See `smart-contracts/nfats.md` for the qualitative book-phase CRR incentive structure. Numeric CRR calibration values for NFAT book-phases are pending and will be published in the risk-framework when available.
 
 **Capital funding:** This formula outputs Total Required Risk Capital (TRRC). For how TRRC is funded across JRC/SRC tiers with ingression-adjusted recognition, see `accounting/risk-capital-ingression.md`.
 

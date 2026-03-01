@@ -200,6 +200,8 @@ Cumulative Capacity at Bucket N = Σ (Effective Capacity for all buckets ≥ N)
 
 ### Duration Capacity Reservation System
 
+> **Note:** The tug-of-war mechanism and duration auctions described in this section are Phase 9+ features. Prior phases use manual, governance-directed duration matching allocations — see `accounting/tugofwar.md` for the algorithm details and phase dependencies.
+
 Duration Bucket capacity is allocated to Primes through a reservation system. Primes acquire reservations via daily auctions, then can resell them on a secondary market.
 
 #### Core Principles

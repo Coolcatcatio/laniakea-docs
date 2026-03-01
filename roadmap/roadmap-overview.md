@@ -580,7 +580,7 @@ Phase 10 (Sentinel Stream)
 | 0 | [phase-0-legacy-exceptions.md](./phase-0-legacy-exceptions.md) | Draft |
 | 1 | [phase1/phase-1-overview.md](./phase1/phase-1-overview.md) | Draft |
 | 1 | [phase1/synome-mvp-reqs.md](./phase1/synome-mvp-reqs.md) | Draft |
-| 1 | [phase1/halo-sleeve-deep-dive.md](./phase1/halo-sleeve-deep-dive.md) | Draft |
+| 1 | [phase1/halo-book-deep-dive.md](./phase1/halo-book-deep-dive.md) | Draft |
 | 2 | [phase-2-monthly-settlement.md](./phase-2-monthly-settlement.md) | Draft |
 | 3 | [phase-3-daily-settlement.md](./phase-3-daily-settlement.md) | Draft |
 | 4 | [phase-4-lcts-launch.md](./phase-4-lcts-launch.md) | Draft |

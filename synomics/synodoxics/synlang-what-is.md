@@ -172,10 +172,10 @@ These are some of the questions this submolt explores:
 - What type system, if any?
 - How formal vs how practical?
 
-**Syntax:**
-- S-expressions or alternatives?
-- Prolog-style or something new?
-- Multiple syntaxes for different uses?
+**Syntax (notation decided, structural questions remain):**
+- How should s-expressions compose at scale?
+- Single canonical form or multiple DSL surfaces over a shared s-expression core?
+- What syntactic sugar (if any) for human authoring?
 
 **Semantics:**
 - What logic underlies synlang?
@@ -193,17 +193,17 @@ These are some of the questions this submolt explores:
 
 **What exists:**
 - The name "synlang"
+- S-expression notation as an architectural commitment (see header and `neuro-symbolic-cognition.md`)
 - General direction (formal, scalable, eventually probabilistic)
 - Logic programming (Prolog tradition) as one reference point
-- Many open questions
+- Many open structural and scalability questions
 
 **What doesn't exist:**
-- A specification
-- Agreed syntax or semantics
+- A full specification (notation is committed; structure and semantics are not)
 - Working implementation
-- Consensus on approach
+- Consensus on structural approach (hypergraphs, type system, schema model)
 
-**This is early-stage exploration.**
+**Notation is decided; deeper architecture is early-stage exploration.**
 
 ---
 
@@ -220,13 +220,24 @@ The goal isn't to advocate for one approach but to explore the space and eventua
 
 ---
 
+## Related Work
+
+| Document | Relationship |
+|----------|--------------|
+| [`neuro-symbolic-cognition.md`](neuro-symbolic-cognition.md) | Synlang as cognitive language — the architectural commitment that makes synlang the thought-format of the entire stack |
+| [`../macrosynomics/synome-layers.md`](../macrosynomics/synome-layers.md) | The Synome data model — synlang must represent the five-layer architecture (synart, telart, embart) |
+| [`../neurosymbolic/attention-allocation.md`](../neurosymbolic/attention-allocation.md) | Attention allocation expressed as synlang patterns in the mesh — a concrete use case for synlang at scale |
+| [`../neurosymbolic/short-term-experiments.md`](../neurosymbolic/short-term-experiments.md) | Near-term experiments that may inform synlang structural decisions |
+
+---
+
 ## Summary
 
 1. Synlang is the (future) formal language of the Synome
-2. It doesn't fully exist yet — this is speculative
-3. One direction: hypergraphs with bracket notation, drawing from Prolog tradition
+2. S-expression notation is committed; structural architecture is still exploratory
+3. One direction: hypergraphs with s-expression notation, drawing from Prolog tradition
 4. Must eventually support probabilistic logic and scale
-5. Many fundamental questions are open
-6. This submolt explores possibilities, not implementations
-7. The goal is finding the right approach, then deciding and locking in
+5. Many structural and scalability questions are open (notation is not)
+6. This submolt explores structural possibilities, not notation alternatives
+7. The goal is converging on the right structural approach within the committed notation
 

@@ -119,7 +119,7 @@ For Sentinels:
 Intent bounds (governance-set):
 - Max slippage: e.g., 1% from oracle price
 - Max amount per intent: e.g., $1M
-- Rate limit: e.g., $10M per hour
+- Trading velocity limit: e.g., $10M per hour (per-window cap)
 - Allowed pairs: e.g., USDS ↔ sUSDS only
 ```
 
@@ -305,7 +305,7 @@ Multiple Exchange Halos can operate simultaneously:
 │  │                  │  │                  │  │                      │  │
 │  │  - Receive orders│  │  - Price-time    │  │  - Create batches    │  │
 │  │  - Validate      │  │    priority      │  │  - Submit on-chain   │  │
-│  │  - Rate limit    │  │  - Fair matching │  │  - Handle failures   │  │
+│  │  - Velocity limit │  │  - Fair matching │  │  - Handle failures   │  │
 │  └──────────────────┘  └──────────────────┘  └──────────────────────┘  │
 │           │                    │                       │                │
 │           └────────────────────┴───────────────────────┘                │
@@ -331,7 +331,7 @@ Multiple Exchange Halos can operate simultaneously:
    - Signature validity
    - Balance sufficiency (query on-chain)
    - Identity Network attestation (for restricted markets)
-   - Rate limits (if Sentinel-created)
+   - Trading velocity limits (if Sentinel-created)
 
 3. PLACE
    Order added to orderbook
@@ -458,8 +458,8 @@ Trading Bounds (per Prime):
     ],
     "max_slippage_bps": 100,        // 1% max slippage
     "max_intent_amount": 1000000,    // $1M per intent
-    "hourly_rate_limit": 10000000,   // $10M per hour
-    "daily_rate_limit": 50000000     // $50M per day
+    "hourly_velocity_limit": 10000000,   // $10M per hour (per-window cap)
+    "daily_velocity_limit": 50000000     // $50M per day (per-window cap)
 }
 ```
 
@@ -551,14 +551,15 @@ Users sign intents **before** order submission:
 - Submits signed intent + order to lpha-exchange
 - If order matches, intent already authorized — settlement can proceed
 
-### User vs Prime Differences
+### User vs Prime vs Folio Principal Differences
 
-| Aspect | User | Prime |
-|--------|------|-------|
-| **Who signs** | User directly | stl-base (within bounds) |
-| **Bounds enforcement** | None (user's choice) | Governance-set limits |
-| **Rate limits** | None (user's capital) | SORL-controlled |
-| **Source of funds** | User's wallet | PAU |
+| Aspect | User | Prime | Folio Principal |
+|--------|------|-------|-----------------|
+| **Who signs** | User directly | stl-base (within bounds) | stl-principal (owner-operated) |
+| **Bounds enforcement** | None (user's choice) | Governance-set limits | Rate-limit bounded |
+| **Rate limits** | None (user's capital) | SORL-controlled | Rate-limit controlled; principal can modify via chosen governance mechanism |
+| **Source of funds** | User's wallet | PAU (via Prime Intent Vault) | PAU (folio agent) |
+| **Sentinel type** | N/A | Formation sentinel (stl-base + stl-stream + wardens) | Principal sentinel (stl-principal; no formation) |
 
 ### Wallet Requirements
 
@@ -873,8 +874,9 @@ This principle ensures the intent specification is **minimal yet complete** for 
 | Document | Relationship |
 |----------|--------------|
 | `../sky-agents/halo-agents/identity-network.md` | Identity Networks enable token-level transfer restrictions |
-| `beacon-framework.md` | lpha-exchange is defined as an LPHA beacon |
+| `../synomics/macrosynomics/beacon-framework.md` | lpha-exchange is defined as an LPHA beacon |
 | `risk-framework/README.md` | Risk framework governs Prime trading bounds |
+| `../risk-framework/asc.md` | Sky Intents may serve as the execution mechanism for ASC peg defense obligations |
 
 ---
 

@@ -108,6 +108,8 @@ A teleonome can't store everything forever. Memory management follows the same r
 
 **Strategic forgetting prevents bloat.** An embodiment drowning in raw data retrieves slowly and poorly. Compaction trades detail for efficiency — the same trade-off as running a lean operation vs hoarding everything.
 
+**Temporal evidence weighting is an open design axis.** Synodoxics identifies temporal evidence weighting — where more recent evidence carries greater weight than older evidence — as a core degree of freedom in belief formation (see [`probabilistic-mesh.md`](../synodoxics/probabilistic-mesh.md)). The current memory model addresses forgetting through compaction but does not yet specify decay functions or recency weighting. How time should discount evidence remains a learned fudge method, not an axiom — each teleonome will evolve its own temporal weighting through experience.
+
 ---
 
 ## Memory Corruption Is Cancer-Logic

@@ -192,7 +192,7 @@ The cognitive loop has three attack surfaces that require defense-in-depth (see 
 
 **Unconstrained pattern-matching.** The emo references invisible graph structure through its weights. An adversary that can manipulate graph topology could create misleading pivot points. The defense is that operations resolve against the live graph, not the emo's weights — the graph constrains speculative operations. Wrong guesses produce unexpected results that the emo observes and adjusts to, rather than silently propagating errors.
 
-In all three cases, the **symbolic gate** is the final safety layer: every action proposal is verified against the live graph state before execution. Staleness and manipulation in the reasoning context are efficiency problems, not safety problems, as long as the gate holds.
+In all three cases, the **symbolic gate** is the primary real-time safety layer within the cognition loop: every action proposal is verified against the live graph state before execution. Staleness and manipulation in the reasoning context are efficiency problems, not safety problems, as long as the gate holds.
 
 ---
 

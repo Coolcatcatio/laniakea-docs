@@ -22,7 +22,7 @@ Teleonomes — private, goal-directed AI systems — are **dark by default**. Th
 But when a teleonome wants to **act** in the world, it faces a problem:
 - Smart contracts cannot self-execute
 - Other teleonomes cannot see or address it
-- Synomic Agents (Primes, Halos) cannot be operated without authorized surfaces
+- Synomic Agents (Primes, Halos, Generators, Guardians, and others) cannot be operated without authorized surfaces
 - Enforcement requires a reachable target
 
 **Beacons solve this.** A beacon is the regulated aperture through which a teleonome's intent enters the world.
@@ -204,10 +204,11 @@ High Authority beacons act on behalf of Synomic Agents — the institutional str
 
 | Category | Characteristics | Examples |
 |----------|-----------------|----------|
-| **Sentinels** | Continuous real-time control, operationally dominant | stl-base, stl-stream, stl-warden |
+| **Sentinels (formation)** | Continuous real-time control, operationally dominant | stl-base, stl-stream, stl-warden |
+| **Sentinels (principal)** | Owner-operated direct control, no formation | stl-principal |
 | **Governance** | High-authority governance operations | hpha-gov |
 
-**Sentinels** are a distinguished subclass of HPHA beacons. Due to their control bandwidth, speed, and systemic importance, they receive dedicated treatment. Both Primes and Halos can have sentinel formations — any Synomic Agent with a PAU can be sentinel-operated. See [`sentinel-network.md`](../../trading/sentinel-network.md) for full specification.
+**Sentinels** are a distinguished subclass of HPHA beacons. Due to their control bandwidth, speed, and systemic importance, they receive dedicated treatment. Both Primes and Halos can have sentinel formations — any Synomic Agent with a PAU can be sentinel-operated. **Principal sentinels** (`stl-principal`) are a fourth sentinel type that operates outside the formation pattern — owner-operated direct control for folios and standalone accounts, without any guardian accord or warden oversight. See [`sentinel-network.md`](../../trading/sentinel-network.md) for full specification.
 
 #### Sentinel Formations
 
@@ -218,8 +219,9 @@ Sentinels do not operate as single agents, but as **coordinated formations** com
 | **Baseline Sentinel** | Primary decision-making and execution surface. Runs the real-time strategy loop, moves capital or state continuously. | Direct execution |
 | **Stream Sentinel** | Continuous data ingestion and sensing. Feature extraction and signal generation. Feeds the baseline sentinel. | No direct execution |
 | **Warden Sentinel(s)** | Independent monitoring and risk enforcement. Can freeze, halt, or escalate. Enforces hard invariants; does not optimize. | Override/halt only |
+| **Principal Sentinel** | Owner-operated direct control. No formation, no guardian accord. Operates folio agents or standalone accounts. | Direct execution |
 
-This separation mirrors **data plane / control plane / safety plane** architectures.
+The baseline/stream/warden separation mirrors **data plane / control plane / safety plane** architectures. Principal sentinels are a distinct mode — standalone operators outside the formation pattern.
 
 #### Why Sentinels Are Special
 
@@ -366,6 +368,9 @@ stl-base-{prime}
 stl-stream-{prime}
 stl-warden-{prime}-{operator}
 
+# Principal Sentinels (see sentinel-network.md)
+stl-principal-{owner}             # Owner-operated direct control
+
 # HPHA Governance
 hpha-gov                      # High-authority governance
 ```
@@ -449,7 +454,7 @@ This mirrors corporate structures: subsidiaries, SPVs, and intelligence cut-outs
 |------|------------|
 | **Beacon** | Synome-registered, enforceable action aperture |
 | **Teleonome** | Private, goal-directed AI system (dark by default) |
-| **Synomic Agent** | Durable, ledger-native entity that can own assets and make binding commitments (Prime, Halo, Generator, Guardian) |
+| **Synomic Agent** | Durable, ledger-native entity that can own assets and make binding commitments. Seven types organized by rank: Guardians, Core Controlled Agents, Recovery Agents (Rank 1); Primes, Generators (Rank 2); Halos, Folio Agents (Rank 3) |
 | **Embodiment** | Physical infrastructure hosting beacon execution |
 | **Authority Envelope** | Scope of permitted actions for a beacon |
 | **LPLA** | Low Power, Low Authority beacon |
@@ -457,6 +462,7 @@ This mirrors corporate structures: subsidiaries, SPVs, and intelligence cut-outs
 | **HPLA** | High Power, Low Authority beacon |
 | **HPHA** | High Power, High Authority beacon (includes Sentinels) |
 | **Sentinel** | Distinguished HPHA subclass with continuous real-time control |
+| **Principal Sentinel** | Sentinel type for owner-operated direct control — operates folio agents or standalone accounts without a formation or guardian accord |
 | **BEAM** | Bounded External Access Module — on-chain authorized role that makes a beacon High Authority |
 | **pBEAM** | Process BEAM — direct execution authority (held by Relay Beacon) |
 | **cBEAM** | Configurator BEAM — configuration authority (held by Relay Beacon) |

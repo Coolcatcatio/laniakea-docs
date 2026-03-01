@@ -139,7 +139,7 @@ Assets can be matched against liability tiers based on their stressed pull-to-pa
 
 | Asset | Stressed Pull-to-Par | Required Bucket | If Matched | If Unmatched |
 |-------|---------------------|-----------------|------------|--------------|
-| JAAA | ~1,260 days (900d × 1.4x) | bucket 84 | ~4-5% risk weight | ~10% FRTB (≥ RW) |
+| JAAA | ~1,277 days (912d × 1.4x) | bucket 84 | ~4-5% risk weight | ~10% FRTB (≥ RW) |
 | 90-day T-bill | ~90 days (no stress modifier) | bucket 6 | ~0.5% risk weight | ~2% FRTB (≥ RW) |
 | 4-week T-bill | ~30 days (no stress modifier) | bucket 2 | ~0.2% risk weight | ~1% FRTB (≥ RW) |
 | Sparklend | None | Cannot match | N/A | max(RW, gap risk) |

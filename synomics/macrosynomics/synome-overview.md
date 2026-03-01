@@ -58,6 +58,8 @@ All directives pass through [Language Intent](../core-concepts/language-intent.m
 
 The Synome has two fundamentally different types of structure operating simultaneously:
 
+> **Note:** This two-type framing is a pedagogical simplification. Synodoxics models these as endpoints of a continuous spectrum — see [`probabilistic-mesh.md`](../synodoxics/probabilistic-mesh.md).
+
 ### Deontic Skeleton (Hard)
 
 The **deontic skeleton** is sparse, load-bearing, and deterministic:

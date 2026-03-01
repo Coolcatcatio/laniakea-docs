@@ -37,6 +37,8 @@ LCTS is a general-purpose token standard used across multiple layers of the Sky 
 | **Prime** | TISRC | Tokenized Isolated Senior Risk Capital — senior risk capital scoped to a specific Prime |
 | **Halo** | Halo Unit shares | Claims on Halo Units — default for capacity-constrained products |
 
+These LCTS tokens are held by a variety of participants. Folios are one example of a standardized holding structure for LCTS tokens, but direct holders (EOAs), institutional accounts, and other contract-based structures also hold these tokens independently.
+
 **Risk capital tokens (srUSDS, TEJRC, TISRC)** MUST use LCTS. No alternative exists. These tokens represent risk capital that absorbs losses in exchange for yield.
 
 **Halo Units** use LCTS as the default token standard when Halos face constraints on both subscribe (strategy limits) and redeem (liquidity). Alternatives exist for Halos: NFATS for bespoke deals, stablecoin-style vaults for instant liquidity.
@@ -190,7 +192,8 @@ Settlement:
 | **Net Flow Netting** | Subscribe and redeem queues canceling each other out, reducing net conversion needs |
 | **rewardPerToken** | Cumulative rewards distributed per share (accumulator pattern) |
 | **rewardDebt** | Snapshot of rewardPerToken at time of user's entry (prevents claiming pre-entry rewards) |
-| **LCTS-pBEAM** | pBEAM held by an authorized operator (LPHA beacon) that can call lock/settle |
+| **LCTS-pBEAM** | pBEAM (Process BEAM) permission token held by an authorized LPHA beacon operator that can call lock/settle |
+| **lpha-lcts** | The LPHA (Low-Power High-Authority) beacon operator that holds the LCTS-pBEAM. lpha-lcts is the beacon; LCTS-pBEAM is the permission it holds. See `synomics/macrosynomics/beacon-framework.md` for the beacon taxonomy |
 | **Holding System** | Contract holding sUSDS backing srUSDS; receives funding, sources redemptions |
 
 ---

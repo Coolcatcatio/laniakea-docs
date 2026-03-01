@@ -17,7 +17,7 @@ This folder contains the modular Risk Framework documentation.
 - `capital-formula.md` — Capital formulas and computation flow.
 - `correlation-framework.md` — Category caps + capacity rights (concentration limits via 100% CRR on excess).
 - `examples.md` — Current vs proposed examples + summary principles.
-- `operational-risk-capital.md` — Operational Risk Capital (ORC): executor-posted capital covering compromise damage, rate limit ↔ capital linkage.
+- `operational-risk-capital.md` — Operational Risk Capital (ORC): guardian-posted capital covering compromise damage, rate limit ↔ capital linkage.
 - `sentinel-integration.md` — Output metrics and how Sentinel uses the framework.
 - `risk-monitoring.md` — Risk monitoring framework — metrics, stress testing, anomaly detection, escalation procedures.
 
@@ -47,5 +47,11 @@ Capital requirements should reflect: **what is the maximum loss we could be forc
 | Document | Relevance |
 |----------|-----------|
 | `../smart-contracts/lcts.md` | LCTS tokens (srUSDS, TEJRC, TISRC) are risk capital instruments sized by this framework |
+
+## Planned Modules
+
+| Module | Scope | Current Coverage |
+|---|---|---|
+| **Trading Execution Risk** | Settlement failure, stale oracle prices, counterparty default between match and settlement | Currently managed via on-chain enforcement in PIVs (see [`trading/sky-intents.md`](../trading/sky-intents.md)). Formal risk module pending. |
 
 *This document defines the Risk Framework. For Sentinel integration details, see the Sentinel Network document.*

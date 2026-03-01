@@ -22,7 +22,7 @@ The Configurator Unit is a governance layer that controls rate limits and static
 | **Restricted init** | An init that can only be used by a specific PAU (when `pau != address(0)`) |
 | **Relayer** | The address that executes operations on the Controller; set by accordant GovOps via `setRelayer` |
 | **Freezer** | The address that can remove compromised relayers from a Controller; set by accordant GovOps via `setFreezer` |
-| **Second-order rate limit (SORL)** | The constraint on how fast rate limits can be increased (default: 25% per 18 hours) |
+| **Second-order rate limit (SORL)** | The constraint on how fast rate limits can be increased (default: 25% per 18 hours). **Canonical source:** This document is the canonical reference for SORL parameters. Other documents should cross-reference here. |
 
 ---
 

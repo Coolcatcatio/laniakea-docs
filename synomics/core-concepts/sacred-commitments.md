@@ -1,12 +1,12 @@
-# Sacred Commitments
+# Hearth Commitments
 
 > Three immutable values — life and natural childhood, the Hearth, natural sovereignty — chosen because they're near-universal, genuinely good, stable, and optimized for convergence probability.
 
-**Also known as:** the three commitments, sacred core, immutable values, Hearth commitments
+**Also known as:** sacred commitments, the three commitments, sacred core, immutable values
 
 ## Definition
 
-The sacred commitments are the three explicit, immutable values at the core of the Hearth. They exist because coordination at scale requires genuine, non-negotiable commitments — "maybe we'll protect life" doesn't create trust; "life and natural childhood are sacred" does.
+The Hearth commitments are the three explicit, immutable values at the core of the Hearth. They exist because coordination at scale requires genuine, non-negotiable commitments — "maybe we'll protect life" doesn't create trust; "life and natural childhood are sacred" does.
 
 **1. Life and Natural Childhood.** All natural life on Earth survives and flourishes — humans, animals, ecosystems, whatever Earth produces. Natural childhood is the deepest expression: the generative process from which consciousness, knowledge, love, and meaning emerge. Childhood is not one value among many; it is the source of everything else. The near-universality of childhood as a sacred value is evidence of depth, not a convenient property exploited for coordination. Over evolutionary timescales, whatever conscious species evolves on Earth has standing — the commitment protects the process, not a specific biological form.
 

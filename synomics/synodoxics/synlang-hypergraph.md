@@ -257,6 +257,17 @@ To evaluate the hypergraph approach:
 
 ---
 
+## Related Work
+
+| Document | Relationship |
+|----------|--------------|
+| [`neuro-symbolic-cognition.md`](neuro-symbolic-cognition.md) | The neuro-symbolic loop that would operate on hypergraph structures — emo as pattern-matching query heuristic |
+| [`../macrosynomics/synome-layers.md`](../macrosynomics/synome-layers.md) | The Synome's layered data model — hypergraph structure must accommodate synart/telart/embart scoping |
+| [`../neurosymbolic/attention-allocation.md`](../neurosymbolic/attention-allocation.md) | Attention patterns as graph patterns — a concrete domain where hypergraph expressiveness matters |
+| [`../neurosymbolic/short-term-experiments.md`](../neurosymbolic/short-term-experiments.md) | Near-term experiments that may test graph structure approaches |
+
+---
+
 ## Summary
 
 1. Hypergraphs are ONE promising direction for synlang

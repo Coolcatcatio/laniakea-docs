@@ -8,7 +8,7 @@ All Phase 1 specifications and implementation details.
 |---|---|
 | [phase-1-overview.md](phase-1-overview.md) | Phase 1 overview — deliverables, substages (1.0-1.6), end state |
 | [synome-mvp-reqs.md](synome-mvp-reqs.md) | Synome-MVP requirements — data model, end-to-end flows, acceptance tests, non-goals |
-| [halo-sleeve-deep-dive.md](halo-sleeve-deep-dive.md) | Halo Sleeve implementation spec — lifecycle states, Synome schema, offboarding pipeline, creation policy, loss distribution |
+| [halo-book-deep-dive.md](halo-book-deep-dive.md) | Halo Book implementation spec — lifecycle states, Synome schema, offboarding pipeline, creation policy, loss distribution |
 
 ## Summary
 

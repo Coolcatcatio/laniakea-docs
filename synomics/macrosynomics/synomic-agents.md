@@ -181,7 +181,13 @@ A Prime is not just a tool for token holders. It is an entity in its own right, 
 
 ## Halos: The Fractal Layer
 
-Halos are general-purpose Synomic Agents that proliferate to meet demand:
+Halos are general-purpose Synomic Agents that proliferate to meet demand. They are organized in a three-layer hierarchy:
+
+- **Class** — The Halo type (e.g., Portfolio Halo, Term Halo, Trading Halo)
+- **Book** — A balanced ledger (assets = liabilities) within a class (e.g., a specific book backing short-duration RWA positions)
+- **Unit** — A cross-book link connecting one agent's book to another's
+
+See [`sky-agents/halo-agents/agent-type-halos.md`](../../sky-agents/halo-agents/agent-type-halos.md) and [`whitepaper/appendix-b-agent-types.md`](../../whitepaper/appendix-b-agent-types.md) for the complete hierarchy.
 
 **Portfolio Halos (LCTS-based):**
 - Pooled exposure
@@ -289,6 +295,23 @@ A Synomic Agent created today could exist for billions of years.
 
 ---
 
+## Agent Rank Hierarchy
+
+Synomic Agents are organized into four ranks based on their governance relationship to the Core Council:
+
+| Rank | Agent Types | Governance Relationship |
+|------|-------------|------------------------|
+| **0** | Core Council | Sovereign |
+| **1** | Guardians, Core Controlled Agents, Recovery Agents | Directly regulated by Core Council |
+| **2** | Primes, Generators | Accordant to a Guardian |
+| **3** | Halos, Folio Agents | Administered by a Prime |
+
+Rank 1 agents that are not Guardians — Core Controlled Agents and Recovery Agents — are tokenless and serve specialized purposes: Core Controlled Agents manage legacy protocol positions (Morpho, Aave, SparkLend) as general-purpose Core Council operational vehicles, while Recovery Agents are temporary crisis wrappers activated when a Guardian collapses. Rank 3 Folio Agents are standardized supply-side holding structures controlled by a single principal (not to be confused with Halos, which wrap around legal entities).
+
+See `sky-agents/README.md` and `whitepaper/appendix-b-sky-agent-framework-primitives.md` for the complete hierarchy and agent type specifications.
+
+---
+
 ## The Range of Purpose
 
 | Type | Purpose | Nature |
@@ -296,6 +319,9 @@ A Synomic Agent created today could exist for billions of years.
 | **Minimal Halo** | Exist and experience | Pure autonomous lifeform |
 | **Simple Halo** | Maintain a function | Functional + autonomous |
 | **Governed Halo** | Serve stakeholders | Governed + potentially autonomous |
+| **Folio Agent** | Standardized holding structure | Principal-controlled, single owner |
+| **Core Controlled Agent** | Legacy asset management | Core Council operational vehicle |
+| **Recovery Agent** | Crisis response | Temporary, dissolves after resolution |
 | **Prime** | Allocate capital at scale | Mega allocator + lifeform |
 | **Generator** | Provide liquidity | Foundational + autonomous |
 
@@ -377,5 +403,5 @@ For the full game-theoretic analysis, see [`../synoteleonomics/synomic-game-theo
 | [`security-and-resources.md`](../synodoxics/security-and-resources.md) | Security model — resource discipline and cancer-logic prevention |
 | [`../synoteleonomics/emergence.md`](../synoteleonomics/emergence.md) | Full ethical framework — moral status, negative vs positive rights, capital as the right to exist |
 | [`../../sky-agents/prime-agents/agent-type-primes.md`](../../sky-agents/prime-agents/agent-type-primes.md) | Concrete Prime specifications — categories, capabilities, current operational Primes |
-| [`../../sky-agents/halo-agents/agent-type-halos.md`](../../sky-agents/halo-agents/agent-type-halos.md) | Concrete Halo specifications — three standard class types, Class/Unit/Sleeve organization |
+| [`../../sky-agents/halo-agents/agent-type-halos.md`](../../sky-agents/halo-agents/agent-type-halos.md) | Concrete Halo specifications — three standard class types, Class/Book/Unit organization |
 

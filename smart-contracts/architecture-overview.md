@@ -56,8 +56,8 @@ What differs between PAU deployments:
 
 - Receives capital from Generator via ERC4626 vault
 - Deploys to:
-  - **Halo Layer** — the primary long-term deployment path (includes both Prime-created Halos and Core Halos)
-  - **Core Halos** — legacy DeFi (Morpho vaults, Aave pools, SparkLend) wrapped as Halo Units under Core Council governance
+  - **Halo Layer** — the primary long-term deployment path (includes both Prime-created Halos and Core Controlled Agents)
+  - **Core Controlled Agents** — legacy DeFi (Morpho vaults, Aave pools, SparkLend) wrapped as Halo Units under Core Council governance
   - **Foreign Primes** — via bridge for cross-chain deployment
 - Each Prime controls its own vault's liquidity availability
 
@@ -91,7 +91,7 @@ What differs between PAU deployments:
 |------------|-----------|---------|
 | Generator → Prime | ERC4626 vault | Rate limits on deposit/withdraw |
 | Prime → Halo | ERC4626 vault (or other vault types) | Rate limits + vault-specific parameters |
-| Prime → Core Halos | Via CoreHaloFacet (ERC4626, Aave, Curve interfaces) | Rate limits + protocol-specific parameters |
+| Prime → Core Controlled Agents | Via CoreHaloFacet (ERC4626, Aave, Curve interfaces) | Rate limits + protocol-specific parameters |
 | Prime → Foreign Prime | Direct bridge transfer (no vault) | Rate limits on LayerZero/CCTP transfers |
 | Foreign Prime → Foreign Halo | Various vault types | Rate limits + vault-specific parameters |
 | Halo → RWA/Custodian | Asset transfer | Rate limits on transfers to custodian addresses |
@@ -173,7 +173,7 @@ This means:
    │    RWA/Custodian                      RWA/Custodian
    │    Endpoints                          Endpoints
    │
-   └──► Core Halos
+   └──► Core Controlled Agents
         (Morpho, Aave, SparkLend - legacy DeFi wrapped as Halo Units)
 ```
 
@@ -186,6 +186,10 @@ The diagram above shows the capital deployment flow. Parallel to this, risk capi
 - **TISRC** (Tokenized Isolated Senior Risk Capital) — held by end users, issued by Primes via LCTS
 
 Primes *ingress* (recognize) this external risk capital as part of their capital base. Risk capital holders don't participate in the deployment flow — they provide the buffer that absorbs losses. See `accounting/risk-capital-ingression.md` for details.
+
+**Note: User Touchpoints — Demand Side and Supply Side**
+
+The capital flow above is infrastructure — funds move through PAUs, but end users interact at the edges. On the **demand side**, sUSDS is the user-facing product: holders deposit USDS and earn the savings rate passively. On the **supply side**, folios are the user-facing layer: each folio is a principal-controlled (or automated) PAU that gives the end user a direct capital-deployment surface within the Laniakea stack. sUSDS abstracts away all deployment complexity; folios expose it, giving sophisticated participants a governed vehicle for active allocation while inheriting the same rate-limit and risk-capital infrastructure as Primes and Halos. See `sky-agents/folio-agents/agent-type-folios.md`.
 
 ---
 

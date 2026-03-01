@@ -61,7 +61,7 @@ Entities woven INTO the Synome — ledger-native, Synome-controlled, structurall
 
 ### Phase 1
 
-Six teleonome-less beacons (lpla-verify, lpha-relay, lpha-nfat, lpha-report, lpha-collateral, lpha-council). All Low-Power, deterministic. Monthly settlement. No teleonome layer, no learning, no probabilistic mesh. Preserves beacon taxonomy, authority hierarchy, rate limits, and separation of concerns. Evolution: Phase 2 formalizes monthly settlement with lpla-checker; Phase 3 adds daily settlement; Phases 4-8 add LCTS, factory stack; Phases 9-10 introduce Sentinels; beyond brings full teleonome emergence and RSI.
+Phase 1 uses teleonome-less beacons (lpla-verify, lpha-relay, lpha-nfat, lpha-council): all Low-Power, deterministic. Settlement remains manual (legacy process). Prime performance reporting (`lpha-report`) is introduced in Phase 3 as a daily-settlement artifact. Core Halo / legacy RWA disclosures are published via `lpha-council` (no dedicated collateral beacon). Evolution: Phase 2 formalizes monthly settlement with lpla-checker; Phase 3 adds daily settlement; Phases 4-8 add LCTS + the factory stack; Phases 9-10 introduce Sentinels; beyond brings full teleonome emergence and RSI.
 
 ---
 

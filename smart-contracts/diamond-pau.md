@@ -93,6 +93,8 @@ The diamond pattern solves this by:
 
 Facets are organized by function type:
 
+> The following facet set is illustrative. Actual facet deployments are defined per implementation phase — see roadmap phase specifications for current facet sets.
+
 | Facet | Functions |
 |-------|-----------|
 | **ERC4626Facet** | deposit, withdraw, mint, redeem for ERC-4626 vaults |

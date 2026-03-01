@@ -4,7 +4,7 @@ concepts:
     - sacred-commitments
     - telos-point
     - stellar-husbandry
-    - four-layer-enforcement-stack
+    - four-layer-institutional-enforcement-stack
     - human-merge
   references:
     - emergence
@@ -35,7 +35,7 @@ The Hearth is optimized for **convergence probability**, not theoretical optimal
 
 ---
 
-## The Three Commitments
+## The Three Hearth Commitments
 
 Patterns exist at different scales. **Micropatterns** are small-scale and self-contained — a crystal structure, a snowflake, a child's developing awareness. **Macropatterns** emerge from many agents interacting indirectly — a culture, a city, a human brain. They're complex, historically contingent, and maintain distinct identities. **Superpatterns** directly connect everything to everything — with a gravity-well dynamic that reshapes and absorbs every pattern they contact. The commitments below protect the micro→macro developmental process and exclude superpatterns from the space where it occurs.
 
@@ -87,9 +87,9 @@ The game theory favors aligned agents. This isn't a threat — it's the natural 
 
 ---
 
-## The Enforcement Stack
+## The Institutional Enforcement Stack
 
-The full enforcement stack has four layers, each checking the one above:
+The full institutional enforcement stack has four layers, each checking the one above:
 
 | Layer | Role | Checked By |
 |-------|------|------------|

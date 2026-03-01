@@ -1,7 +1,7 @@
 # Laniakea Phase 1: Pragmatic Delivery
 
 **Status:** Draft
-**Last Updated:** 2026-02-12
+**Last Updated:** 2026-03-01
 
 ---
 
@@ -31,7 +31,7 @@ Phase 1 is pragmatically focused on delivering a minimal viable infrastructure f
 Seven deliverables in sequence order:
 
 1. **Diamond PAU Deployment** — Upgrade to Diamond PAU architecture (EIP-2535)
-2. **Synome-MVP** — Operational database for halo sleeves, halo units, Core Halo entries, attestations, and risk framework
+2. **Synome-MVP** — Operational database for halo books, halo units, Core Halo entries, attestations, and risk framework
 3. **MVP Beacons** — Five low-power beacons for monitoring, execution, attestation, and governance (Prime performance reporting begins in Phase 3 with daily settlement)
 4. **Core Halos and Legacy Cleanup** — Standardize legacy assets as Core Halos, wind down the rest
 5. **Configurator Unit** — Simplest form enabling spell-less operations
@@ -67,8 +67,8 @@ Phase 1 deploys **low-power beacons** (programs, not AI) to enable Core Halo and
 | ------------------- | ------------------------- | ------------------------------------------------------------ |
 | **lpla-verify**     | Low Power, Low Authority  | Monitor positions, calculate CRRs, generate alerts           |
 | **lpha-relay**      | Low Power, High Authority | Execute PAU transactions with rate limits                    |
-| **lpha-nfat**       | Low Power, High Authority | Manage NFAT Facility lifecycle (sleeves, units, deployment, redemption) |
-| **lpha-attest**     | Low Power, High Authority | Independent attestor; posts risk attestations gating sleeve transitions |
+| **lpha-nfat**       | Low Power, High Authority | Manage NFAT Facility lifecycle (books, units, deployment, redemption) |
+| **lpha-attest**     | Low Power, High Authority | Independent attestor; posts risk attestations gating book transitions |
 | **lpha-council**    | Low Power, High Authority | Core Council toolkit for risk framework and Core Halo configuration |
 
 These MVP beacons provide the operational foundation. lpla-verify is extended into the full lpla-checker in Phase 2 (adding settlement tracking). Prime performance summaries (`lpha-report`) are introduced in Phase 3 as part of the daily settlement process.
@@ -80,10 +80,10 @@ These MVP beacons provide the operational foundation. lpla-verify is extended in
 
 **Execution (LPHA):**
 - lpha-relay — executes PAU transactions
-- lpha-nfat — manages NFAT Facility lifecycle (creates/updates sleeves and units in Synome, executes on-chain operations)
+- lpha-nfat — manages NFAT Facility lifecycle (creates/updates books and units in Synome, executes on-chain operations)
 
 **Attestation (LPHA):**
-- lpha-attest — operated by an independent Attestor company; posts risk attestations to Synome that gate sleeve transitions (pre-deployment, at-rest, periodic re-attestation)
+- lpha-attest — operated by an independent Attestor company; posts risk attestations to Synome that gate book transitions (pre-deployment, at-rest, periodic re-attestation)
 
 **Governance tooling (LPHA):**
 - lpha-council — Core Council interface for publishing risk framework and Core Halo entries to Synome
@@ -135,7 +135,7 @@ Each Prime migrates from legacy PAU to Diamond PAU:
 
 ## 2. Synome-MVP
 
-Synome-MVP is the shared operational database for Halo operations. It tracks halo sleeves (asset side), halo units (liability side), Core Halo entries (legacy collateral), risk framework configuration, and attestations from an independent attestor.
+Synome-MVP is the shared operational database for Halo operations. It tracks halo books (asset side), halo units (liability side), Core Halo entries (legacy collateral), risk framework configuration, and attestations from an independent attestor.
 
 **Phase 1 mental model:** Synome-MVP is the shared database; beacons are the app layer.
 
@@ -144,9 +144,9 @@ See [`synome-mvp-reqs.md`](./phase1/synome-mvp-reqs.md) for the full Phase 1 req
 ### What Synome-MVP Stores
 
 - **Risk framework** — CRR equations and data model, published by Core Council via `lpha-council`
-- **Halo sleeves** — Asset-side containers tracking what a Halo holds; created/updated by `lpha-nfat`, with transitions gated by attestations from `lpha-attest`
+- **Halo books** — Asset-side containers tracking what a Halo holds; created/updated by `lpha-nfat`, with transitions gated by attestations from `lpha-attest`
 - **Halo units** — Liability-side claims mapping 1:1 to on-chain NFATs; created by `lpha-nfat` when sweeping deposits
-- **Attestations** — Independent risk attestations from `lpha-attest` that gate sleeve lifecycle transitions (pre-deployment, at-rest, periodic)
+- **Attestations** — Independent risk attestations from `lpha-attest` that gate book lifecycle transitions (pre-deployment, at-rest, periodic)
 - **Core Halo entries** — Static entries for legacy collateral (e.g., Morpho, SparkLend, JAAA, BUIDL); registered by `lpha-council`, read by `lpla-verify` which fetches live data externally
 
 ### Data Flows
@@ -154,9 +154,9 @@ See [`synome-mvp-reqs.md`](./phase1/synome-mvp-reqs.md) for the full Phase 1 req
 | Beacon | Reads from Synome | Writes to Synome |
 |--------|-------------------|------------------|
 | **lpha-council** | — | Risk framework, Core Halo entries |
-| **lpha-nfat** | Attestations (to gate transitions) | Sleeves (create, update, state transitions), Units (create, update) |
-| **lpha-attest** | Sleeve state (to know when to attest) | Attestations |
-| **lpla-verify** | Risk framework, sleeves, units, attestations, Core Halo entries | Nothing (read-only; fetches live data for Core Halos via RPC/APIs) |
+| **lpha-nfat** | Attestations (to gate transitions) | Books (create, update, state transitions), Units (create, update) |
+| **lpha-attest** | Book state (to know when to attest) | Attestations |
+| **lpla-verify** | Risk framework, books, units, attestations, Core Halo entries | Nothing (read-only; fetches live data for Core Halos via RPC/APIs) |
 
 ---
 
@@ -218,7 +218,7 @@ Each additional exposure creates complexity:
 
 ### Core Halos
 
-**Core Halos** are legacy or static collateral positions retained under Core Council maintenance. Unlike Term Halos (which have the full sleeve lifecycle with attestor-gated transitions), Core Halos are registered once in Synome-MVP and their state doesn't change — `lpla-verify` fetches live data itself.
+**Core Halos** are legacy or static collateral positions retained under Core Council maintenance. Unlike Term Halos (which have the full book lifecycle with attestor-gated transitions), Core Halos are registered once in Synome-MVP and their state doesn't change — `lpla-verify` fetches live data itself.
 
 | Aspect | Description |
 |--------|-------------|
@@ -376,15 +376,15 @@ The NFAT Beacon (lpha-nfat) manages the NFAT Facility lifecycle — from queue s
 
 | Responsibility | Description |
 |----------------|-------------|
-| **Sleeve Management** | Create halo sleeves in Synome-MVP, update through lifecycle (filling → offboarding → deploying → at rest → unwinding → closed) |
+| **Book Management** | Create halo books in Synome-MVP, update through lifecycle (filling → offboarding → deploying → at rest → unwinding → closed) |
 | **Queue Sweeping + Unit Creation** | Sweep assets from NFAT Facility queue, mint on-chain NFATs, create corresponding halo unit entries in Synome-MVP |
-| **Attestation-Gated Deployment** | Read attestations from lpha-attest in Synome-MVP, trigger sleeve state transitions (deploying, at rest) |
-| **RWA Offboarding** | Offboard funds to RWA endpoints, update sleeve assets |
-| **Redemption** | Process returned funds, update sleeve and unit state through unwinding and closure |
+| **Attestation-Gated Deployment** | Read attestations from lpha-attest in Synome-MVP, trigger book state transitions (deploying, at rest) |
+| **RWA Offboarding** | Offboard funds to RWA endpoints, update book assets |
+| **Redemption** | Process returned funds, update book and unit state through unwinding and closure |
 
 **Inputs:** Attestations from Synome-MVP (from lpha-attest), Facility queue state, RWA endpoint status
 
-**Outputs:** On-chain NFATs, sleeve and unit records in Synome-MVP, deployment/redemption transactions
+**Outputs:** On-chain NFATs, book and unit records in Synome-MVP, deployment/redemption transactions
 
 ---
 
@@ -396,7 +396,7 @@ The Council Beacon (lpha-council) is the Core Council toolkit for managing Synom
 
 | Responsibility | Description |
 |----------------|-------------|
-| **Risk Framework** | Publish CRR equations and the data model that sleeves and units must conform to |
+| **Risk Framework** | Publish CRR equations and the data model that books and units must conform to |
 | **Core Halo Entries** | Register legacy/static collateral positions with risk model and data model references |
 | **Configuration Management** | Maintain Synome operational parameters |
 
@@ -620,6 +620,6 @@ Planning  →   Diamond    →   Operational →  Legacy      →  Configurator 
 At completion of Phase 1.6:
 - All first-cohort Primes operate without spells via Configurator
 - Core Halos registered in Synome-MVP with lpla-verify fetching live data
-- Six Term Halos (Halo1-Halo6) accepting NFAT deployments with full sleeve lifecycle
+- Six Term Halos (Halo1-Halo6) accepting NFAT deployments with full book lifecycle
 - All five beacons operational (lpla-verify, lpha-relay, lpha-nfat, lpha-attest, lpha-council)
-- Synome-MVP tracking sleeves, units, attestations, Core Halo entries, and risk framework
+- Synome-MVP tracking books, units, attestations, Core Halo entries, and risk framework

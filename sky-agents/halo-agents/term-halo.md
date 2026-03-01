@@ -1,7 +1,7 @@
 # Term Halo — Business Overview
 
 **Status:** Draft
-**Last Updated:** 2026-01-27
+**Last Updated:** 2026-03-01
 
 ---
 
@@ -9,15 +9,15 @@
 
 A **Term Halo** is a Halo type that uses **NFATS** (Non-Fungible Allocation Token Standard) to create bespoke, individual capital deployment deals. Unlike Portfolio Halos (which use LCTS for pooled, fungible positions), Term Halos treat each deal as a distinct, non-fungible position with its own terms.
 
-Term Halos separate the **liability side** (Halo Units — the NFATs held by Primes) from the **asset side** (Halo Sleeves — the collateral backing those units). This separation enables privacy protection: multiple assets can be blended in a sleeve, preventing outsiders from inferring individual loan terms from NFAT data.
+Term Halos separate the **liability side** (Halo Units — the NFATs held by Primes) from the **asset side** (Halo Books — balanced ledgers where assets equal liabilities for the units they back). This separation enables privacy protection: multiple assets can be blended in a book, preventing outsiders from inferring individual loan terms from NFAT data.
 
 Term Halos are operated by two LPHA beacons:
-- **lpha-nfat** — claims capital from queues, mints NFATs, manages sleeve status, deploys funds, processes redemptions
-- **lpha-attest** — operated by an independent Attestor; posts risk attestations about sleeve contents into the Synome
+- **lpha-nfat** — claims capital from queues, mints NFATs, manages book status, deploys funds, processes redemptions
+- **lpha-attest** — operated by an independent Attestor; posts risk attestations about book contents into the Synome
 
 > **Note:** Both are **LPHA beacons** — deterministic rule executors, not sentinels. Sentinels (stl-base, stl-stream, stl-warden) have continuous real-time control and proprietary intelligence. LPHA beacons apply rules exactly as written without judgment. See `beacon-framework.md` for the full taxonomy.
 
-**Key value proposition**: Enable bespoke structured deals at scale — each NFAT can have different duration, size, and terms, while sharing the same legal buybox and smart contract infrastructure. Halo Sleeves provide asset-side privacy and bankruptcy remoteness.
+**Key value proposition**: Enable bespoke structured deals at scale — each NFAT can have different duration, size, and terms, while sharing the same legal buybox and smart contract infrastructure. Halo Books provide asset-side privacy and bankruptcy remoteness.
 
 ---
 
@@ -50,7 +50,7 @@ Term Halos are operated by two LPHA beacons:
 
 ## Halo Class Structure
 
-A Term Halo is organized into **Halo Classes** — each Halo Class is an **NFAT Facility** that defines a buybox of acceptable deal parameters. Within each class, **Halo Units** (NFATs) represent the liability side and **Halo Sleeves** represent the asset side.
+A Term Halo is organized into **Halo Classes** — each Halo Class is an **NFAT Facility** that defines a buybox of acceptable deal parameters. Within each class, **Halo Units** (NFATs) represent the liability side and **Halo Books** represent the asset side.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -69,15 +69,15 @@ A Term Halo is organized into **Halo Classes** — each Halo Class is an **NFAT 
 │   │         │              │            │              │              │   │
 │   │         └──────┬───────┘            └──────┬───────┘              │   │
 │   │                ▼                           ▼                      │   │
-│   │   ASSET SIDE (Halo Sleeves):                                     │   │
+│   │   ASSET SIDE (Halo Books):                                       │   │
 │   │   ┌────────────────────┐       ┌────────────────────┐            │   │
-│   │   │ Sleeve α           │       │ Sleeve β           │            │   │
+│   │   │ Book α             │       │ Book β             │            │   │
 │   │   │ Loan A + Loan B    │       │ Loan C + Loan D    │            │   │
 │   │   │ (backs #1, #2)     │       │ (backs #3, #4)     │            │   │
 │   │   └────────────────────┘       └────────────────────┘            │   │
 │   │                                                                  │   │
-│   │   Units on same sleeve: pari passu on losses                     │   │
-│   │   Units on different sleeves: fully isolated                     │   │
+│   │   Units on same book: pari passu on losses                       │   │
+│   │   Units on different books: fully isolated                       │   │
 │   └─────────────────────────────────────────────────────────────────┘   │
 │                                                                          │
 │   ┌─────────────────────────────────────────────────────────────────┐   │
@@ -100,7 +100,7 @@ A Term Halo is organized into **Halo Classes** — each Halo Class is an **NFAT 
 
 ### Halo Units (Liability Side)
 
-Each NFAT is a Halo Unit — a claim on a Halo Sleeve. Units can vary within the buybox:
+Each NFAT is a Halo Unit — a claim on a Halo Book. Units can vary within the buybox:
 
 | Parameter | Variation Within Buybox |
 |-----------|------------------------|
@@ -110,34 +110,34 @@ Each NFAT is a Halo Unit — a claim on a Halo Sleeve. Units can vary within the
 | **Counterparty** | Different Primes for each NFAT |
 | **Specific Terms** | Payment schedules, early redemption conditions |
 
-### Halo Sleeves (Asset Side)
+### Halo Books (Asset Side)
 
-Each Halo Sleeve is a bankruptcy-remote container holding the assets that back one or more units:
+Each Halo Book is a balanced ledger — assets on one side, the liabilities owed to its units on the other — providing bankruptcy remoteness for the positions it backs:
 
 | Property | Description |
 |----------|-------------|
-| **Bankruptcy remoteness** | The sleeve is the isolation boundary — not the unit |
-| **Loss distribution** | Pari passu across units on the same sleeve (unless tranched) |
-| **Privacy** | Multiple assets blended in a sleeve prevent inference of individual loan terms |
-| **Composition** | Whole assets per sleeve |
-| **Recursive** | A sleeve can hold Halo Units from other sleeves as assets |
+| **Bankruptcy remoteness** | The book is the isolation boundary — not the unit |
+| **Loss distribution** | Pari passu across units on the same book (unless tranched) |
+| **Privacy** | Multiple assets blended in a book prevent inference of individual loan terms |
+| **Composition** | Whole assets per book |
+| **Recursive** | A book can hold Halo Units from other books as assets |
 
 ### Terms Source
 
 | Mode | Description |
 |------|-------------|
 | **General buybox** | Halo Class defines ranges; units fall within the buybox. Halo has flexibility. |
-| **Ecosystem accord** | Pre-negotiated agreement specifying individual unit and sleeve terms. Overrides the buybox. |
+| **Ecosystem accord** | Pre-negotiated agreement specifying individual unit and book terms. Overrides the buybox. |
 
 ---
 
 ## Beacons: lpha-nfat and lpha-attest
 
-Two LPHA beacons operate a Term Halo. Neither can act alone on deployment — the attestor must post an attestation before the Halo can transition a sleeve.
+Two LPHA beacons operate a Term Halo. Neither can act alone on deployment — the attestor must post an attestation before the Halo can transition a book.
 
 ### lpha-nfat — Halo Operations
 
-The **lpha-nfat beacon** is the operational backbone. It operates the NFAT Facility's PAU and manages the complete lifecycle of each NFAT and sleeve.
+The **lpha-nfat beacon** is the operational backbone. It operates the NFAT Facility's PAU and manages the complete lifecycle of each NFAT and book.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -147,12 +147,12 @@ The **lpha-nfat beacon** is the operational backbone. It operates the NFAT Facil
 │   │  1. ISSUANCE    │     │  2. DEPLOYMENT  │     │  3. REDEMPTION  │   │
 │   │                 │     │                 │     │                 │   │
 │   │  • Monitor      │     │  • Transition   │     │  • Receive      │   │
-│   │    Prime queues │     │    sleeve to    │     │    returned     │   │
+│   │    Prime queues │     │    book to      │     │    returned     │   │
 │   │  • Validate     │────▶│    deploying    │────▶│    funds        │   │
 │   │    deal terms   │     │    (requires    │     │  • Move to      │   │
 │   │  • Mint NFAT    │     │    attestation) │     │    Redeem       │   │
 │   │  • Assign to    │     │  • Transfer via │     │    Contract     │   │
-│   │    sleeve       │     │    PAU to RWA   │     │  • Notify       │   │
+│   │    book         │     │    PAU to RWA   │     │  • Notify       │   │
 │   │                 │     │                 │     │    NFAT holder  │   │
 │   └─────────────────┘     └─────────────────┘     └─────────────────┘   │
 │                                                                          │
@@ -161,12 +161,12 @@ The **lpha-nfat beacon** is the operational backbone. It operates the NFAT Facil
 
 ### lpha-attest — Independent Attestor
 
-The **lpha-attest beacon** is operated by an independent Attestor company whitelisted by Sky governance. It posts risk attestations about sleeve contents into the Synome.
+The **lpha-attest beacon** is operated by an independent Attestor company whitelisted by Sky governance. It posts risk attestations about book contents into the Synome.
 
 | Property | Description |
 |----------|-------------|
 | **Capability** | Write attestations into Synome |
-| **Cannot** | Move capital, mint NFATs, change sleeve status directly |
+| **Cannot** | Move capital, mint NFATs, change book status directly |
 | **Accountability** | Subject to its own govops supply chain of checks and audits |
 
 **Two-beacon deployment gate:**
@@ -180,7 +180,7 @@ ATTESTOR                          SYNOME                          HALO
     │                                │  2. Attestation present ✓     │
     │                                │  ────────────────────────────▶│
     │                                │                               │
-    │                                │  3. Sleeve → deploying        │
+    │                                │  3. Book → deploying          │
     │                                │  ◀────────────────────────────│
 ```
 
@@ -319,7 +319,7 @@ Standard Laniakea infrastructure for capital flows.
 │   │  QUEUE CONTRACT │                                                    │
 │   └────────┬────────┘                                                    │
 │            │                                                             │
-│            │ 2. lpha-nfat claims, mints NFAT, assigns to sleeve          │
+│            │ 2. lpha-nfat claims, mints NFAT, assigns to book            │
 │            ▼                                                             │
 │   ┌─────────────────┐        ┌─────────────────┐                        │
 │   │    lpha-nfat     │───────▶│   NFAT minted   │───────▶ PRIME holds    │
@@ -327,12 +327,12 @@ Standard Laniakea infrastructure for capital flows.
 │   └────────┬────────┘        └─────────────────┘         position       │
 │            │                                                             │
 │   ┌────────┴────────┐                                                    │
-│   │  HALO SLEEVE    │  ← Sleeve fills (may add more NFATs over time)    │
+│   │   HALO BOOK     │  ← Book fills (may add more NFATs over time)      │
 │   │  (asset side)   │  ← USDS earns agent rate while in filling phase   │
 │   └────────┬────────┘                                                    │
 │            │                                                             │
 │            │ 3. lpha-attest posts attestation (risk characteristics)     │
-│            │    lpha-nfat transitions sleeve → deploying                 │
+│            │    lpha-nfat transitions book → deploying                   │
 │            │                                                             │
 │            │ 4. Deploy via PAU (obfuscated — high CRR)                  │
 │            ▼                                                             │
@@ -345,7 +345,7 @@ Standard Laniakea infrastructure for capital flows.
 │            ▼                                                             │
 │   ┌─────────────────┐                                                    │
 │   │  RWA ENDPOINT   │  ← lpha-attest posts "at rest" attestation        │
-│   │                 │  ← Sleeve transitions to at rest (lower CRR)      │
+│   │                 │  ← Book transitions to at rest (lower CRR)        │
 │   │                 │  ← Ongoing re-attestation per asset type           │
 │   └────────┬────────┘                                                    │
 │            │                                                             │
@@ -368,21 +368,21 @@ Standard Laniakea infrastructure for capital flows.
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Sleeve Lifecycle and Privacy
+## Book Lifecycle and Privacy
 
-Halo Sleeves progress through defined phases. See `nfats.md` for full specification.
+Halo Books progress through defined phases. See `nfats.md` for full specification.
 
 | Phase | Synome Visibility | CRR Impact |
 |-------|-------------------|------------|
-| **Filling** | Full transparency — sleeve holds USDS earning agent rate | Low |
+| **Filling** | Full transparency — book holds USDS earning agent rate | Low |
 | **Deploying** | Obfuscated — attestor forward-looking only (Schrödinger's risk) | **High** |
 | **At Rest** | Attestor-confirmed risk characteristics (not individual borrower details) | Medium |
-| **Unwinding** | Halo funds Redeem Contract from sleeve proceeds | — |
+| **Unwinding** | Halo funds Redeem Contract from book proceeds | — |
 | **Closed** | All units redeemed | — |
 
-**Privacy mechanism:** Multiple assets are blended in a sleeve, and multiple NFATs issued against the blended collateral. Individual loan terms cannot be inferred from NFAT data — only the blended risk characteristics (as attested by the Attestor) are visible in the Synome.
+**Privacy mechanism:** Multiple assets are blended in a book, and multiple NFATs issued against the blended collateral. Individual loan terms cannot be inferred from NFAT data — only the blended risk characteristics (as attested by the Attestor) are visible in the Synome.
 
-**CRR incentives:** The higher CRR during deployment encourages Halos to minimize the obfuscated phase duration and stagger deployments across sleeves — balancing borrower privacy against capital efficiency without mandating specific behavior.
+**CRR incentives:** The higher CRR during deployment encourages Halos to minimize the obfuscated phase duration and stagger deployments across books — balancing borrower privacy against capital efficiency without mandating specific behavior.
 
 ---
 
@@ -405,12 +405,12 @@ Any deal within the buybox can be executed by lpha-nfat without additional gover
 
 ### Bankruptcy Remoteness
 
-Bankruptcy remoteness is at the **Halo Sleeve** level — the asset-side container:
+Bankruptcy remoteness is at the **Halo Book** level — the balanced ledger matching assets to the liabilities owed to its units:
 
-- Units sharing a sleeve are **pari passu** on losses (unless tranched within the sleeve)
-- Units on different sleeves are **fully isolated** — if one sleeve's assets fail, other sleeves are protected
-- Each sleeve is like a serialized LLC
-- In the simplest case (1 unit : 1 sleeve : 1 asset), the effect is the same as per-unit isolation
+- Units sharing a book are **pari passu** on losses (unless tranched within the book)
+- Units on different books are **fully isolated** — if one book's assets fail, other books are protected
+- Each book is like a serialized LLC
+- In the simplest case (1 unit : 1 book : 1 asset), the effect is the same as per-unit isolation
 
 ### Governance Artifacts
 
@@ -418,8 +418,8 @@ Bankruptcy remoteness is at the **Halo Sleeve** level — the asset-side contain
 |----------|----------|
 | **Halo Artifact** | Overall governance, buybox definitions, recourse mechanisms |
 | **Unit Artifact** | Per-NFAT operational parameters, legal recourse, deal terms |
-| **Sleeve Records** | Asset-side composition, attestor attestations, deployment status |
-| **Synome Records** | Real-time position data, yield schedules, maturity tracking, sleeve assignments |
+| **Book Records** | Asset-side composition, attestor attestations, deployment status |
+| **Synome Records** | Real-time position data, yield schedules, maturity tracking, book assignments |
 
 ---
 
@@ -429,8 +429,8 @@ The beacons operate alongside other beacons for safety:
 
 | Component | Type | Role |
 |-----------|------|------|
-| **lpha-nfat** | LPHA beacon | Primary execution — issuance, sleeve management, deployment, redemption |
-| **lpha-attest** | LPHA beacon | Independent attestations — risk characteristics of sleeve contents |
+| **lpha-nfat** | LPHA beacon | Primary execution — issuance, book management, deployment, redemption |
+| **lpha-attest** | LPHA beacon | Independent attestations — risk characteristics of book contents |
 | **stl-warden** | Sentinel | Independent oversight — risk monitoring, halt authority |
 | **lpla-checker** | LPLA beacon | Protocol-level position verification |
 
@@ -510,12 +510,12 @@ Both operate PAUs and are rate-limited. Sentinel formations have warden oversigh
 Term Halos enable **bespoke structured deals at institutional scale**:
 
 - **NFAT-based** — each position is individual, non-fungible, transferable
-- **Asset-liability separated** — Halo Units (NFATs) on liability side, Halo Sleeves on asset side
-- **Privacy-preserving** — blended sleeves prevent inference of individual loan terms
+- **Asset-liability separated** — Halo Units (NFATs) on liability side, Halo Books on asset side
+- **Privacy-preserving** — blended books prevent inference of individual loan terms
 - **Buybox-constrained** — deals vary within defined parameters (or via ecosystem accord)
 - **Two-beacon operated** — lpha-nfat handles execution, lpha-attest provides independent attestations
 - **PAU-integrated** — standard Laniakea rate-limited infrastructure
-- **Bankruptcy remote** — at the sleeve level; pari passu within a sleeve, isolated across sleeves
+- **Bankruptcy remote** — at the book level; pari passu within a book, isolated across books
 - **CRR-incentivized** — risk model encourages short deployment phases and staggered deployments
 
 The capital flow mirrors Prime operations (ingress → deploy → manage → redeem), but lpha-nfat is an LPHA beacon (deterministic rule execution) rather than a sentinel (real-time intelligent control).
@@ -533,5 +533,5 @@ The capital flow mirrors Prime operations (ingress → deploy → manage → red
 
 ---
 
-*Document Version: 0.1*
-*Last Updated: 2026-01-27*
+*Document Version: 0.2*
+*Last Updated: 2026-03-01*

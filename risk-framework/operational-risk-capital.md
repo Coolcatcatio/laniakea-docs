@@ -7,7 +7,7 @@
 
 ## Overview
 
-Operational Risk Capital (ORC) is capital posted by the entity that holds execution authority over a PAU, covering the maximum damage that entity could cause before detection and shutdown. ORC is distinct from portfolio risk capital (CRR-based) — it addresses operational compromise, not market/credit risk.
+Operational Risk Capital (ORC) is capital posted by the entity that holds execution authority over a PAU (the guardian/Accordant — see Glossary: Guardian Role Mapping), covering the maximum damage that entity could cause before detection and shutdown. ORC is distinct from portfolio risk capital (CRR-based) — it addresses operational compromise, not market/credit risk.
 
 | Concept | Portfolio Risk Capital | Operational Risk Capital |
 |---------|----------------------|------------------------|
@@ -39,7 +39,7 @@ ORC ≥ Type 1 Max Loss × N
 
 Where:
 - **IRL** = Initial Rate Limit ($100K)
-- **Accumulation Factor** = `1 + 0.25 × SORL` = 1.0625 (at SORL = 25%)
+- **Accumulation Factor** = `1 + 0.25 × SORL` = 1.0625 (at SORL = 25%; see `smart-contracts/configurator-unit.md` for canonical SORL parameters)
 - **N** = number of attack surfaces (initialization targets)
 
 The detection window is **Time to Freeze (TTF)** — typically 24 hours for Phase 1 monitoring.
@@ -51,6 +51,8 @@ See `smart-contracts/rate-limit-attacks.md` for the full attack model and parame
 > **Note on Type 2 harm:** This formula covers Type 1 (direct extraction — 100% attacker profit). Type 2 (operational extraction via slippage grinding) causes larger marginal harm (~$2.05M/N₁ vs ~$395K/N₁ at adopted parameters) but has a much lower attacker extraction rate (~10%). The adopted SORL/IRL parameters were optimized for combined weighted harm across both types — see `smart-contracts/rate-limit-attacks.md` for the full model. Total weighted harm at adopted parameters is ~$2.36M/N₁.
 
 ### Sentinel Era: TTS-Based
+
+> **Transition:** The shift from Phase 1 (TTF-based) to sentinel-era (TTS-based) ORC occurs when sentinel formations replace GovOps guardians as PAU operators (Phase 9-10). During the transition, both models may coexist — PAUs still operated by GovOps use the Phase 1 formula; PAUs operated by sentinel formations use the TTS formula.
 
 When sentinel formations operate PAUs, the guardian (Accordant to the Prime) posts ORC based on Time to Shutdown:
 
@@ -125,6 +127,8 @@ A **Guardian Accord** is the agreement between a Prime and its guardian defining
 
 In Phase 1, guardian accords are implicit (GovOps teams operate under Core Council governance). In the sentinel era, guardian accords become explicit smart contracts — the Streaming Accord is a specialized form for stream sentinel operators.
 
+> **Folio ORC note:** Automated folios (those operated by sentinel formations via guardian accord) inherit the full ORC framework — their guardians post ORC and their sentinel formations include wardens, so TTS-based sizing applies identically to Primes. Principal-control folios, by contrast, have no TTS and no wardens; risk is bounded solely by rate limits, since the principal is both operator and beneficiary and there is no external execution authority to insure against. This distinction matters for Phase 9+ ORC sizing: automated folios scale ORC with warden quality like any other sentinel-operated PAU, while principal-control folios require no ORC charge at all.
+
 ---
 
 ## Warden Economics
@@ -151,13 +155,15 @@ ORC covers damage from compromised execution authority (guardian keys). A relate
 
 PIV trading risk is managed through on-chain enforcement, not ORC:
 
-- **Delegation Intent Policy (DIP)** — on-chain policy defining allowed assets, position limits, velocity limits, concentration caps
+- **Delegated Intent Policy (DIP)** — on-chain policy defining allowed assets, position limits, velocity limits, concentration caps
 - **Per-window caps** — stateful limits on delegated trading volume per time window
 - **EIP-1271 validation** — settlement contract validates each intent against the vault's policy before execution
 
 PIV capital is isolated from the Prime's main PAU by design — the vault holds only the working capital needed for active trading, bounding worst-case loss.
 
 See `trading/sky-intents.md` for the full PIV specification and security model.
+
+> **Forward reference:** For broader trading execution risk — settlement failure, stale oracle prices, counterparty default between match and settlement — a dedicated risk framework module is planned. See the "Planned Modules" section in the [`risk-framework/README.md`](README.md).
 
 ---
 

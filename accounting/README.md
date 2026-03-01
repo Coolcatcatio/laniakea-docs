@@ -7,6 +7,7 @@ Settlement operations, auction mechanics, and capital recognition for the Laniak
 
 ## Module Index
 
+- `books-and-units.md` — Books (balanced ledgers, assets = liabilities) and Units (cross-book links) as foundational accounting primitives. How the recursive book pattern chains the capital stack from Generator through Prime to Halo.
 - `daily-settlement-cycle.md` — Daily settlement timeline, OSRC and Duration auctions, LCTS settlement, prepayments, penalties.
 - `tugofwar.md` — Tug-of-war algorithm for duration capacity allocation when reservations exceed availability.
 - `risk-capital-ingression.md` — How external capital (EJRC, SRC) is recognized on Prime balance sheets: ingression curves, quality multipliers, MC-based caps.

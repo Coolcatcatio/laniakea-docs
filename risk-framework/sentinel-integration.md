@@ -22,6 +22,16 @@ For the broader beacon taxonomy, see `synomics/macrosynomics/beacon-framework.md
 | **stl-base** | Risk monitoring during execution, deployment decisions |
 | **stl-warden** | Independent risk verification, halt triggers |
 
+### Folio-Side Sentinels
+
+| Component | Uses Risk Framework For |
+|-----------|-------------------------|
+| **stl-base-{folio}** | Risk monitoring during execution, deployment decisions (automated folios) |
+| **stl-warden-{folio}** | Independent risk verification, halt triggers (automated folios) |
+| **stl-principal-{owner}** | Direct control with structural protection only (principal control folios) |
+
+> **Note:** Automated folios inherit formation-level protection identical to Primes — TTS is defined by the warden set, and ORC is sized accordingly. Principal control folios have no TTS (no wardens to shut them down) — risk is bounded by rate limits and PAU architecture alone, not by formation-level protections.
+
 ### Halo-Side LPHA Beacons
 
 | Component | Uses Risk Framework For |
@@ -45,6 +55,19 @@ For the broader beacon taxonomy, see `synomics/macrosynomics/beacon-framework.md
 | **TRRC** | Total Required Risk Capital | Sum of CRR × position size across portfolio |
 | **TRC** | Total Risk Capital actually held | Actual safety capital |
 | **Encumbrance Ratio** | TRRC / TRC | Capital utilization — target ≤90% |
+
+---
+
+## PIV / Trading Execution Risk
+
+Sentinel formations that operate Prime Intent Vaults (PIVs) face **trading execution risk** in addition to portfolio risk. Unlike portfolio risk — which is managed through CRR, duration matching, and risk capital — PIV risk is managed through on-chain enforcement mechanisms:
+
+- **Delegated Intent Policy (DIP):** Per-vault policy defining allowed pairs, max slippage, per-intent notional caps, and per-window velocity limits. Enforced at fill time via a stateful vault hook.
+- **Per-window caps:** Hourly and daily notional limits bound trading throughput, capping worst-case losses from a malfunctioning or compromised stl-base.
+- **EIP-1271 validation:** Settlement contract validates maker authorization against the Prime Intent Vault, ensuring only authorized delegated signers can produce valid intents.
+- **Vault balance isolation:** Only the PIV balance is exposed to settlement; the full Prime PAU is not at risk.
+
+PIV trading execution risk is bounded by the vault balance and velocity limits rather than sized through ORC. For the full PIV specification, see `trading/sky-intents.md`. For the ORC/PIV boundary and how operational risk capital relates to formation-level protections, see `risk-framework/operational-risk-capital.md`.
 
 ---
 

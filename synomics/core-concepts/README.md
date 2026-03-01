@@ -48,3 +48,4 @@ stay in their narrative docs.
 | 29 | [human-merge](human-merge.md) | Human and teleonome join into a single irreversible entity |
 | 30 | [telos-point](telos-point.md) | The irreducible teleological invariant at the center of a synome — a Schelling point but for everything, forever |
 | 31 | [rsi-risk-convergence](rsi-risk-convergence.md) | Self-improvement and risk management are the same operation |
+| 32 | [symbolic-gate](symbolic-gate.md) | Final verification checkpoint — every action proposal verified against the live graph before execution |

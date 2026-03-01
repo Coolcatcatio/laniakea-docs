@@ -48,27 +48,27 @@ NFAT terms can come from two sources:
 | Mode | Description |
 |---|---|
 | **General buybox** | Halo Class defines acceptable ranges; individual units fall within the buybox without predetermined terms. Halo has flexibility in structuring. |
-| **Ecosystem accord** | Pre-negotiated agreement specifying individual unit and sleeve terms. Overrides the general buybox. More constrained, more predictable for the Prime. |
+| **Ecosystem accord** | Pre-negotiated agreement specifying individual unit and book terms. Overrides the general buybox. More constrained, more predictable for the Prime. |
 
 ---
 
 ## Legal Isolation
 
-Bankruptcy remoteness is at the **Halo Sleeve** level — the asset-side container:
+Bankruptcy remoteness is at the **Halo Book** level — the balanced ledger boundary:
 
-- If one NFAT's underlying deal fails, other NFATs on different sleeves in the facility are protected
-- Each Halo Sleeve functions as a serialized LLC equivalent (BVI SPC segregated portfolio)
-- Recourse is limited to the specific sleeve's assets
-- Units sharing a sleeve are **pari passu** on losses (pro rata by principal)
-- Units on different sleeves are **fully isolated**
+- If one NFAT's underlying deal fails, other NFATs on different books in the facility are protected
+- Each Halo Book functions as a serialized LLC equivalent (BVI SPC segregated portfolio)
+- Recourse is limited to the specific book's assets
+- Units sharing a book are **pari passu** on losses (pro rata by principal)
+- Units on different books are **fully isolated**
 
 | Halo Concept | BVI SPC Equivalent | Delaware Equivalent |
 |---|---|---|
 | **Halo Class** | The SPC entity itself | The Series LLC parent |
-| **Halo Sleeve** | Segregated portfolio (statutory ring-fencing under BVI BCA s.146) | Individual series (untested in bankruptcy) |
+| **Halo Book** | Segregated portfolio (statutory ring-fencing under BVI BCA s.146) | Individual series (untested in bankruptcy) |
 | **Halo Unit** | Share/interest within a portfolio | Membership interest in a series |
 
-BVI SPCs provide materially stronger sleeve-level isolation than Delaware Series LLCs — the BVI statutory segregation has been court-tested.
+BVI SPCs provide materially stronger book-level isolation than Delaware Series LLCs — the BVI statutory segregation has been court-tested.
 
 ---
 
@@ -134,7 +134,7 @@ Primes without valid hedging or floating-rate terms cannot deploy into duration 
 | Document | Relationship |
 |---|---|
 | [`phase-1-overview.md`](phase-1-overview.md) | Phase 1 substages |
-| [`halo-sleeve-deep-dive.md`](halo-sleeve-deep-dive.md) | Sleeve-level bankruptcy remoteness mechanics |
-| [`../../sky-agents/halo-agents/halo-class-sleeve-unit.md`](../../sky-agents/halo-agents/halo-class-sleeve-unit.md) | Legal mapping (BVI SPC / Delaware) for Class/Sleeve/Unit |
+| [`halo-book-deep-dive.md`](halo-book-deep-dive.md) | Book-level bankruptcy remoteness mechanics |
+| [`../../sky-agents/halo-agents/halo-class-book-unit.md`](../../sky-agents/halo-agents/halo-class-book-unit.md) | Legal mapping (BVI SPC / Delaware) for Class/Book/Unit |
 | [`../../sky-agents/halo-agents/term-halo.md`](../../sky-agents/halo-agents/term-halo.md) | Term Halo business overview |
 | [`../../smart-contracts/nfats.md`](../../smart-contracts/nfats.md) | NFAT smart contract specification |

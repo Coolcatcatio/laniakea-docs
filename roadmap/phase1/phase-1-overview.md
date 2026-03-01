@@ -29,7 +29,7 @@ Each Prime migrates: deploy Diamond PAU → migrate positions → grant cBEAMs �
 
 ### 2. Synome-MVP
 
-Shared operational database for Halo operations. Tracks halo sleeves (asset side), halo units (liability side), Core Halo entries, risk framework configuration, and attestations from an independent attestor.
+Shared operational database for Halo operations. Tracks halo books (balanced ledgers), halo units (cross-book links), Core Halo entries, risk framework configuration, and attestations from an independent attestor.
 
 **Phase 1 mental model:** Synome-MVP is the shared database; beacons are the app layer.
 
@@ -43,8 +43,8 @@ Five low-power beacons (programs, not AI) for monitoring, execution, attestation
 |---|---|---|
 | **lpla-verify** | LPLA | Monitor positions, calculate CRRs, generate alerts |
 | **lpha-relay** | LPHA | Execute PAU transactions with rate limits |
-| **lpha-nfat** | LPHA | Manage NFAT Facility lifecycle (sleeves, units, deployment, redemption) |
-| **lpha-attest** | LPHA | Independent attestor; posts risk attestations gating sleeve transitions |
+| **lpha-nfat** | LPHA | Manage NFAT Facility lifecycle (books, units, deployment, redemption) |
+| **lpha-attest** | LPHA | Independent attestor; posts risk attestations gating book transitions |
 | **lpha-council** | LPHA | Core Council toolkit for risk framework and Core Halo configuration |
 
 lpla-verify is extended into the full lpla-checker in Phase 2 (adding settlement tracking). Prime performance summaries (`lpha-report`) are introduced in Phase 3.
@@ -68,7 +68,7 @@ Enables GovOps teams to manage Prime operations without requiring Sky Spells. Tw
 Two contracts enable Term Halos: the **NFAT Facility** (queue, claim, mint, deploy) and the **Redeem Contract** (receive, notify, redeem). Connected via shared PAU; lpha-nfat holds pBEAM for Facility operations.
 
 *Canonical spec:* [`../../smart-contracts/nfats.md`](../../smart-contracts/nfats.md)
-*Sleeve implementation:* [`halo-sleeve-deep-dive.md`](halo-sleeve-deep-dive.md) — lifecycle, Synome schema, offboarding pipeline
+*Book implementation:* [`halo-book-deep-dive.md`](halo-book-deep-dive.md) — lifecycle, Synome schema, offboarding pipeline
 
 ### 7. Term Halo Legal + SOFR Hedging
 
@@ -204,9 +204,9 @@ Planning  →   Diamond    →   Operational →  Legacy      →  Configurator 
 At completion of Phase 1.6:
 - All first-cohort Primes operate without spells via Configurator
 - Core Halos registered in Synome-MVP with lpla-verify fetching live data
-- Six Term Halos (Halo1-Halo6) accepting NFAT deployments with full sleeve lifecycle
+- Six Term Halos (Halo1-Halo6) accepting NFAT deployments with full book lifecycle
 - All five beacons operational (lpla-verify, lpha-relay, lpha-nfat, lpha-attest, lpha-council)
-- Synome-MVP tracking sleeves, units, attestations, Core Halo entries, and risk framework
+- Synome-MVP tracking books, units, attestations, Core Halo entries, and risk framework
 
 ---
 
@@ -216,7 +216,7 @@ At completion of Phase 1.6:
 |---|---|
 | **This file** | Phase 1 overview — deliverables, substages, end state |
 | [`synome-mvp-reqs.md`](synome-mvp-reqs.md) | Synome-MVP data model, end-to-end flows, acceptance tests |
-| [`halo-sleeve-deep-dive.md`](halo-sleeve-deep-dive.md) | Halo Sleeve implementation — lifecycle, Synome schema, offboarding, creation policy |
+| [`halo-book-deep-dive.md`](halo-book-deep-dive.md) | Halo Book implementation — lifecycle, Synome schema, offboarding, creation policy |
 | [`beacons.md`](beacons.md) | All 5 Phase 1 beacons — responsibilities, I/O, Synome access |
 | [`core-halos-and-cleanup.md`](core-halos-and-cleanup.md) | Core Halo model, legacy decision tree, cleanup targets |
 | [`term-halo-legal.md`](term-halo-legal.md) | Buybox model, legal isolation, governance artifacts, SOFR hedging |

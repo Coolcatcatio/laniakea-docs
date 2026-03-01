@@ -6,16 +6,22 @@ Features and capabilities available to Synomic Agents. Together with Appendix A 
 
 ## Agent Types Overview
 
-Synomic Agents are created directly as their permanent type. Each agent type has specific capabilities, primitives, and governance structures. Agent types cannot be changed after creation.
+Synomic Agents are created directly as their permanent type. Each agent type has specific capabilities, primitives, and governance structures. Agent types cannot be changed after creation (except via Type 2 Restructure for Halo→Prime upgrade).
 
-### Agent Type Hierarchy
+### Agent Rank Hierarchy
 
-| Type | Role | Examples |
-|------|------|----------|
-| **Prime** | Capital-deploying agents operating at scale | 5 Stars (Spark, Grove, Keel, Star4, Star5) + 1 Institutional (Obex) |
-| **Halo** | Lighter investment products under Prime umbrella | CLO tranches, yield vaults |
-| **Generator** | Issue Sky Generated Assets (new currencies) | USDS Generator (current), future SGA Generators |
-| **Guardian** | Operate systems with collateral backing | Core Guardians, Operational Guardians |
+Agents are organized into four ranks based on their governance relationship to the Core Council:
+
+| Rank | Type | Role | Tokenized | Examples |
+|------|------|------|-----------|----------|
+| **0** | Core Council | Sovereign governance | N/A | 24 Core Guardians |
+| **1** | Guardian | Privileged operations with collateral | Yes | Core Guardians, Operational Guardians |
+| **1** | Core Controlled Agent | Core Council operational vehicle | No | Legacy asset management (Morpho, Aave, SparkLend) |
+| **1** | Recovery Agent | Crisis wrapper | No | Guardian collapse response |
+| **2** | Prime | Capital-deploying at scale | Yes | Spark, Grove, Keel, Obex |
+| **2** | Generator | Issue Sky Generated Assets | Yes | USDS Generator, future SGA Generators |
+| **3** | Halo | Investment products under Prime umbrella | Yes | Portfolio, Term, Trading, Exchange, Identity Network |
+| **3** | Folio Agent | Standardized supply-side holding structure | No | Principal-controlled, automated or direct operation |
 
 ### Agent Subtypes
 
@@ -117,9 +123,9 @@ Native governance and reward token for the Agent.
 |----------|-------|
 | Purpose | Governance voting, staking rewards, incentive distribution |
 | Creation | All agents can create a token at genesis |
-| Optional | Only Halos can realistically opt out of token issuance |
+| Optional | Several agent types operate without tokens by design |
 
-Agent tokens enable decentralized governance and align stakeholder incentives. While all agent types can issue tokens, Halos may operate without one when functioning purely as investment wrappers under a Prime's umbrella.
+Agent tokens enable decentralized governance and align stakeholder incentives. While Primes and most autonomous agents issue tokens, several agent types are tokenless by design: Halos (when functioning purely as investment wrappers under a Prime's umbrella), Core Controlled Agents, Recovery Agents, and Folio Agents.
 
 #### Agent Token Issuance Fee
 
@@ -742,7 +748,7 @@ Halos are classified on two dimensions: **regulatory treatment** and **Halo Clas
 | Treatment | Types | Rules |
 |-----------|-------|-------|
 | **Standard** | Portfolio, Term, Trading | Normal Halo rules — standard governance, rate limits, and risk framework |
-| **Special** | Identity Network, Exchange, Staking | Additional regulatory or operational requirements beyond standard Halo rules |
+| **Special** | Identity Network, Exchange | Additional regulatory or operational requirements beyond standard Halo rules |
 
 **Standard Halo Class types** (by capital deployment mechanism):
 
@@ -760,7 +766,6 @@ A Halo Agent with a single Halo Class is commonly referred to by its class name 
 |------|---------|
 | **Identity Network Halo** | Operates identity verification infrastructure (KYC registries). See `sky-agents/halo-agents/identity-network.md` |
 | **Exchange Halo** | Operates intent-based exchange infrastructure (orderbooks, matching engines). See `trading/sky-intents.md` |
-| **Staking Halo** | Personal Growth Staking vehicle for SKY holders. See `growth-staking/growth-staking.md` |
 
 ---
 
@@ -774,16 +779,16 @@ A Halo Agent with a single Halo Class is commonly referred to by its class name 
 
 ---
 
-### Halo Class, Sleeve, and Unit Structure
+### Halo Class, Book, and Unit Structure
 
-Halos organize capital into three layers: **Class**, **Sleeve**, and **Unit**. Each layer serves a distinct purpose — infrastructure sharing, risk isolation, and individual claims.
+Halos organize capital into three layers: **Class**, **Book**, and **Unit**. Each layer serves a distinct purpose — infrastructure sharing, balanced ledgers, and cross-book links.
 
 **Hierarchy:**
 ```
 Halo (Synomic Agent)
 └── Halo Class (shared SC + legal infra)
-    ├── ASSET SIDE: Halo Sleeves (bankruptcy-remote containers)
-    └── LIABILITY SIDE: Halo Units (claims on sleeves)
+    ├── Halo Books (balanced ledgers: assets = liabilities)
+    └── Halo Units (cross-book links connecting layers)
 ```
 
 **Halo Class** — shared smart contract infrastructure (PAU, LPHA beacon) and legal framework (buybox, agreements). The Class defines operational bounds.
@@ -795,9 +800,9 @@ Halo (Synomic Agent)
 | Legal framework (buybox constraints) | Asset pair, spread, pool depth (for Trading) |
 | Factory template (audited, reusable) | Risk/return profile within class constraints |
 
-**Halo Sleeve** — an asset-side, bankruptcy-remote container holding the actual assets backing one or more Units. Sleeves provide risk isolation: units sharing a sleeve are pari passu on losses; units on different sleeves are fully isolated. Multiple assets can be blended in a sleeve for borrower privacy. Sleeves progress through a lifecycle (Filling → Deploying → At Rest → Unwinding) with capital requirements varying by phase — see `sky-agents/halo-agents/halo-class-sleeve-unit.md`.
+**Halo Book** — a balanced ledger (assets = liabilities) that serves as a bankruptcy-remote isolation boundary. Each book balances real-world positions on the asset side against the Units that claim on them on the liability side. Books provide risk isolation: units sharing a book are pari passu on losses; units on different books are fully isolated. Multiple assets can be blended in a book for borrower privacy. Books progress through a lifecycle (Filling → Deploying → At Rest → Unwinding) with capital requirements varying by phase — see `sky-agents/halo-agents/halo-class-book-unit.md`.
 
-**Halo Unit** — a liability-side claim on a specific Sleeve. Each Unit is legally and operationally isolated from other units (similar to a serialized LLC). The token standard determines how claims are represented:
+**Halo Unit** — a cross-book link representing a claim on a specific Book. Each Unit is legally and operationally isolated from other units (similar to a serialized LLC). The token standard determines how claims are represented:
 
 | Standard | Model | Use Case |
 |----------|-------|----------|
@@ -904,6 +909,61 @@ Guardian Agents operate systems with collateral backing. They interpret governan
 | Function | Interpret Atlas, oversee Operational Guardians, participate in governance votes |
 | Relationship | Governs multiple Operational Guardians; receives delegated SKY voting power |
 | Accountability | To Sky Governance; collateral-backed interpretation and execution |
+
+---
+
+## Folio Agents
+
+Folio Agents are rank 3 standardized supply-side holding structures in the Sky ecosystem. They are **not** Halos — the structural difference is fundamental: a Halo wraps around a legal entity, while a folio is controlled BY the principal through legal entities (the principal's legal structure is the governance surface).
+
+Each folio has a **principal** (the end user) who controls the folio through a **directive** — human language instructions defining investment philosophy, risk appetite, and constraints. Two operating modes:
+
+- **Automated folio** — operated by a sentinel formation (baseline + stream + wardens) via guardian accord. The directive governs the formation's behavior.
+- **Principal control folio** — operated directly by the principal via a **principal sentinel** (`stl-principal`). No guardian accord, no formation. The principal deploys their own algorithms and manages positions directly.
+
+| Property | Value |
+|----------|-------|
+| Rank | 3 — administered by a Prime |
+| Token | None — tokenless, single owner (the principal) |
+| Creation | Instant — any SKY holder |
+| Purpose | Standardized holding structure: Growth Staking, capital deployment, strategy access |
+| Control | Automated (sentinel formation) or Principal Control (principal sentinel) |
+| Restructuring | Type 1 only (graduate to Halo or Prime) |
+
+See `sky-agents/folio-agents/agent-type-folios.md` for the full specification.
+
+---
+
+## Core Controlled Agents
+
+Core Controlled Agents are rank 1 agents directly administered by the Core Council. They serve as general-purpose operational vehicles — in the short term covering legacy protocol positions (replacing "Core Halos"), in the long term serving any Core Council operational need.
+
+| Property | Value |
+|----------|-------|
+| Rank | 1 — directly regulated by Core Council |
+| Token | None — tokenless |
+| Creation | Core Council governance (SpellCore) |
+| Purpose | Legacy asset management, general-purpose Core Council operations |
+| Growth asset | No — excluded from Growth Staking |
+
+See `sky-agents/core-controlled-agents/agent-type-core-controlled.md`.
+
+---
+
+## Recovery Agents
+
+Recovery Agents are rank 1 crisis agents administered by the Core Council, activated when a Guardian collapses or is implicated in misconduct.
+
+| Property | Value |
+|----------|-------|
+| Rank | 1 — directly regulated by Core Council |
+| Token | None — tokenless |
+| Creation | Core Council governance (SpellCore), crisis response |
+| Purpose | Take over affected agent tree, manage resolution |
+| Duration | Temporary — dissolves after crisis resolution |
+| Growth asset | No — excluded from Growth Staking |
+
+See `sky-agents/recovery-agents/agent-type-recovery.md`.
 
 ---
 

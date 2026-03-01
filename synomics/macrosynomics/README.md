@@ -27,7 +27,7 @@ How entities exist and act within the architecture.
 
 Connecting architecture to deployment.
 
-6. **[`short-term-actuators.md`](short-term-actuators.md)** — Phase 1 teleonome-less beacons. The six beacons, Synome-MVP, evolution pathway toward full teleonome-based operation.
+6. **[`short-term-actuators.md`](short-term-actuators.md)** — Phase 1 teleonome-less beacons. Beacon set + Synome-MVP + evolution pathway toward full teleonome-based operation.
 
 ### Maintenance
 

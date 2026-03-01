@@ -82,11 +82,22 @@ The governance and operational layer. These are the running agents that make the
   - *Agentic Axioms* — Machine-readable rules derived from Agent Directives. The constitutional foundation that the agent's graph is organized around.
   - *Synomic Agent Resources* — The resources (compute, credentials, capabilities) allocated to instantiate agents.
 
-- **Synomic Agent Types** — Instantiated by Agentic Axioms + Synomic Agent Resources:
-  - *Guardians* — Execute and guard specific tasks
-  - *Generators* — Generate outputs (e.g., USDS)
-  - *Primes* — Capital allocation agents
-  - *Halos* — Regulated endpoint agents
+- **Synomic Agent Types** — Instantiated by Agentic Axioms + Synomic Agent Resources, organized into a rank hierarchy based on governance relationship to the Core Council:
+
+  | Rank | Agent Types | Governance Relationship |
+  |------|-------------|------------------------|
+  | **0** | Core Council | Sovereign |
+  | **1** | Guardians, Core Controlled Agents, Recovery Agents | Directly regulated by Core Council |
+  | **2** | Primes, Generators | Accordant to a Guardian |
+  | **3** | Halos, Folio Agents | Administered by a Prime |
+
+  - *Guardians* (Rank 1) — Execute and guard specific tasks, post collateral
+  - *Core Controlled Agents* (Rank 1) — Core Council operational vehicles for legacy asset management; tokenless
+  - *Recovery Agents* (Rank 1) — Crisis agents activated when a Guardian collapses; temporary, tokenless
+  - *Generators* (Rank 2) — Generate outputs (e.g., USDS)
+  - *Primes* (Rank 2) — Capital allocation agents
+  - *Halos* (Rank 3) — Regulated endpoint agents (investment products under Prime umbrella)
+  - *Folio Agents* (Rank 3) — Standardized supply-side holding structures; tokenless, single owner (the principal)
 
 **Relationships:**
 
@@ -321,6 +332,8 @@ Ephemeral context (used during execution, discarded)
 ## Probabilistic-Deontic Architecture
 
 The Synome is a [dual architecture](../core-concepts/dual-architecture.md) — a sparse deontic skeleton of hard, deterministic connections surrounded by a dense [probabilistic mesh](../core-concepts/probabilistic-mesh.md) of soft, informing connections. Governance sits at the [crystallization interface](../core-concepts/crystallization-interface.md) — consuming probabilistic evidence, producing deontic commitments. See [`synome-overview.md`](synome-overview.md) for the canonical treatment of the dual architecture and [`probabilistic-mesh.md`](../synodoxics/probabilistic-mesh.md) for the full mesh specification.
+
+> **Note:** The deontic/probabilistic split is a pedagogical simplification. These are endpoints of a continuous spectrum — an unannotated knowledge graph is a valid Synome where everything is axiomatic, and you soften parts by adding explicit truth values. See [`probabilistic-mesh.md`](../synodoxics/probabilistic-mesh.md).
 
 **Visual convention used in this document:**
 - `──────►` Hard (authority, control, instantiation, governance)

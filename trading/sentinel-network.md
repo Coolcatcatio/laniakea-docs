@@ -29,7 +29,7 @@ Even governance beacons (LPHA beacons) remain process-gated and asynchronous. Se
 
 ### Connection to Beacon Framework
 
-For the broader taxonomy of beacons — including LPHA keepers, HPLA trade beacons, LPLA reporting beacons, controllers, and custodians — see `beacon-framework.md`.
+For the broader taxonomy of beacons — including LPHA keepers, HPLA trade beacons, LPLA reporting beacons, controllers, and custodians — see `../synomics/macrosynomics/beacon-framework.md`.
 
 This document focuses on **sentinel formations**: the coordinated HPHA beacon systems that execute strategies for Synomic Agents (Primes and Halos with PAUs).
 
@@ -196,9 +196,60 @@ Each sentinel formation connects to **multiple wardens**, typically operated by 
 
 ---
 
+## Principal Sentinel
+
+> Owner-operated direct control — no formation, no guardian accord.
+
+**Profile:** HPHA (High Power, High Authority)
+**Operator:** The principal (folio owner, or standalone account operator)
+**Access:** Private / Proprietary
+
+### What Is a Principal Sentinel?
+
+A principal sentinel is a fourth sentinel type — distinct from baseline, stream, and warden. It enables direct control of a folio agent (or standalone account) without any guardian accord, formation assembly, or GovOps intermediary.
+
+The principal deploys their own algorithms, makes their own trading decisions, and manages their own positions directly through the PAU. They still operate within rate limits — but they also have the freedom to change those rate limits through whatever governance mechanism they choose to set up.
+
+### Relationship to Formations
+
+The principal sentinel is **not** part of a formation. It is a standalone operator. There is no baseline fail-safe, no stream feeding it intelligence, no wardens monitoring it. The principal is responsible for their own security and risk management.
+
+Principal sentinels skip the formation lifecycle entirely — no accord negotiation, no formation assembly, no warden engagement.
+
+### Capabilities
+
+| Capability | Description |
+|-----------|-------------|
+| **Direct PAU control** | Holds pBEAMs, executes transactions on PAU directly |
+| **Own algorithms** | Deploys proprietary trading and management strategies |
+| **Rate limit modification** | Can modify rate limits through chosen governance mechanism |
+| **Multi-target operation** | Can operate a folio agent, a standalone account (multisig/EOA), or both simultaneously |
+
+### Expected Users
+
+Principal control is for highly competent operators. In practice, the primary users are expected to be companies that themselves run stream sentinels for other primes, halos, and folios. They have the infrastructure, expertise, and algorithms to operate autonomously.
+
+### Trade-Off
+
+More power, less protection. The PAU architecture still provides structural protection (rate limits, standardized interfaces, audited contracts), but formation-level protections (baseline fail-safe, stream/warden monitoring, guardian collateral) are absent.
+
+### Naming Convention
+
+```
+stl-principal-{owner}             # Principal sentinel operated by specific owner
+```
+
+**Examples:**
+```
+stl-principal-horizonlabs          # Horizon Labs operating their own folio
+stl-principal-sentinelco           # SentinelCo operating their own account
+```
+
+---
+
 ## Time to Shutdown (TTS)
 
-The number and quality of wardens determines a critical parameter: **Time to Shutdown (TTS)**.
+The number and quality of wardens determines a critical parameter: **Time to Shutdown (TTS)** (TTF in Phase 1).
 
 ### Definition
 
@@ -367,7 +418,23 @@ For completeness: **Trade Beacons** are the HPLA equivalent of sentinel formatio
 - Ecosystem Actor commercial operations
 - Cross-venue arbitrage with private capital
 
-Trade beacons are documented in `beacon-framework.md`.
+Trade beacons are documented in `../synomics/macrosynomics/beacon-framework.md`.
+
+---
+
+## Formation Sentinel vs Principal Sentinel
+
+The two sentinel operating models have fundamentally different safety and accountability properties:
+
+| Aspect | Formation Sentinel | Principal Sentinel |
+|--------|-------------------|-------------------|
+| **Structure** | Baseline + Stream + Wardens (coordinated formation) | Single operator, no formation |
+| **Fail-safe** | Baseline reverts to Base Strategy if Stream disconnects | No automatic fail-safe; principal manages own continuity |
+| **Safety oversight** | Independent wardens with halt authority | No wardens; principal is self-accountable |
+| **Guardian collateral** | Guardian posts ORC covering Rate Limit x TTS | No guardian collateral; principal bears own risk |
+| **TTS-based ORC** | TTS determines required operational risk capital | No TTS concept; rate limits are the sole on-chain constraint |
+| **Algorithms** | Public Baseline code; proprietary Stream intelligence | Owner's proprietary algorithms throughout |
+| **Rate limit governance** | SORL-constrained increases (25%/18h); governance-set | Principal can modify via chosen governance mechanism |
 
 ---
 
@@ -381,7 +448,7 @@ Sentinel formations use shared toolkit functions for common operations.
 
 Operations:
 - Cross-check positions against risk limits
-- Calculate CRR, TRRC, TRC, Encumbrance Ratio
+- Calculate CRR, TRRC, TRC, Encumbrance Ratio (target ≤90% -- see `risk-framework/capital-formula.md`)
 - Flag discrepancies and anomalies
 - Calculate PnL
 - Calculate interest payable
@@ -404,6 +471,8 @@ Used by: Baseline (for Stream compensation)
 ---
 
 ## Formation Lifecycle
+
+> **Note:** Principal sentinels skip the formation lifecycle entirely. They do not negotiate accords, assemble formations, or engage wardens. The lifecycle below applies to baseline/stream/warden formations only.
 
 ### 1. Accord Negotiation
 
@@ -485,6 +554,20 @@ Prime sentinels manage capital deployment from Prime PAUs into yield opportuniti
 
 **Flow:** Risk capital ingression → leverage deployment → yield capture
 
+### Folio-Side Sentinels
+
+Folio sentinels manage capital deployment from folio PAUs on behalf of the principal.
+
+| Sentinel | Role |
+|----------|------|
+| **stl-base-{folio}** | Baseline execution for automated folio |
+| **stl-stream-{folio}-{actor}** | Proprietary intelligence streaming for automated folio |
+| **stl-warden-{folio}-{operator}** | Independent risk oversight for automated folio |
+| **stl-principal-{owner}** | Direct control for principal control folio |
+
+**Automated folio flow:** Principal writes directive → sentinel formation executes within directive bounds
+**Principal control flow:** Principal operates directly via principal sentinel → no formation
+
 ### Halo LPHA Beacons
 
 Capital flows through Halo Unit PAUs into RWA endpoints are managed by **LPHA beacons** (Low Power, High Authority keepers), not sentinels.
@@ -516,6 +599,15 @@ Shared infrastructure across all Primes and Halos:
 stl-base-{prime}                  # Baseline for specific Prime
 stl-stream-{prime}-{actor}        # Stream operated by specific actor
 stl-warden-{prime}-{operator}     # Warden operated by specific party
+```
+
+### Folio Formation Components
+
+```
+stl-base-{folio}                  # Baseline for automated folio
+stl-stream-{folio}-{actor}        # Stream operated by specific actor for folio
+stl-warden-{folio}-{operator}     # Warden operated by specific party for folio
+stl-principal-{owner}             # Principal sentinel (no formation)
 ```
 
 ### Halo LPHA Beacons
@@ -558,6 +650,7 @@ lpha-nfat-grove-term               # NFAT operations for Grove's Term Halo
 | **stl-base** | Primary execution sentinel for formations |
 | **stl-stream** | Proprietary intelligence streaming |
 | **stl-warden** | Independent safety oversight |
+| **stl-principal** | Owner-operated direct control (no formation, no guardian accord) |
 
 > **Note:** Halo operations (LCTS and NFAT) are handled by **LPHA beacons** (lpha-lcts, lpha-nfat), not sentinels. See the Halo LPHA Beacons section above and `beacon-framework.md` for the distinction.
 
@@ -565,11 +658,12 @@ lpha-nfat-grove-term               # NFAT operations for Grove's Term Halo
 
 1. **Sentinels are HPHA beacons** — distinguished by continuous real-time control
 2. **Both Primes and Halos can have sentinel formations** — any PAU can be sentinel-operated
-3. **Formations, not individuals** — Baseline + Stream + Wardens
-4. **Separation of concerns** — Execution (Baseline), Intelligence (Stream), Safety (Wardens)
-5. **Independence matters** — Wardens must be independent for TTS to be meaningful
-6. **TTS economics** — Warden quality determines operational efficiency
-7. **Compounding loop** — Streams enable intelligence accumulation within safe bounds
+3. **Formations, not individuals** — Baseline + Stream + Wardens (for automated operation)
+4. **Principal sentinels as alternative** — direct control without formation, for folios and standalone accounts
+5. **Separation of concerns** — Execution (Baseline), Intelligence (Stream), Safety (Wardens)
+6. **Independence matters** — Wardens must be independent for TTS to be meaningful
+7. **TTS economics** — Warden quality determines operational efficiency
+8. **Compounding loop** — Streams enable intelligence accumulation within safe bounds
 
 ---
 

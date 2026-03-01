@@ -11,7 +11,7 @@ Term definitions for the Sky Protocol.
 | **Sky** | Evolution of MakerDAO; decentralized stablecoin protocol |
 | **Sky Core** | Central governance and monetary policy layer |
 | **Atlas** | Constitutional governance document; human-readable; target ~10-20 pages post Atlas/Synome separation |
-| **Synome** | Initially a machine-readable operational database (Synome-MVP); evolves into the cognitive architecture encompassing the entire Sky ecosystem — agents, knowledge, governance, and autonomous coordination |
+| **Synome** | A probabilistic-deontic knowledge architecture delivered through a phased rollout beginning with Synome-MVP (operational knowledge base) and progressing toward a full cognitive architecture encompassing the entire Sky ecosystem — agents, knowledge, governance, and autonomous coordination. In the Hearth framework, the Synome takes on additional teleological significance as a self-analyzing civilizational entity. Also names both Layer 1 specifically and the entire 5-layer system depending on context |
 
 ---
 
@@ -67,25 +67,46 @@ Term definitions for the Sky Protocol.
 | Term | Definition |
 |------|------------|
 | **Agent** | Autonomous entity operating within Sky's framework |
-| **Synomic Agent** | Durable, ledger-native entity that can own assets and make binding commitments; four types: Prime, Halo, Generator, Guardian |
+| **Synomic Agent** | Durable, ledger-native entity that can own assets and make binding commitments; seven types organized into ranks 0–3: Guardian (1), Core Controlled Agent (1), Recovery Agent (1), Prime (2), Generator (2), Halo (3), Folio Agent (3) |
 | **Prime** | Capital-deploying agent category; heavyweight. Two subtypes: Star Primes (5) and Institutional Primes (1) |
 | **Star Prime** | Standard Prime operating under a Generator; 5 genesis Stars: Spark, Grove, Keel, Star4, Star5 |
 | **Institutional Prime** | Prime focused on institutional users with higher compliance requirements and controlled token holder base; example: Obex |
-| **Halo** | Lighter operational agent; wraps external value. Organized into Halo Classes containing Halo Units (liability side) and Halo Sleeves (asset side) |
-| **Halo Class** | Grouping of Halo Units and Halo Sleeves sharing the same smart contract infrastructure (PAU, beacons) and legal framework (buybox). Three standard class types: Portfolio (LCTS), Term (NFAT), Trading (AMM). Examples: tranched Portfolio Halo (senior/junior sharing one PAU), NFAT Facility (same buybox, varying duration/size) |
+| **Halo** | Lighter operational agent; wraps external value. Organized into Halo Classes containing Halo Books (balanced ledgers) and Halo Units (cross-book links) |
+| **Halo Class** | Grouping of Halo Books and Halo Units sharing the same smart contract infrastructure (PAU, beacons) and legal framework (buybox). Three standard class types: Portfolio (LCTS), Term (NFAT), Trading (AMM). Examples: tranched Portfolio Halo (senior/junior sharing one PAU), NFAT Facility (same buybox, varying duration/size) |
 | **Portfolio Halo** | Standard Halo Class type using LCTS — pooled capital, fungible shares, queue-based entry/exit, uniform terms |
 | **Term Halo** | Standard Halo Class type using NFAT — bespoke deals, non-fungible positions, individual terms within buybox |
 | **Trading Halo** | Standard Halo Class type using AMM — programmatic counterparty providing instant liquidity for RWA tokens and ecosystem assets at a spread |
-| **Staking Halo** | Special Halo type for delegated staking operations; subject to additional regulatory requirements |
+| **Folio Agent (Folio)** | Rank 3 standardized supply-side holding structure; not a Halo — tokenless, single owner (the principal), instantly created. Each folio has a principal who controls it through a directive (human language instructions). Two modes: automated (sentinel formation via guardian accord) or principal control (principal sentinel, direct operation). Required vehicle for Growth Staking participation. Administered by a Prime |
+| **Principal** | The end user who controls a folio; writes the directive that governs the folio's operation |
+| **Directive** | Human language instructions governing a folio agent's operation — investment philosophy, risk appetite, strategic priorities, and constraints |
+| **Automated Folio** | Folio operated by a sentinel formation (baseline + stream + wardens) via guardian accord; the directive governs the formation's behavior |
+| **Principal Control Folio** | Folio operated directly by the principal via a principal sentinel; no guardian accord, no formation |
+| **Principal Sentinel** | Sentinel type (`stl-principal`) for owner-operated direct control of a folio agent or standalone account; distinct from baseline, stream, and warden sentinels — operates outside the formation pattern |
+| **Folio Service** | Configurator that assembles folios from standardized building blocks based on location, status, strategy, and scale inputs |
 | **Identity Network Halo** | Special Halo type implementing identity/KYC infrastructure; operated via `lpha-identity` |
-| **Special Halo** | Halo with additional regulatory or operational requirements beyond standard rules: Identity Network Halo, Exchange Halo, Staking Halo |
-| **Halo Unit** | Liability side — individual claim within a Halo Class; specific parameters within the class's bounds (e.g., a specific tranche, a specific NFAT). Each unit is a claim on a specific Halo Sleeve |
-| **Halo Sleeve** | Asset side — bankruptcy-remote container holding actual assets that back one or more Halo Units. Units sharing a sleeve are pari passu on losses (unless tranched). Multiple assets can be blended in a sleeve for borrower privacy |
-| **Ecosystem Accord** | Pre-negotiated agreement specifying individual Halo Unit and Halo Sleeve terms; overrides the general buybox of the Halo Class |
-| **Attestor** | Company whitelisted by Sky governance to provide risk attestations about Halo Sleeve contents via `lpha-attest`; bridges borrower privacy with risk transparency |
-| **Core Halos** | Legacy assets (Morpho vaults, Aave pools, SparkLend, etc.) standardized as Halo Units under Core Council governance. Primes deploy to Core Halos via CoreHaloFacet. Core Halos can transition to Prime ownership or wind down systematically |
-| **Guardian** | Governance operator agent; performs privileged operations with collateral-backed accountability. Consolidates the former Facilitator (interpretation) and Aligned Delegate (governance participation) roles. Two subtypes: Core Guardian (interpretation, oversight, governance) and Operational Guardian (day-to-day execution) |
+| **Special Halo** | Halo with additional regulatory or operational requirements beyond standard rules: Identity Network Halo, Exchange Halo |
+| **Halo Unit** | Cross-book link — individual claim within a Halo Class; specific parameters within the class's bounds (e.g., a specific tranche, a specific NFAT). Each unit is a claim on a specific Halo Book (appears as a liability in the book, an asset in the holder's book above) |
+| **Halo Book** | Balanced ledger (assets = liabilities) that serves as a bankruptcy-remote isolation boundary. Each book balances real-world positions against the Units that claim on them. Units sharing a book are pari passu on losses (unless tranched). Multiple assets can be blended in a book for borrower privacy |
+| **Ecosystem Accord** | Pre-negotiated agreement specifying individual Halo Unit and Halo Book terms; overrides the general buybox of the Halo Class |
+| **Attestor** | Company whitelisted by Sky governance to provide risk attestations about Halo Book contents via `lpha-attest`; bridges borrower privacy with risk transparency |
+| **Core Controlled Agent** | Rank 1 agent directly administered by Core Council; tokenless general-purpose operational vehicle. Short-term: manages legacy protocol positions (Morpho vaults, Aave pools, SparkLend). Long-term: any Core Council operational need. Replaces the former "Core Halos" concept |
+| **Recovery Agent** | Rank 1 crisis agent administered by Core Council; activated when a Guardian collapses or is implicated in misconduct. Takes over the affected agent tree and manages resolution. Temporary — dissolves after crisis |
+| **Guardian** | Governance operator agent; performs privileged operations with collateral-backed accountability. Consolidates the former Facilitator (interpretation) and Aligned Delegate (governance participation) roles. Two subtypes: Core Guardian (interpretation, oversight, governance) and Operational Guardian (day-to-day execution). See also: Guardian Role Mapping below |
+| **Genesis Agents** | The category of autonomous entities within the Sky Ecosystem that receive Genesis Capital to bootstrap growth and innovation. Nine planned: 5 Star Primes, 1 Institutional Prime, 3 Guardian Agents. See [`genesis-capital.md`](../accounting/genesis-capital.md) |
 | **Generator** | Foundational Synomic Agent that interfaces with stablecoin ERC20 contracts and creates the credit medium. Currently one implicit Generator for USDS; future Generators will issue Sky Generated Assets (SGAs) for other currencies |
+
+### Guardian Role Mapping
+
+Several related terms describe governance execution roles across the documentation. This mapping clarifies how they relate:
+
+| Term | Meaning | Context |
+|------|---------|---------|
+| **Guardian** | General governance role — performs privileged operations with collateral-backed accountability (SpellGuard Guardians who vote, Core Guardians, Operational Guardians) | Whitepaper, governance-transition, risk-framework |
+| **Accordant** | Entity with PAU execution authority, bound by a Guardian Accord. Phase 1: GovOps team holding a cBEAM. Phase 9+: sentinel operator holding a pBEAM | Whitepaper, synomics, smart-contracts |
+| **GovOps** | Phase 1 implementation of the Accordant role — the organizational team that holds cBEAMs and operates PAUs on behalf of Primes | Smart-contracts, governance-transition |
+| **Relayer** | On-chain key role — the actual address that signs and submits transactions to Controller functions on a PAU; set by the Accordant GovOps team via `setRelayer` | Smart-contracts |
+| **Executor** | Legacy term, replaced by "Accordant" (and before that, by "Guardian"). Retained only in historical references (e.g., "Executor Action Precedents") | Legacy |
+| **Guardian Agents** | Genesis Capital class — Sky Agents that operationalize and buffer risk related to governance operations and governance security; negotiate paid Guardian Accords with Star Primes and Institutional Primes. Distinct from governance Guardians | Accounting (genesis-capital) |
 
 ---
 
@@ -99,6 +120,27 @@ Term definitions for the Sky Protocol.
 | **Agent Token** | Native token for an Agent (10B supply, no emissions) |
 | **Nested Contributors** | Core contributors serving both Agent and Sky |
 | **Foundation** | Legal entity associated with a Prime |
+
+---
+
+## Agent Ranks
+
+| Term | Definition |
+|------|------------|
+| **Agent Rank** | Four-tier hierarchy (0–3) defining governance relationships: Rank 0 (Core Council), Rank 1 (directly regulated by Core Council: Guardians, Core Controlled Agents, Recovery Agents), Rank 2 (accordant to a Guardian: Primes, Generators), Rank 3 (administered by a Prime: Halos, Folio Agents) |
+
+---
+
+## Growth Staking
+
+| Term | Definition |
+|------|------------|
+| **Growth Staking** | Mechanism aligning SKY stakers with ecosystem innovation; stakers must hold growth assets alongside staked SKY to unlock staking rewards |
+| **Growth Factor (GF)** | Multiplier on a growth asset's Reference Value that determines how much it counts toward unlocking staking rewards. Higher GF = more credit per dollar. Agent tokens: 2.5×, Junior risk capital: ~1.67×, Senior risk capital: 1.0×, Savings: 0.5×, Halo Units: ~0.33× |
+| **Staking Factor** | Ratio (0 to 1) of GF-adjusted growth asset value to staked SKY Reference Value; determines what percentage of base staking rewards a staker earns |
+| **Reference Value** | Fundamentals-based valuation used in Growth Staking instead of spot market prices; makes the system immune to speculative price swings. Derived from the global P/E model for revenue-generating assets, or redemption value for risk capital |
+| **Global P/E Model** | Governance-set valuation framework for Reference Values. One global Base P/E parameter, with per-income-stream Modifier (center P/E), Variance (range), and Growth Score (position within range) |
+| **Growth Asset** | Ecosystem token eligible for Growth Staking: Agent governance tokens, risk capital (TEJRC, TISRC, ESRC, srSGA), savings (sSGA, fixed-rate sSGA), and Halo Units |
 
 ---
 
@@ -117,7 +159,9 @@ Term definitions for the Sky Protocol.
 | **First Loss Capital (FLC)** | The first 10% of JRC losses, absorbed solely by Prime's own capital (IJRC) before external JRC shares losses |
 | **Agent Token Inflation** | Loss absorption mechanism (step 3) where Prime token is inflated to cover losses after JRC exhaustion; can theoretically cover unlimited losses |
 | **SKY Token Inflation** | Loss absorption mechanism (step 5) where SKY token is inflated to cover losses at protocol level after SRC pool exhaustion |
-| **Genesis Capital** | Protocol reserves; loss absorption step 6 — haircut applied only after all risk capital and token inflation mechanisms exhausted |
+| **Allocated Genesis Capital** | The specific funds deployed from Sky Core to Genesis Agents; bootstraps innovation and diversity. Subtracted when calculating Aggregate Backstop Capital. See [`genesis-capital.md`](../accounting/genesis-capital.md) |
+| **Genesis Capital** | Temporary capital deployed to bootstrap the agent ecosystem during 2026-2027; remains as backstop capital within the system. In the loss absorption waterfall, haircut applied at step 6 only after all risk capital and token inflation mechanisms exhausted. See [`genesis-capital.md`](../accounting/genesis-capital.md) |
+| **Genesis Capital Backstop Mechanism** | The mechanism by which Sky can reclaim capital from Genesis Agents as a last line of defense during a crisis — activated after SKY token inflation fails but before a USDS haircut. See [`genesis-capital.md`](../accounting/genesis-capital.md) |
 | **Loss Absorption Waterfall** | 7-step sequence for absorbing losses: (1) FLC → (2) JRC → (3) Agent Token → (4) SRC Pool (TISRC + Global SRC, pari passu) → (5) SKY Token → (6) Genesis Capital → (7) Peg Adjustment |
 
 ---
@@ -133,13 +177,14 @@ Term definitions for the Sky Protocol.
 | **aBEAM** | Admin BEAM — administrative authority; held by Council Beacon (HPHA) to register PAUs, approve inits, and grant cBEAMs |
 | **Keeper** | Market participant that performs liquidations or other maintenance operations in DeFi protocols; relevant for collateralized lending within Sky's Halo ecosystem |
 | **SORL** | Second-Order Rate Limit — constraint on rate limit increase speed (25% per 18h) |
+| **Rate Limit** | Unqualified "rate limit" refers to **PAU rate limits** — the buffer ceiling (`maxAmount`) plus linear replenishment (`slope`) that governs capital flow through a PAU, constrained by SORL on increases and instant on decreases. Two other contexts use related terminology: (1) **trading velocity limits** — per-window caps on delegated trading notional in a Prime Intent Vault (see `trading/sky-intents.md`), and (2) **intent bounds** — per-intent size constraints (e.g., `max_intent_amount`) on individual signed intents. These are distinct mechanisms and should be qualified when context is ambiguous |
 | **Init** | Pre-approved configuration that GovOps can instantiate |
 | **Configurator Unit** | Stack enabling spell-less Prime operations (BEAMTimeLock → BEAMState → Configurator) |
 | **BEAMTimeLock** | Timelock component of Configurator Unit; enforces 14-day delay on additions, instant removals |
 | **Buybox** | Defined parameter ranges for automated Halo operations (duration, size, APY, counterparties); deals within buybox execute without governance approval |
 | **TTS** | Time to Shutdown — worst-case time for wardens to detect and halt a rogue sentinel; determines ORC requirements. Equivalent to TTF (Time to Freeze) in Phase 1 terminology |
 | **TTF** | Time to Freeze — Phase 1 term for the worst-case detection-to-halt window (24h); equivalent to TTS in the Sentinel era. See `risk-framework/operational-risk-capital.md` |
-| **ORC** | Operational Risk Capital — capital posted by the guardian (Accordant) covering maximum damage from compromise; sized by Rate Limit × TTS |
+| **ORC** | Operational Risk Capital — capital posted by the guardian (Accordant) covering maximum damage from compromise; sized by Rate Limit × TTS (where TTS is determined by warden count). Warden economics and guardian-posted capital are separate operational requirements, not part of the ORC sizing formula |
 | **Guardian Accord** | Agreement between a Prime and its guardian defining scope, rate limits, ORC requirements, and TTS commitments |
 | **Streaming Accord** | Specialized Guardian Accord for stream sentinel operators; governs the Baseline ↔ Stream relationship, carry distribution, and termination conditions |
 | **RTI** | Risk Tolerance Interval — off-chain behavioral envelope in a Streaming Accord defining position limits, velocity limits, concentration limits, and prohibited actions; Baseline rejects intents outside RTI. See also: DIP |
@@ -170,14 +215,15 @@ Term definitions for the Sky Protocol.
 |------|------------|
 | **Governance Poll** | SKY holder decision-making; 3-day duration |
 | **Executive Vote** | On-chain parameter changes |
-| **Aligned Delegate** | Recognized governance participant; ranked L1-L3 |
+| **Aligned Delegate** | (Legacy) Former governance participant role; ranked L1-L3. Absorbed into Core Guardians during alignment-conserver consolidation. See Alignment Conserver |
+| **Alignment Conserver** | Trusted entity that facilitates and protects the governance process. Consolidates the former Aligned Delegate (governance participation) and Facilitator (interpretation) roles into the Guardian framework |
 | **Facilitator** | (Legacy) Former interpretive role; absorbed into Core Guardians during alignment-conserver consolidation |
 | **Root Edit** | Process for token holders to modify Agent Artifacts |
 | **Guardian Action Precedents** | Binding governance interpretations documented by Core Guardians; the canonical record of how Atlas rules are applied to specific situations. Lineage: Facilitator Action Precedents → Executor Action Precedents → Guardian Action Precedents |
 | **Core Council** | Group of 24 Core Guardians responsible for Sky Core operations; 16/24 supermajority required for SpellCore spells; quarterly rotation. See `governance-transition/` for authority details |
 | **GovOps** | Governance Operations — the organizational team that holds cBEAMs and operates PAUs on behalf of Primes. In Phase 1, GovOps teams are the operational arm of Guardians |
 | **Relayer** | On-chain execution address that calls Controller functions on a PAU; set by the accordant GovOps team via `setRelayer`. In Phase 1, the relayer is typically the GovOps team itself |
-| **SpellGuard** | Layered governance execution system replacing direct Executive Votes for routine operations. Components: SpellCore (Guardian supermajority) and SpellRitual (full token holder vote). SKY holders retain freeze, override, and rotation authority over Guardians |
+| **SpellGuard** | Layered governance execution system replacing direct Executive Votes for routine operations. Core component: SpellCore (Guardian supermajority). SKY holders retain freeze, override, and rotation authority over Guardians |
 | **SpellCore** | Component of SpellGuard requiring 16/24 Core Guardian supermajority for routine governance operations (parameter changes, agent onboarding). See `governance-transition/spellguard-system.md` |
 | **Council Beacon** | HPHA beacon operated by the Core Council; holds aBEAM authority to register PAUs, approve inits, and grant cBEAMs. See `governance-transition/council-beam-authority.md` |
 
@@ -192,7 +238,7 @@ Term definitions for the Sky Protocol.
 | **LPHA** | Low Power, High Authority beacon — deterministic rule execution on behalf of Synomic Agents (e.g., lpha-auction) |
 | **HPLA** | High Power, Low Authority beacon — sophisticated peer-to-peer interaction with private capital |
 | **HPHA** | High Power, High Authority beacon — governance execution with real-time capability; includes Sentinels |
-| **Sentinel** | Distinguished subclass of HPHA beacons forming coordinated Baseline/Stream/Warden formations; specifically the trading and execution layer that deploys capital in live markets |
+| **Sentinel** | Distinguished subclass of HPHA beacons; four types: baseline, stream, and warden (forming coordinated formations) plus principal (standalone direct control). The trading and execution layer that deploys capital in live markets |
 | **stl-\* (prefix)** | Sentinel interface specification |
 | **stk-\* (prefix)** | Sentinel toolkit operation |
 | **lpla-\* (prefix)** | LPLA (Low Power, Low Authority) reporting/monitoring beacon |
@@ -201,18 +247,19 @@ Term definitions for the Sky Protocol.
 | **stl-base** | Baseline sentinel — primary execution for formations (long-term) |
 | **stl-stream** | Stream sentinel — proprietary intelligence streaming (long-term) |
 | **stl-warden** | Warden sentinel — independent safety oversight (long-term) |
+| **stl-principal** | Principal sentinel — owner-operated direct control for folios and standalone accounts |
 | **lpha-relay** | LPHA beacon for executing governance-approved operations on a PAU — capital moves, rate limit changes, target onboarding. Holds pBEAM and cBEAM |
 | **lpha-lcts** | LPHA beacon for Portfolio Halo LCTS operations — deposits, redemptions, capacity management |
-| **lpha-nfat** | LPHA beacon for Term Halo NFAT operations — queue sweeping, NFAT issuance, sleeve management, deployment, redemption funding |
+| **lpha-nfat** | LPHA beacon for Term Halo NFAT operations — queue sweeping, NFAT issuance, book management, deployment, redemption funding |
 | **lpha-amm** | LPHA beacon for Trading Halo AMM operations — pricing, inventory management, redemption processing |
-| **lpha-attest** | LPHA beacon operated by an independent Attestor; posts risk attestations about Halo Sleeve contents into the Synome. Cannot move capital — attestation is a prerequisite that unlocks `lpha-nfat` sleeve transitions |
+| **lpha-attest** | LPHA beacon operated by an independent Attestor; posts risk attestations about Halo Book contents into the Synome. Cannot move capital — attestation is a prerequisite that unlocks `lpha-nfat` book transitions |
 | **lpha-auction** | Allocation coordination (pre-auction) and OSRC/Duration auction matching (auction mode) |
 | **lpha-exchange** | Exchange Halo orderbook and matching engine |
 | **lpha-identity** | Identity Network registry keeper |
 | **lpla-checker** | LPLA beacon for monitoring and compliance checking |
 | **lpla-verify** | LPLA beacon for on-chain verification and data validation |
 | **hpha-gov** | High-authority governance execution |
-| **Synome** | Operational database (Phase 1); cognitive architecture encompassing the Sky ecosystem (long-term) |
+| **Synome** | See Core Concepts. In Phase 1 context: the operational knowledge base (Synome-MVP) |
 | **CC Synome** | Core Council Synome — authoritative source |
 
 ---
@@ -230,7 +277,7 @@ Term definitions for the Sky Protocol.
 | **Gap Risk** | Risk from discrete price jumps that bypass stop-losses; relevant for collateralized lending liquidations |
 | **FRTB** | Fundamental Review of the Trading Book — Basel framework for market risk capital; Sky adapts FRTB principles for crypto asset valuation |
 | **Ingression Rate** | Ratio (0 to 1) of effectively recognized capital to nominally provided capital; determines how much "dumber" risk capital counts given a base of "smarter" capital (e.g., EJRC relative to IJRC, SRC relative to JRC) |
-| **CRR** | Capital Ratio Requirements — at portfolio level, the ratio of required risk capital to available risk capital for a Prime. Also used per-position (e.g., "1.6% CRR") to express the risk capital charge for an individual asset or sleeve |
+| **CRR** | Capital Ratio Requirements — at portfolio level, the ratio of required risk capital to available risk capital for a Prime. Also used per-position (e.g., "1.6% CRR") to express the risk capital charge for an individual asset or book |
 
 ---
 
@@ -284,7 +331,7 @@ Term definitions for the Sky Protocol.
 
 | Term | Definition |
 |------|------------|
-| **Emo** | Epistemic Module — internal cognitive component that processes, stores, and reasons about knowledge within the Synome |
+| **Emo** | Embodied Orchestrator — internal cognitive component that processes, stores, and reasons about knowledge within the Synome |
 | **Ema** | Epistemic Module Assembly — coordinated group of emos forming a cognitive subsystem |
 | **Synlang** | Formal language for expressing Synome knowledge and operations. S-expression notation is an architectural commitment; structural/scalability design remains exploratory |
 | **S-Expression** | The committed notation format for synlang; Lisp-style parenthesized prefix expressions for Synome knowledge representation |
@@ -328,3 +375,4 @@ Term definitions for the Sky Protocol.
 | **Vault** | Original collateralized debt position |
 | **DSR** | DAI Savings Rate; predecessor to SSR |
 | **PSM** | Peg Stability Module |
+| **Executor** | (Legacy) Former name for Guardian/Accordant; see Guardian Role Mapping in the Agents section |

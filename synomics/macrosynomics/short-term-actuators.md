@@ -31,12 +31,12 @@ Instead: start with **teleonome-less beacons** — deterministic programs that p
 
 ## What Are Teleonome-less Beacons?
 
-Beacons are autonomous operational components. They vary along two axes:
+Beacons are autonomous operational components. They vary along two axes (see [`beacon-framework.md`](beacon-framework.md) for the canonical definitions):
 
 | Axis | Low | High |
 |------|-----|------|
-| **Power** | Programs (deterministic, rule-based) | AI (adaptive, learning) |
-| **Authority** | Controls independent entities | Synome or smart contract capabilities |
+| **Power** | Minimal compute, narrow I/O, executes policies from elsewhere | Substantial compute, continuous I/O, local intelligence and adaptation |
+| **Authority** | Independent action, peer-to-peer interaction between teleonomes | Acts on behalf of a Synomic Agent (Prime, Halo, Generator, Guardian) |
 
 **Phase 1 beacons are all Low-Power** — deterministic programs, not AI. They follow rules, don't learn, don't have directives. They're "teleonome-less" because there's no autonomous entity with its own mission.
 
@@ -46,18 +46,16 @@ Beacons are autonomous operational components. They vary along two axes:
 
 ## Phase 1 Beacons
 
-### The Six Beacons
+### Phase 1 Beacon Set
 
 | Beacon | Type | Reads | Writes | Executes |
 |--------|------|-------|--------|----------|
 | **lpla-verify** | LPLA | positions, prices, risk params | — | — |
 | **lpha-relay** | LPHA | execution requests, rate limits | — | PAU transactions |
 | **lpha-nfat** | LPHA | deal params, queue state | NFAT records | NFAT lifecycle |
-| **lpha-report** | LPHA | Prime positions, CRRs | 24h summaries | — |
-| **lpha-collateral** | LPHA | Core Halo / legacy RWA state | collateral data | — |
-| **lpha-council** | LPHA | — | risk equations, report formats | — |
+| **lpha-council** | LPHA | — | risk equations, report formats, disclosures | — |
 
-> **Note:** lpha-collateral is speculative and may not be needed.
+Phase 2 extends `lpla-verify` into `lpla-checker` (settlement tracking). Phase 3 introduces `lpha-report` to write daily Prime performance summaries as settlement artifacts.
 
 ### Grouped by Function
 
@@ -65,9 +63,8 @@ Beacons are autonomous operational components. They vary along two axes:
 - lpla-verify — observes, calculates, alerts (no write authority)
 
 **Reporters (LPHA):**
-- lpha-report — writes Prime performance summaries to Synome
-- lpha-collateral — writes Core Halo / legacy data to Synome
 - lpha-nfat — writes NFAT records to Synome (also executes)
+- lpha-report — writes daily Prime performance summaries as settlement artifacts (Phase 3+)
 
 **Guardians (LPHA):**
 - lpha-relay — executes PAU transactions with rate limits
@@ -87,6 +84,7 @@ Beacons are autonomous operational components. They vary along two axes:
                      │              │
                      │ • Risk eqns  │
                      │ • Formats    │
+                     │ • Disclosures│
                      └──────┬───────┘
                             │
                             ▼
@@ -95,10 +93,10 @@ Beacons are autonomous operational components. They vary along two axes:
 │                                                              │
 │  • Risk parameters (from lpha-council)                       │
 │  • Report formats (from lpha-council)                        │
-│  • Prime reports (from lpha-report)                          │
-│  • Collateral data (from lpha-collateral)                    │
+│  • Disclosures (from lpha-council)                           │
 │  • NFAT records (from lpha-nfat)                             │
-│  • Position data                                             │
+│  • Artifacts (addresses, metadata)                           │
+│  • Position data (optional)                                  │
 └──────────────────────────┬──────────────────────────────────┘
                            │
        ┌───────────────────┼───────────────────┐
@@ -116,20 +114,34 @@ Beacons are autonomous operational components. They vary along two axes:
 │ • alerts    │     │             │     │ Executes:   │
 │             │     │             │     │ • lifecycle │
 └─────────────┘     └─────────────┘     └─────────────┘
-       │
-       ▼
-┌─────────────┐     ┌─────────────────┐
-│lpha-report  │     │lpha-collateral  │
-│             │     │  (speculative)  │
-│ Reads:      │     │                 │
-│ • positions │     │ Reads:          │
-│ • CRRs      │     │ • Core Halos    │
-│             │     │ • legacy RWA    │
-│ Writes:     │     │                 │
-│ • 24h report│     │ Writes:         │
-│             │     │ • collateral    │
-└─────────────┘     └─────────────────┘
 ```
+
+---
+
+## Synome-MVP Content Inventory
+
+The Synome-MVP spans both governance data and operational data. Different source documents emphasize different facets; this section provides the unified inventory.
+
+**Governance data** (emphasis in [whitepaper Part 7](../../whitepaper/sky-whitepaper.md)):
+
+| Content | Source | Description |
+|---------|--------|-------------|
+| Agent artifacts | Governance (lpha-council) | Agent type definitions, encoded rules, directives |
+| Governance process rules | Governance (lpha-council) | Escalation procedures, approval thresholds |
+| Penalty/compliance parameters | Governance (lpha-council) | Encumbrance ratio targets, violation consequences |
+| Atlas-derived constraints | Governance (lpha-council) | Constitutional principles encoded as machine-readable rules |
+
+**Operational data** (emphasis in this document):
+
+| Content | Source | Description |
+|---------|--------|-------------|
+| Risk parameters | lpha-council | Risk equations, CRR formulas, correlation framework parameters |
+| Report formats | lpha-council | Standardized formats for Prime performance and risk reporting |
+| Disclosures | lpha-council | Required disclosure templates and schedules |
+| NFAT records | lpha-nfat | Individual deal records (terms, status, lifecycle events) |
+| Position data | External feeds / beacons | Current holdings, prices, valuations per Prime |
+
+Both categories coexist in the Synome-MVP as a single operational database. The governance data provides the rules and constraints; the operational data provides the state that beacons read and write. In the full Synome architecture, governance data crystallizes into the deontic skeleton (synart layer), while operational data evolves into the probabilistic mesh.
 
 ---
 
@@ -137,7 +149,7 @@ Beacons are autonomous operational components. They vary along two axes:
 
 | Phase 1 Concept | Full Architecture | Notes |
 |-----------------|-------------------|-------|
-| Synome-MVP | Synart (operational subset) | Risk params, NFAT records, position data |
+| Synome-MVP | Synart (operational subset) | Risk params, artifacts, NFAT records, disclosures (position data optional) |
 | Low-power beacons | Actuator embodiments | But without teleonome layer, no learning |
 | lpha-council updates | Governance crystallization | Human-in-loop, signed statements |
 | Rate limits, constraints | Hard constraints (axioms) | Enforced by smart contracts |
@@ -177,13 +189,13 @@ GOVERNANCE (Core Council, GovOps)
     ┌───────┼───────┐
     ▼       ▼       ▼
  LPLA     LPHA    LPHA
-checker   relay   nfat ...
+verify    relay   nfat ...
 ```
 
 - All beacons are Low-Power (deterministic programs)
 - Human governance provides all configuration
 - No learning, no adaptation
-- Monthly settlement cycle
+- Settlement remains manual in Phase 1 (legacy process)
 
 > **Roadmap note:** Phases 2–8 add daily settlement, srUSDS/LCTS, governed (pre-auction) allocations, and the factory stack — but operations remain beacon-driven and governance-directed until sentinel formations are live.
 
@@ -341,12 +353,12 @@ This operational experience becomes the foundation for sentinel and teleonome de
 
 | Aspect | Phase 1 | Evolves Toward |
 |--------|---------|----------------|
-| Beacons | 6 low-power (deterministic) | High-power sentinels, then teleonome embodiments |
+| Beacons | Low-power (deterministic) | High-power sentinels, then teleonome embodiments |
 | Intelligence | None (rule-based) | AI (adaptive), then RSI |
 | Learning | None | Sentinels learn, teleonomes have full RSI |
 | Synome | MVP (operational database) | Full synart + telart + embart |
 | Governance | Human-in-loop (Core Council) | Increasing autonomy within bounds |
-| Settlement | Monthly | Daily, then continuous |
+| Settlement | Manual | Formalized monthly → daily → continuous |
 
 **The goal:** Build working infrastructure that accepts increasing autonomy without rearchitecting.
 
@@ -362,5 +374,5 @@ This operational experience becomes the foundation for sentinel and teleonome de
 | [`security-and-resources.md`](../synodoxics/security-and-resources.md) | Security principles (rate limits, audit trails, governance) |
 | [`atlas-synome-separation.md`](atlas-synome-separation.md) | How Synome-MVP relates to full Atlas/Synome model |
 | [`short-term-experiments.md`](../neurosymbolic/short-term-experiments.md) | Parallel dreamer pathway (game-playing agents) |
-| [`phase-1-pragmatic-delivery.md`](../../roadmap/phase-1-pragmatic-delivery.md) | Full Phase 1 implementation spec |
+| [`phase-1-overview.md`](../../roadmap/phase1/phase-1-overview.md) | Full Phase 1 implementation spec |
 | [`../synoteleonomics/teleonome-economics.md`](../synoteleonomics/teleonome-economics.md) | Full teleonome economics — the target these Phase 1 beacons evolve toward |

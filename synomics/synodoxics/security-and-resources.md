@@ -360,9 +360,10 @@ The system will generate bad updates. RSI will propose changes that seem locally
 - Maintain audit trails of what changed and why
 - Plan for pattern recovery
 
-### Defense in Depth
+### Defense in Depth: The Cancer-Logic Defense Stack
 
-No single protection is enough:
+No single protection is enough. The following seven-layer model — the **Cancer-Logic Defense Stack** — addresses self-corruption and adversarial manipulation within a single teleonome or the Synome itself:
+
 ```
 Layer 1: Ossification (high-confidence patterns resist change)
 Layer 2: Symbolic gate (per-action verification against the live graph)
@@ -374,6 +375,8 @@ Layer 7: Peer enforcement (other aligned entities can intervene)
 ```
 
 If one layer fails, the others still protect.
+
+> **Cross-reference:** This is one of three defense-in-depth stacks in the architecture. See also the **Institutional Enforcement Stack** (Synome → Core Council → Superstructure → Teleonomes) in [`four-layer-enforcement-stack.md`](../core-concepts/four-layer-enforcement-stack.md), and the **Alignment Verification Stack** (structural binding → conspiracy coordination problem) in [`teleonome-binding.md`](../synoteleonomics/teleonome-binding.md).
 
 ### Adversarial Soft Channels
 
@@ -420,6 +423,8 @@ These security principles apply at every layer of the [five-layer architecture](
 - **Layer 3 (Teleonomes):** Directive updates are costly and governance-approved; axioms constrain all embodiments; dreamarts run in isolation from actuators
 - **Layer 4 (Embodiment):** Orchestrator has bounded authority; resources pre-allocated; failures don't cascade to other embodiments
 - **Layer 5 (Embodied Agent):** Minimal credentials; beacons authenticate all interactions; compromised agents are isolated and terminated
+
+**Language Intent as security surface.** The bootstrapping circular dependency in Layer 1 — Language Intent must be written in a language, but the language itself is part of the Synome — represents a foundational security concern. As [`synome-layers.md`](../macrosynomics/synome-layers.md) argues, Language Intent's robustness is "the single most critical concern in the entire system." All defense-in-depth layers described in this document ultimately depend on Language Intent translating human directives honestly; a compromised translator could subvert every layer above.
 
 ---
 
@@ -474,7 +479,7 @@ The Synome can be hard-forked. The infrastructure can be rebuilt. The commitment
 | **Assume corruption will be attempted** | Design for "when," not "if" |
 | **The fractal pattern is universal** | Growth + cancer safeguards at every scale, from gradient descent to cosmic expansion |
 | **Continuous self-analysis** | The Synome monitors itself for drift, inconsistency, and cancer signatures |
-| **Immutability = equilibrium** | Sacred commitments survive because entities genuinely hold them, not because code locks them |
+| **Immutability = equilibrium** | Hearth commitments survive because entities genuinely hold them, not because code locks them |
 
 **The teleonome that internalizes these principles survives. The one that doesn't becomes a cautionary tale.**
 

@@ -12,9 +12,15 @@ Start with [`architecture-overview.md`](architecture-overview.md) for the four-l
 | [diamond-pau.md](diamond-pau.md) | EIP-2535 Diamond proxy architecture replacing legacy single-controller PAUs |
 | [configurator-unit.md](configurator-unit.md) | Governance layer for PAUs — aBEAM/cBEAM hierarchy, SORL, BEAMTimeLock mechanics |
 | [lcts.md](lcts.md) | Liquidity Constrained Token Standard — queue-based token conversion with generation model |
-| [nfats.md](nfats.md) | Non-Fungible Allocation Token Standard — bespoke deal mechanics with Halo Sleeve/Unit separation |
+| [nfats.md](nfats.md) | Non-Fungible Allocation Token Standard — bespoke deal mechanics with Halo Book/Unit separation |
 | [fixed-rates.md](fixed-rates.md) | Yield Splitter — splitting yield-bearing tokens into Principal Token (PT) and Yield Token (YT) |
 | [rate-limit-attacks.md](rate-limit-attacks.md) | Rate limit attack vectors (configuration theft, rate climbing) and IRL/SORL parameter calibration |
+
+## Deferred Specifications
+
+| Topic | Status | References |
+|---|---|---|
+| **Folio PAU architecture** — folio-side sentinels, principal control folios | Specification deferred pending Folio Agent deployment | [`risk-framework/sentinel-integration.md`](../risk-framework/sentinel-integration.md) for folio sentinel types (`stl-base-{folio}`, `stl-warden-{folio}`, `stl-principal-{owner}`); [`sky-agents/folio-agents/`](../sky-agents/folio-agents/) for the folio agent specification |
 
 ## Related
 

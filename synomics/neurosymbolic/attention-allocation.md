@@ -4,6 +4,7 @@ concepts:
     - probabilistic-mesh
     - truth-values
     - ossification
+    - synomic-inertia
     - rsi
     - dreamer-actuator-split
 ---
@@ -93,7 +94,7 @@ OpenCog's ECAN used an artificial economy — conserved currency, rent, wages, h
 | **Conservation** | Context is zero-sum — finite tokens, loading one thing means not loading another |
 | **Importance spreading** | Co-occurrence patterns: "when A is useful, B usually is too" — learned like any other pattern |
 | **Forgetting** | Compaction of low-confidence, low-use patterns — natural consequence of evidence dynamics |
-| **Homeostatic controls** | Ossification: high-evidence attention patterns resist noise; low-evidence ones stay fluid |
+| **Homeostatic controls** | Synomic inertia: high-evidence attention patterns resist noise; low-evidence ones stay fluid |
 
 The advantage: **the attention system improves through the same RSI loop as everything else.** ECAN's mechanisms are architectural parameters someone tunes. The Synome's attention patterns are subject to evidence-counting, dreaming, and evolutionary refinement.
 
@@ -124,7 +125,7 @@ No separate forgetting mechanism needed:
 5. Falls through the candidate queue (Layer 3)
 6. During compaction, archived or deleted
 
-Exception: **ossified patterns resist forgetting regardless of recent use.** An axiomatic safety rule doesn't need daily reinforcement. The ossification spectrum provides the stability floor.
+Exception: **high-inertia patterns resist forgetting regardless of recent use.** An axiomatic safety rule doesn't need daily reinforcement. Synomic inertia provides the stability floor — patterns that have ossified to axiomatic status are the most resistant.
 
 ---
 

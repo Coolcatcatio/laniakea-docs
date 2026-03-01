@@ -1,7 +1,7 @@
 # Trading Halo — Business Overview
 
 **Status:** Draft
-**Last Updated:** 2026-02-12
+**Last Updated:** 2026-03-01
 
 ---
 
@@ -218,7 +218,7 @@ BUYERS/SELLERS              TRADING HALO
 
 ## Halo Class Structure
 
-### How Class/Sleeve/Unit Maps to a Trading Halo
+### How Class/Book/Unit Maps to a Trading Halo
 
 The Trading Halo adapts the standard Halo architecture:
 
@@ -226,7 +226,7 @@ The Trading Halo adapts the standard Halo architecture:
 
 **Halo Units** = individual trading pools within the Class. Each Unit is a specific asset pair (e.g., USDS/t-bill, USDS/JAAA). Units can use LCTS shares so that multiple Primes providing capital to the same trading pool receive proportional exposure to the pool's spread revenue and inventory risk.
 
-**Halo Sleeves** = the asset-side containers holding trading inventory. Each sleeve holds the RWA inventory accumulated through trading activity. For a t-bill trading pool, the sleeve holds t-bills pending redemption. Sleeve isolation means that if one asset's redemption fails, other trading pools are unaffected.
+**Halo Books** = the asset-side containers holding trading inventory. Each book holds the RWA inventory accumulated through trading activity. For a t-bill trading pool, the book holds t-bills pending redemption. Book isolation means that if one asset's redemption fails, other trading pools are unaffected.
 
 ```
 Trading Halo Class
@@ -234,14 +234,14 @@ Trading Halo Class
   |
   +-- Unit: USDS / T-Bill Pool
   |     |
-  |     +-- Sleeve: T-bill inventory pending redemption
+  |     +-- Book: T-bill inventory pending redemption
   |     |     (T-bills bought from users, awaiting issuer settlement)
   |     |
   |     +-- LCTS shares representing Prime capital contributions
   |
   +-- Unit: USDS / JAAA Pool
         |
-        +-- Sleeve: JAAA inventory
+        +-- Book: JAAA inventory
         |     (JAAA tokens held as market-making inventory)
         |
         +-- LCTS shares representing Prime capital contributions
@@ -473,7 +473,7 @@ The core insight: **settlement delay is a solvable problem with capital.** By de
 | Document | Relationship |
 |---|---|
 | `agent-type-halos.md` | Halos as a Synomic Agent type |
-| `halo-class-sleeve-unit.md` | Class/Sleeve/Unit architecture |
+| `halo-class-book-unit.md` | Class/Book/Unit architecture |
 | `portfolio-halo.md` | Portfolio Halo (LCTS-based alternative) |
 | `term-halo.md` | Term Halo (NFAT-based alternative) |
 | `../smart-contracts/configurator-unit.md` | Configurator — asset onboarding prerequisite |
@@ -483,4 +483,4 @@ The core insight: **settlement delay is a solvable problem with capital.** By de
 ---
 
 *Document Version: 0.1*
-*Last Updated: 2026-02-12*
+*Last Updated: 2026-03-01*

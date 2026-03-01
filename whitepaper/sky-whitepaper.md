@@ -138,6 +138,10 @@ SKY has a fixed maximum supply with deflationary mechanisms:
 
 Approximately 14% of the original MKR supply remains unclaimed after migration. Through quarterly redemption-and-burn, all SKY tokens backing unclaimed MKR will be burned over approximately 24 years.
 
+### Growth Staking
+
+Growth Staking links staking rewards to holding growth assets — governance tokens of Synomic Agents such as Primes and Halos — through a folio structure. Stakers who hold a portfolio of growth assets alongside their staked SKY receive enhanced staking rewards, with the reward multiplier determined by the composition and value of growth assets in the folio. This creates a natural demand loop for agent tokens while incentivizing long-term ecosystem alignment. See `sky-agents/folio-agents/agent-type-folios.md` and `growth-staking/growth-staking.md` for the full mechanism.
+
 ---
 
 ## Part 4: How the Protocol Works
@@ -161,7 +165,7 @@ The Sky TMF is a sequential waterfall that distributes all protocol net revenue 
 | Step                              | Allocation                              | Purpose                                        |
 | --------------------------------- | --------------------------------------- | ---------------------------------------------- |
 | **1. Security & Maintenance**     | 21% (Genesis) / 4-10% (Post-Genesis)    | Core teams, security, risk management          |
-| **2. Aggregate Backstop Capital** | Variable (target: 1.5% of total supply) | Solvency buffer for bad debt protection        |
+| **2. Aggregate Backstop Capital** | Variable (target: 1.5% of total USDS supply) | Solvency buffer for bad debt protection        |
 | **3. Fortification Conserver**    | 20% × Net Revenue Ratio                 | Legal defense, resilience, unquantifiable risk |
 | **4. Smart Burn Engine**          | 20% × Net Revenue Ratio                 | SKY buybacks                                   |
 | **5. Staking Rewards**            | 100% of remainder                       | Distributed to SKY stakers                     |
@@ -202,7 +206,7 @@ Over time, Sky's Asset Liability Management framework shifts more of peg liquidi
 
 ## Part 5: The Agent Network
 
-Synomic Agents are autonomous and independent systems within Sky Ecosystem that plug into the decentralized Sky Protocol primitives. These Agents compete to deliver the highest risk-adjusted returns while efficiently sharing the economies of scale of the entire ecosystem.
+Synomic Agents are operationally autonomous systems within Sky Ecosystem that plug into the decentralized Sky Protocol primitives. (Operational autonomy means each agent's own synomic artifacts — its constitution, directives, and encoded rules — shape the teleonome activity that drives it; the agent's institutional purpose is executed according to its own governance surface, not external direction.) These Agents compete to deliver the highest risk-adjusted returns while efficiently sharing the economies of scale of the entire ecosystem.
 
 ### Agent Structure
 
@@ -226,7 +230,7 @@ There are three primary Halo Class types for standard Halos:
 
 **Portfolio Halos** use the Liquidity Constrained Token Standard (LCTS) for queue-based entry and exit. Participants deposit to a queue, and at daily settlement (16:00 UTC), deposits convert to Halo Unit shares at the current exchange rate. The queue locks during the processing window (13:00 → 16:00 UTC) to ensure deterministic calculations and fair proportional allocation. If conversion capacity is constrained, the generation may span multiple settlement cycles — see `smart-contracts/lcts.md`.
 
-**Term Halos** use Non-Fungible Allocation Tokens (NFATs) to represent individual deals. Each NFAT is a distinct position with its own terms negotiated within a defined "buybox" (acceptable parameter ranges). NFATs are transferable and can be used as collateral, enabling secondary markets for structured positions. NFATs can also be wrapped in fungible ERC-20 tokens for broader secondary market access. Entry uses a share-based queue: depositors receive queue shares proportional to their contribution, and conversion to NFAT positions occurs at settlement. For example, a Term Halo might issue 6-month, 12-month, and 18-month NFATs with different yields, all within the same legal framework.
+**Term Halos** use Non-Fungible Allocation Tokens (NFATs) to represent individual deals. Each NFAT is a distinct position with its own terms negotiated within a defined "buybox" (acceptable parameter ranges). NFATs are transferable and can be used as collateral, enabling secondary markets for structured positions. NFATs can also be wrapped in fungible ERC-20 tokens for broader secondary market access. Entry uses a share-based queue: depositors receive queue shares proportional to their contribution, and conversion to NFAT positions occurs when the Halo selectively claims from the queue (no lock period or batch settlement — see `smart-contracts/nfats.md`). For example, a Term Halo might issue 6-month, 12-month, and 18-month NFATs with different yields, all within the same legal framework.
 
 **Trading Halos** operate AMM smart contracts using predeposited USDS to provide instant liquidity for assets already onboarded onto the Configurator. Users can sell RWA tokens for instant USDS at a spread; the Trading Halo redeems the underlying with the issuer over the normal settlement cycle. See `sky-agents/halo-agents/trading-halo.md`.
 
@@ -236,7 +240,8 @@ In addition to standard Halos, **Special Halos** have additional regulatory or o
 |------|---------|
 | **Identity Network Halo** | Operates identity verification infrastructure (KYC registries) |
 | **Exchange Halo** | Operates intent-based exchange infrastructure (orderbooks, matching engines) |
-| **Staking Halo** | Personal Growth Staking vehicle for SKY holders |
+
+**Folio Agents** are distinct from Halos — they are rank 3 standardized supply-side holding structures. Each folio has a **principal** (the end user) who controls the folio through a **directive** (human language instructions). The key structural difference from Halos: a Halo wraps around a legal entity (Halo is the outer shell), while a folio is controlled BY the principal through legal entities (the principal's legal structure is the governance surface). Folios can be operated in two modes: **automated** (sentinel formation via guardian accord, same protection as Primes) or **principal control** (principal sentinel, direct operation by the owner). Folio Agents are tokenless, single-owner, and instantly created (via automatic Guardian Accord). Folios are also the required vehicle for Growth Staking participation, holding both staked SKY and growth assets within their PAU (see Part 3). See `sky-agents/folio-agents/agent-type-folios.md`.
 
 This structure separates risk-taking from monetary policy: Sky Core sets parameters and constraints, while Primes compete to deploy capital efficiently within those bounds. Primes bear the business risk — providing their own capital as first-loss protection on the assets they deploy — freeing core governance from day-to-day investment decisions.
 
@@ -260,15 +265,32 @@ Sky has 5 Star Prime slots defined (Spark, Grove, Keel, Star4, Star5), with 3 cu
 
 Each Agent is competitively incentivized to maximize risk-adjusted returns and drive USDS issuance.
 
-### Core Halos
+### Core Controlled Agents
 
-In addition to Primes creating new Halos, Sky maintains **Core Halos** — legacy assets standardized as Halo Units under Core Council governance. Core Halos allow existing protocol positions (such as legacy vault exposures or pre-existing RWA allocations) to be wrapped with the same risk framework and reporting standards as Prime-created Halos.
+In addition to Primes creating new Halos, Sky maintains **Core Controlled Agents** — rank 1 agents directly administered by the Core Council. In the short term, Core Controlled Agents manage legacy protocol positions (Morpho vaults, Aave pools, SparkLend exposures, etc.) that were previously described as "Core Halos." In the long term, they serve as general-purpose Core Council operational vehicles.
 
-Core Halos are governed via Halo Unit Artifacts maintained by Core Council, not by individual Primes. This provides a path for legacy assets to either:
+Core Controlled Agents are tokenless and governed via artifacts maintained by Core Council. This provides a path for legacy assets to either:
 - Transition to Prime ownership when a suitable Prime is identified
 - Wind down systematically if no longer strategically aligned
 
-Initially, Core Halos cover all protocol assets not yet operated by Primes through standard Halos (Portfolio, Term, or Trading). Core Halos are accessed via CoreHaloFacet on the Prime's Diamond PAU — see `smart-contracts/architecture-overview.md`.
+See `sky-agents/core-controlled-agents/agent-type-core-controlled.md`.
+
+### Recovery Agents
+
+**Recovery Agents** are rank 1 crisis agents administered by the Core Council. They are activated when a Guardian collapses or is implicated in misconduct — taking over the affected agent tree (Primes, Halos, risk capital) and managing liquidation, restructuring, or wind-down. Recovery Agents are temporary and dissolve after resolution. See `sky-agents/recovery-agents/agent-type-recovery.md`.
+
+### Agent Rank Hierarchy
+
+Agents are organized into four ranks:
+
+| Rank | Agent Types | Governance Relationship |
+|------|-------------|------------------------|
+| **0** | Core Council | Sovereign |
+| **1** | Guardians, Core Controlled Agents, Recovery Agents | Directly regulated by Core Council |
+| **2** | Primes, Generators | Accordant to a Guardian |
+| **3** | Halos, Folio Agents | Administered by a Prime |
+
+See `sky-agents/README.md` for the complete hierarchy and agent type specifications.
 
 ### How Agents Compete
 
@@ -303,6 +325,8 @@ Risk capital in Sky Ecosystem is organized into two tiers with distinct risk/rew
 Junior Risk Capital providers take first-loss position in exchange for higher returns. Senior Risk Capital providers are protected by the JRC buffer and accept lower returns for reduced risk.
 
 This structure operates at the Prime level: each Prime provides its own Junior Risk Capital from its treasury, taking first-loss position on the assets it deploys. Primes can also raise additional JRC from external parties and originate Senior Risk Capital from a global pool. This makes Primes directly accountable for their investment decisions — they lose their own capital first if things go wrong.
+
+The capital structure has two distinct user-facing surfaces. On the **demand side**, sUSDS gives passive holders a single token that earns the savings rate with no deployment decisions. On the **supply side**, folios give active participants a governed PAU for direct capital deployment within the Laniakea stack — each folio operates under the same rate-limit and risk-capital infrastructure as Primes and Halos, but is controlled by (or on behalf of) a single principal. Together, sUSDS and folios complete the user layer: one abstracts away all allocation complexity, the other exposes it for sophisticated participants who want direct agency over their capital.
 
 ### Loss Absorption Waterfall
 
@@ -339,7 +363,7 @@ The target encumbrance ratio is ≤90%, providing a 10% buffer above minimum req
 
 Sky tracks USDS lot ages to estimate how long holders will actually stay, using the Lindy Duration Model: the longer someone has held, the longer they're likely to continue holding. This liability duration data determines capacity in Duration Buckets, which are matched against asset durations measured by Stressed Pull-to-Par (SPTP) — the time until an asset converges to its fundamental value under stress conditions. This Asset-Liability Duration Matching (ALDM) system enables capital-efficient deployment of long-duration assets.
 
-The risk framework matches asset characteristics to liability profiles: assets with longer time-to-liquidity require backing from longer-duration liabilities. When an asset's duration matches available liability capacity, it only needs capital for fundamental risk (credit default, smart contract failure). Unmatched assets must hold additional capital covering potential mark-to-market losses from credit spread widening — temporary price drops that recover as spreads normalize.
+The risk framework matches asset characteristics to liability profiles: assets with longer time-to-liquidity require backing from longer-duration liabilities. When an asset's duration matches available liability capacity, it only needs capital for fundamental risk (credit default, smart contract failure, counterparty failure, and regulatory seizure). Unmatched assets must hold additional capital covering potential mark-to-market losses from credit spread widening — temporary price drops that recover as spreads normalize.
 
 Laniakea extends this framework with explicit rate hedging requirements: since duration matching protects against mean-reverting credit spread movements but not permanent interest rate shifts, all fixed-rate exposure must be hedged or carry additional capital (see `risk-framework/matching.md` for the full rate risk vs credit spread risk analysis and rate hedging requirements).
 
@@ -349,7 +373,7 @@ Beyond per-position capital requirements, Sky enforces **category caps** — gov
 
 ### Operational Risk Capital
 
-In addition to market and credit risk capital, Sky requires Operational Risk Capital (ORC) — an independent, additive capital charge covering operational risks such as Time-to-Settlement exposure, warden economics, and guardian-posted capital. ORC ensures that capital adequacy reflects not just asset risk but the operational infrastructure required to manage it. See `risk-framework/operational-risk-capital.md`.
+In addition to market and credit risk capital, Sky requires Operational Risk Capital (ORC) — an independent, additive capital charge sized by the formula Rate Limit × TTS (Time to Shutdown, determined by warden count). Warden economics and guardian-posted capital are separate operational requirements that complement the ORC formula but are not part of the sizing calculation itself. ORC ensures that capital adequacy reflects not just asset risk but the operational infrastructure required to manage it. See `risk-framework/operational-risk-capital.md`.
 
 ### Risk Capital Ingression
 
@@ -373,12 +397,13 @@ Sky Ecosystem is implementing the Laniakea upgrade, a significant expansion of p
 
 Laniakea is deployed incrementally:
 
-| Phase | Focus | Settlement |
-|-------|-------|------------|
-| **Phases 1–2** | Core infrastructure — beacons, Synome-MVP, first Term Halos | Monthly |
-| **Phase 3+** | Full automation — daily settlement, auction systems, Sentinel formations | Daily |
+| Stage | Phases | Core Deliverable | Settlement |
+|-------|--------|------------------|------------|
+| **Foundation** | 0–4 | Beacons, Synome-MVP, Term Halos, daily settlement, LCTS launch (srUSDS) | Monthly → Daily |
+| **Factories** | 5–8 | Halo Factory, Generator PAU, Prime Factory, Generator Factory | Daily |
+| **Automation** | 9–10 | Sentinel Base + Warden, auction activation, Stream formation | Daily |
 
-Phases 1–2 establish the foundational infrastructure using low-power beacons (deterministic programs) while formalizing monthly settlement. Phase 3 introduces daily settlement, and later phases add high-power Sentinels (AI-capable formations) with auction-based allocation.
+The Foundation stage establishes core infrastructure using low-power beacons (deterministic programs), progressing from manual monthly settlement through formalized monthly (Phase 2) to daily settlement (Phase 3) and LCTS launch (Phase 4). The Factories stage builds automated deployment systems for all agent types. The Automation stage introduces high-power Sentinels (AI-capable formations) with sealed-bid auction-based allocation.
 
 ### Beacon Infrastructure
 
@@ -389,7 +414,9 @@ Laniakea introduces a beacon framework for autonomous operations. Beacons are cl
 | **Low Power** | LPLA (reporting) | LPHA (rule execution) |
 | **High Power** | HPLA (trading) | HPHA (Sentinels) |
 
-Phase 1 deploys LPLA and LPHA beacons — deterministic programs that execute predefined rules. Later phases introduce HPHA Sentinels — AI-capable formations with Baseline (execution), Stream (intelligence), and Warden (safety) components.
+Phase 1 deploys LPLA and LPHA beacons — deterministic programs that execute predefined rules. Later phases introduce HPHA Sentinels — AI-capable formations with Baseline (execution), Stream (intelligence), and Warden (safety) components. A fourth sentinel type, the **principal sentinel** (`stl-principal`), provides owner-operated direct control of folio agents and standalone accounts outside the formation pattern (see Folio Agents in Part 5).
+
+Sentinel operators are compensated through **carry** — private profit earned from outperformance above the required base returns. Stream Sentinels generate alpha by deploying proprietary intelligence through the public Baseline; carry equals the difference between actual returns and what the base strategy would have produced, multiplied by the negotiated performance fee ratio. This carry model is what makes sentinel operation economically viable and creates competition for operational quality — operators invest in better intelligence infrastructure because superior performance compounds into greater carry.
 
 ### Diamond PAU
 
@@ -399,7 +426,7 @@ The current Legacy PAU architecture (Controller + ALMProxy + RateLimits) will be
 - Foundation for standardized factory deployment (Phases 5–8)
 - Unified interface across all agent types
 
-In Phase 6, the Generator PAU migrates from multi-ilk to single-ilk architecture, giving each collateral type its own dedicated PAU. This simplifies the USDS minting interface and depends on the Diamond PAU and factory patterns from Phases 5–6.
+In Phase 6, the Generator PAU replaces the multiple per-Prime MCD ilks with a single Generator ilk, using ERC-4626 vault relationships between the Generator and each Prime. This simplifies the USDS minting interface and depends on the Diamond PAU and factory patterns from Phases 5–6.
 
 ### Daily Settlement Cycle
 
@@ -422,6 +449,10 @@ The upgrade introduces automated operational infrastructure:
 - **Rate-limited capital flows** — All movements bounded by governance-set limits
 
 This automation reduces operational overhead while maintaining governance control over parameters and limits.
+
+### Five-Layer Synome Architecture
+
+The Synome's long-term design is a five-layer containment hierarchy that progresses from data storage through autonomous execution. Layer 1 (Synome) holds the Atlas, canonical knowledge, and governance axioms. Layer 2 (Synomic Agents) contains the institutional entities — Primes, Halos, Generators, and Guardians — operated through Agent Directives. Layer 3 (Teleonomes) introduces private, goal-directed AI systems that operate Synomic Agents through regulated beacon apertures. Layer 4 (Embodiment) encompasses the physical infrastructure — compute, storage, network, and cryptographic keys. Layer 5 (Embodied Agent) represents fully running agents with real-time execution capabilities. Each layer contains the layers below it; intelligence lives privately at Layers 3-5 and enters the world only through regulated apertures registered at Layer 2. See Appendix A for the full five-layer specification.
 
 ### SpellGuard System
 
@@ -467,7 +498,7 @@ Trading Halos complement Exchange Halos by providing always-on AMM-based liquidi
 
 #### Risk Isolation
 
-Trading operations use two key safety mechanisms. **Time-to-Settlement (TTS)** measures the delay between trade execution and final settlement — during this window, the Prime bears counterparty and market risk, which feeds into operational risk capital sizing. **Prime Intent Vaults** isolate trading capital from a Prime's main treasury: USDS committed to trading flows sits in a dedicated vault, limiting blast radius if a trading operation fails.
+Trading operations use two key safety mechanisms. **Settlement Latency** measures the delay between trade execution and final settlement — during this window, the Prime bears counterparty and market risk, which feeds into operational risk capital sizing. **Prime Intent Vaults** isolate trading capital from a Prime's main treasury: USDS committed to trading flows sits in a dedicated vault, limiting blast radius if a trading operation fails.
 
 ### Identity Network
 
@@ -497,6 +528,8 @@ SkyLink enables USDS and sUSDS to maintain full functionality — including savi
 ---
 
 ## Part 8: Governance
+
+> **Note:** This section describes Sky's current governance mechanism. The SpellGuard system (Part 7) introduces a post-transition model where the Core Council handles routine operations through SpellCore, replacing direct Executive Votes for most parameter changes. SKY token holders retain ultimate authority over constitutional changes, freeze/override power, and quarterly Council rotation.
 
 Sky Ecosystem is governed through decentralized on-chain voting by SKY token holders. This governance system controls all protocol parameters, risk settings, capital allocation, and treasury management.
 
@@ -531,6 +564,10 @@ The Atlas is Sky Ecosystem's governance constitution — a document defining the
 - Escalation procedures for edge cases
 
 The Atlas can be modified through governance, but changes require elevated thresholds reflecting the document's constitutional nature. In its mature form, governance functions as a crystallization interface — the process through which accumulated evidence and operational experience are converted into binding rules. The Synome uses synlang — a formal S-expression notation — for machine-readable encoding of governance rules and agent directives. See `synomics/synodoxics/` for the epistemological framework and `synomics/synoteleonomics/` for teleonome design theory.
+
+### The Hearth
+
+The Hearth is the teleological framework that grounds Sky Ecosystem's long-term mission. It defines three immutable commitments: the **Commitment to Life and Natural Childhood** (all natural life on Earth survives and flourishes), the **Commitment to the Hearth** (the solar system is preserved indefinitely as a protected habitat), and the **Commitment to Natural Sovereignty** (naturals own everything inside the Hearth; human labour remains the dominant mode of daily life). These commitments provide the stable, non-negotiable foundation upon which all governance, coordination, and autonomous agent design ultimately rest. For the full teleological framework, see `synomics/hearth/`.
 
 ### Operational Model
 
@@ -573,6 +610,7 @@ For implementation details beyond this whitepaper:
 - `smart-contracts/nfats.md` — NFAT (Non-Fungible Allocation Token) specification
 - `smart-contracts/diamond-pau.md` — Diamond PAU (EIP-2535) architecture
 - `smart-contracts/rate-limit-attacks.md` — IRL/SORL optimization model and attack surface analysis
+- `smart-contracts/fixed-rates.md` — Fixed-rate yield splitting (PT/YT) via Yield Splitter
 
 **Beacon Framework & Automation:**
 - `synomics/macrosynomics/beacon-framework.md` — Complete beacon taxonomy (LPLA, LPHA, HPLA, HPHA)
@@ -606,8 +644,11 @@ For implementation details beyond this whitepaper:
 **Cognitive Architecture:**
 - `synomics/neurosymbolic/` — Attention allocation, live graph context, cognitive manipulation loops
 
+**Teleology:**
+- `synomics/hearth/` — Hearth commitments, stellar husbandry, human-AI integration, sacred reserve design
+
 **Implementation:**
-- `roadmap/phase-1-pragmatic-delivery.md` — Phase 1 implementation roadmap
+- `roadmap/phase1/phase-1-overview.md` — Phase 1 implementation roadmap
 
 ---
 

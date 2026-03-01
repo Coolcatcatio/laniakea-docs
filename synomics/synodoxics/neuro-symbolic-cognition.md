@@ -199,4 +199,4 @@ The emo's size and capability is what distinguishes [embodiment power levels](..
 | [`dreamer-perspective.md`](../synoteleonomics/dreamer-perspective.md) | How dreamers evolve neural weights and generalizable infrastructure |
 | [`teleonome-economics.md`](../synoteleonomics/teleonome-economics.md) | The economic logic behind context optimization and never-idle principle |
 | [`synome-layers.md`](../macrosynomics/synome-layers.md) | Embodiment power levels — light/medium/heavy |
-| [`teleonome-memory.md`](../synoteleonomics/teleonome-memory.md) | Memory as the probabilistic mesh — artifact hierarchy as memory types, ossification as consolidation |
+| [`teleonome-memory.md`](../synoteleonomics/teleonome-memory.md) | Memory as the probabilistic mesh — artifact hierarchy as memory types, synomic inertia as consolidation |

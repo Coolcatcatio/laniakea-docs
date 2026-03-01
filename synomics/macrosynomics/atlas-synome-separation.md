@@ -275,13 +275,28 @@ Party B ──┘     (neutral arbiter)
 
 This enables: sealed-bid auctions, multi-party settlement, cross-jurisdictional capital flows.
 
-### Agent Types
+### Agent Types and Rank Hierarchy
 
-**Primes** — Specialized, heavyweight Synomic Agents. Two subtypes: Star Primes (5: Spark, Grove, Keel, Star4, Star5) and Institutional Primes (1: Obex). Require transformation primitives, foundations, nested contributors.
+Agents are organized into four ranks based on their governance relationship to the Core Council:
 
-**Halos** — General-purpose Synomic Agents. Can wrap any value and give it agency. Organized into **Halo Classes** (shared SC + legal infra) containing **Halo Units** (individual products). Three standard class types: Portfolio (LCTS), Term (NFAT), Trading (AMM). Examples: tranched Portfolio Halo (senior/junior sharing one PAU), NFAT Facility (same buybox, varying duration/size). Halos are the fractal layer — they proliferate.
+| Rank | Agent Types | Governance Relationship |
+|------|-------------|------------------------|
+| **0** | Core Council | Sovereign |
+| **1** | Guardians, Core Controlled Agents, Recovery Agents | Directly regulated by Core Council |
+| **2** | Primes, Generators | Accordant to a Guardian |
+| **3** | Halos, Folio Agents | Administered by a Prime |
 
-**Guardians** — Perform privileged operations with collateral backing. Post escrow, face slashing for failures. Consolidate interpretation, governance participation, and operational execution.
+**Primes** (Rank 2) — Specialized, heavyweight Synomic Agents. Two subtypes: Star Primes (5: Spark, Grove, Keel, Star4, Star5) and Institutional Primes (1: Obex). Require transformation primitives, foundations, nested contributors.
+
+**Halos** (Rank 3) — General-purpose Synomic Agents. Can wrap any value and give it agency. Organized into **Halo Classes** (shared SC + legal infra) containing **Halo Units** (individual products). Three standard class types: Portfolio (LCTS), Term (NFAT), Trading (AMM). Examples: tranched Portfolio Halo (senior/junior sharing one PAU), NFAT Facility (same buybox, varying duration/size). Halos are the fractal layer — they proliferate.
+
+**Guardians** (Rank 1) — Perform privileged operations with collateral backing. Post escrow, face slashing for failures. Consolidate interpretation, governance participation, and operational execution.
+
+**Core Controlled Agents** (Rank 1) — Tokenless agents directly administered by the Core Council. Manage legacy protocol positions (Morpho, Aave, SparkLend) as general-purpose Core Council operational vehicles.
+
+**Recovery Agents** (Rank 1) — Temporary crisis agents for Guardian collapse response. Take over the affected agent tree and dissolve after resolution.
+
+**Folio Agents** (Rank 3) — Standardized supply-side holding structures controlled by a single principal. Operated via sentinel formations (automated) or directly by the principal (principal sentinel). Tokenless.
 
 ### Escalation to Human Reasonableness
 
